@@ -4,6 +4,9 @@ export function showDashboard(user) {
 
     const app = document.getElementById("app");
 
+    var namePart = user.email.split("@")[0];
+    var displayName = namePart.charAt(0).toUpperCase() + namePart.slice(1);
+
     app.innerHTML = `
     <div class="dashboard">
 
@@ -61,7 +64,7 @@ export function showDashboard(user) {
 
                 <div>
                     <h1>Welcome Back</h1>
-                    <small>${user.email}</small>
+                    <small>${displayName}</small>
                 </div>
 
                 <button id="logoutBtn" class="logout-btn">
