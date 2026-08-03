@@ -1,6 +1,6 @@
 body{background:#0a0a0a;margin:0;font-family:Arial,Helvetica,sans-serif;}
 .login-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;}
-.login-logo{width:320px;max-width:70vw;margin-bottom:8px;}
+.login-logo{width:320px;max-width:70vw;margin-bottom:6px;}
 .login-tagline{color:#D4AF37;font-size:14px;letter-spacing:2px;text-transform:uppercase;margin-bottom:24px;}
 .login-card{width:100%;max-width:380px;border:1px solid #D4AF37;border-radius:20px;padding:28px 24px;
   background:#0f0f0f;box-shadow:0 0 30px rgba(212,175,55,0.15);position:relative;text-align:center;}

@@ -10,7 +10,7 @@ export function showDashboard(user) {
         <aside class="sidebar">
 
             <div class="logo">
-                <img src="images/PRAU logo.png" alt="PRAU">
+                 <img src="images/prau-logo.png" alt="PRAU">
                 <h2>PRAU Intelligence</h2>
             </div>
 
@@ -64,7 +64,7 @@ export function showDashboard(user) {
                     <small>${user.email}</small>
                 </div>
 
-                <button id="logoutBtn" class="login-btn">
+                <button id="logoutBtn" class="logout-btn">
                     <i class="bi bi-box-arrow-right"></i>
                     Logout
                 </button>
