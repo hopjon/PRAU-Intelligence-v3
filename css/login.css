@@ -1,0 +1,19 @@
+body{background:#0a0a0a;margin:0;font-family:Arial,Helvetica,sans-serif;}
+.login-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;}
+.login-logo{width:220px;max-width:70vw;margin-bottom:8px;}
+.login-tagline{color:#D4AF37;font-size:14px;letter-spacing:2px;text-transform:uppercase;margin-bottom:24px;}
+.login-card{width:100%;max-width:380px;border:1px solid #D4AF37;border-radius:20px;padding:28px 24px;
+  background:#0f0f0f;box-shadow:0 0 30px rgba(212,175,55,0.15);position:relative;}
+.login-card::before{content:"";position:absolute;top:-1px;left:15%;right:15%;height:2px;
+  background:linear-gradient(90deg,transparent,#D4AF37,transparent);}
+.login-field{display:flex;align-items:center;gap:10px;background:#161616;border:1px solid #3a3120;
+  border-radius:10px;padding:13px 16px;margin-bottom:16px;}
+.login-field i{color:#D4AF37;font-size:18px;}
+.login-field input{flex:1;background:transparent;border:none;outline:none;color:#fff;font-size:15px;}
+.login-field input::placeholder{color:#888;}
+.login-eye{cursor:pointer;}
+.login-btn{width:100%;padding:14px;border:none;border-radius:10px;
+  background:linear-gradient(135deg,#f2d675,#D4AF37,#a8791f);color:#1a1400;font-weight:800;
+  font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
+.login-error{color:#ef5350;font-size:13px;text-align:center;min-height:16px;margin-top:10px;}
+.login-version{color:#8a6c0a;font-size:12px;margin-top:24px;letter-spacing:1px;}
