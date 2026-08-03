@@ -3,7 +3,7 @@ body{background:#0a0a0a;margin:0;font-family:Arial,Helvetica,sans-serif;}
 .login-logo{width:220px;max-width:70vw;margin-bottom:8px;}
 .login-tagline{color:#D4AF37;font-size:14px;letter-spacing:2px;text-transform:uppercase;margin-bottom:24px;}
 .login-card{width:100%;max-width:380px;border:1px solid #D4AF37;border-radius:20px;padding:28px 24px;
-  background:#0f0f0f;box-shadow:0 0 30px rgba(212,175,55,0.15);position:relative;}
+  background:#0f0f0f;box-shadow:0 0 30px rgba(212,175,55,0.15);position:relative;text-align:center;}
 .login-card::before{content:"";position:absolute;top:-1px;left:15%;right:15%;height:2px;
   background:linear-gradient(90deg,transparent,#D4AF37,transparent);}
 .login-field{display:flex;align-items:center;gap:10px;background:#161616;border:1px solid #3a3120;

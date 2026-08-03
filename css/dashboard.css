@@ -1,0 +1,221 @@
+/* =====================================================
+   PRAU Intelligence Dashboard
+   Version 3.1.0
+===================================================== */
+
+.dashboard{
+
+    display:grid;
+    grid-template-columns:280px 1fr;
+
+    min-height:100vh;
+
+    background:var(--background);
+
+}
+
+/* ===========================
+   Sidebar
+=========================== */
+
+.sidebar{
+
+    background:var(--sidebar);
+
+    border-right:1px solid var(--border);
+
+    padding:30px;
+
+    display:flex;
+    flex-direction:column;
+
+}
+
+.logo{
+
+    text-align:center;
+
+    margin-bottom:50px;
+
+}
+
+.logo img{
+
+    width:110px;
+
+    margin-bottom:15px;
+
+}
+
+.logo h2{
+
+    color:var(--gold);
+
+    font-size:1.35rem;
+
+    font-weight:600;
+
+}
+
+/* ===========================
+   Navigation
+=========================== */
+
+.sidebar nav{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:12px;
+
+}
+
+.menu-item{
+
+    background:transparent;
+
+    border:none;
+
+    color:var(--text);
+
+    text-align:left;
+
+    padding:15px 18px;
+
+    border-radius:var(--radius);
+
+    cursor:pointer;
+
+    transition:var(--transition);
+
+    font-size:15px;
+
+}
+
+.menu-item i{
+
+    color:var(--gold);
+
+    margin-right:12px;
+
+}
+
+.menu-item:hover{
+
+    background:rgba(212,175,55,.08);
+
+    transform:translateX(5px);
+
+}
+
+.menu-item.active{
+
+    background:rgba(212,175,55,.15);
+
+    border-left:4px solid var(--gold);
+
+}
+/* ===========================
+   Main Content
+=========================== */
+
+.content{
+
+    padding:40px;
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+/* ===========================
+   Top Bar
+=========================== */
+
+.topbar{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:40px;
+
+}
+
+.topbar h1{
+
+    color:var(--text);
+
+    font-size:2rem;
+
+    margin:0;
+
+}
+
+.topbar small{
+
+    color:var(--text-secondary);
+
+    font-size:.95rem;
+
+}
+
+/* ===========================
+   Dashboard Cards
+=========================== */
+
+.cards{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+
+    gap:25px;
+
+}
+
+.card{
+
+    background:var(--card);
+
+    border:1px solid var(--border);
+
+    border-radius:var(--radius);
+
+    padding:30px;
+
+    box-shadow:var(--shadow);
+
+    transition:var(--transition);
+
+}
+
+.card:hover{
+
+    transform:translateY(-6px);
+
+    border-color:var(--gold);
+
+}
+
+.card h3{
+
+    color:var(--gold);
+
+    margin-top:0;
+
+    margin-bottom:15px;
+
+}
+
+.card p{
+
+    color:var(--text-secondary);
+
+    margin:0;
+
+}
