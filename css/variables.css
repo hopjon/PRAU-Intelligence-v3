@@ -1,0 +1,32 @@
+:root{
+
+    /* Primary Colours */
+
+    --background: #0F1115;
+    --sidebar: #171B22;
+    --card: #1E252F;
+
+    /* Brand */
+
+    --gold: #D4AF37;
+    --gold-hover: #E5C158;
+
+    /* Text */
+
+    --text: #FFFFFF;
+    --text-secondary: #B8B8B8;
+
+    /* Borders */
+
+    --border: rgba(212,175,55,.20);
+
+    /* Effects */
+
+    --shadow:
+        0 8px 30px rgba(0,0,0,.35);
+
+    --radius:16px;
+
+    --transition:.25s ease;
+
+}
