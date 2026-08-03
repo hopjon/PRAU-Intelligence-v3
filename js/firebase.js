@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-import { initializeFirestore } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -11,6 +11,6 @@ const firebaseConfig = {
   appId: "1:405888273288:web:b612d63506ec7de958c83d"
 };
 
-const fbApp = initializeApp(firebaseConfig);
-export const db = initializeFirestore(fbApp, { experimentalAutoDetectLongPolling: true, useFetchStreams: false });
-export const auth = getAuth(fbApp);
+const app = initializeApp(firebaseConfig);
+
+export const auth = getAuth(app);
