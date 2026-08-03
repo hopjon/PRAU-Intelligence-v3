@@ -1,11 +1,20 @@
 import { logout } from "./auth.js";
+import { db } from "./firebase.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
-export function showDashboard(user) {
+export async function showDashboard(user) {
 
     const app = document.getElementById("app");
 
-    var namePart = user.email.split("@")[0];
-    var displayName = namePart.charAt(0).toUpperCase() + namePart.slice(1);
+    var displayName = user.email.split("@")[0];
+    displayName = displayName.charAt(0).toUpperCase() + displayName.slice(1);
+
+    try{
+      var snap = await getDoc(doc(db, "teamMembers", user.email));
+      if(snap.exists() && snap.data().name){
+        displayName = snap.data().name;
+      }
+    }catch(e){ console.error("name lookup failed", e); }
 
     app.innerHTML = `
     <div class="dashboard">
