@@ -1,4 +1,5 @@
 import { watchAuth, login, logout } from "./auth.js";
+import { showDashboard } from "./dashboard.js";
 
 const appEl = document.getElementById("app");
 
@@ -48,14 +49,6 @@ function renderLogin(){
   };
 }
 
-function renderHome(user){
-  appEl.innerHTML = `
-    <div style="padding:40px;text-align:center;color:#fff;">
-      <h2>Welcome, ${user.email}</h2>
-      <button id="logoutBtn" class="login-btn" style="max-width:200px;margin:20px auto;">Sign out</button>
-    </div>
-  `;
-  document.getElementById("logoutBtn").onclick = logout;
-}
 
-watchAuth(renderHome, renderLogin);
+
+watchAuth(showDashboard, renderLogin);
