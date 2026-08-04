@@ -82,5 +82,8 @@ snapshot.forEach(doc => {
     `;
 
 });
+document.getElementById("addPersonBtn").onclick = function () {
+    alert("Add Person form coming next.");
+};
 
 }
