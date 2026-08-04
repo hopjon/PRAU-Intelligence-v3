@@ -53,10 +53,10 @@ function getMenu(){
                     Dashboard
                 </button>
 
-                <button class="menu-item">
-                    <i class="bi bi-person-fill"></i>
-                    People
-                </button>
+             <button class="menu-item" id="peopleMenu">
+    <i class="bi bi-person-fill"></i>
+    People
+</button>
 
                 <button class="menu-item">
                     <i class="bi bi-car-front-fill"></i>
@@ -173,5 +173,5 @@ ${getCards()}
     document
         .getElementById("logoutBtn")
         .onclick = logout;
-
+alert("People Module coming next!");
 }
