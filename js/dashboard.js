@@ -20,8 +20,10 @@ function getMenu(){
       '<nav>' +
         '<button class="menu-item' + (currentView === "dashboard" ? " active" : "") + '" id="navDashboard">' +
           '<i class="bi bi-house-door-fill"></i> Dashboard</button>' +
-        '<button class="menu-item' + (currentView === "people" ? " active" : "") + '" id="navPeople">' +
+       '<button class="menu-item' + (currentView === "people" ? " active" : "") + '" id="navPeople">' +
           '<i class="bi bi-person-fill"></i> People</button>' +
+        '<button class="menu-item' + (currentView === "vehicles" ? " active" : "") + '" id="navVehicles">' +
+          '<i class="bi bi-car-front-fill"></i> Vehicles</button>' +
       '</nav>' +
     '</aside>';
 }
