@@ -83,8 +83,12 @@ export function renderFaceSearch(container){
   container.innerHTML =
     '<div class="people-header"><h1>Face Search</h1></div>' +
     '<div class="modal-error" id="faceStatus" style="text-align:left;color:#888;margin-bottom:16px;">Loading matching engine…</div>' +
-    '<button id="faceTakeBtn" class="btn-primary"><i class="bi bi-camera"></i> Take / choose photo</button>' +
+    '<div style="display:flex;gap:10px;">' +
+      '<button id="faceTakeBtn" class="btn-primary" style="flex:1;justify-content:center;"><i class="bi bi-camera"></i> Take photo</button>' +
+      '<button id="faceGalleryBtn" class="btn-ghost" style="flex:1;"><i class="bi bi-images"></i> From gallery</button>' +
+    '</div>' +
     '<input type="file" id="faceFile" accept="image/*" capture="environment" style="display:none;">' +
+    '<input type="file" id="faceGalleryFile" accept="image/*" style="display:none;">' +
     '<div id="faceResults" style="margin-top:20px;"></div>';
 
   var statusEl = document.getElementById("faceStatus");
@@ -99,10 +103,12 @@ export function renderFaceSearch(container){
     document.getElementById("faceFile").value = "";
     document.getElementById("faceFile").click();
   };
+  document.getElementById("faceGalleryBtn").onclick = function(){
+    document.getElementById("faceGalleryFile").value = "";
+    document.getElementById("faceGalleryFile").click();
+  };
 
-  document.getElementById("faceFile").onchange = async function(){
-    var file = this.files[0];
-    if(!file) return;
+  async function runFaceSearch(file){
     var resultsEl = document.getElementById("faceResults");
     resultsEl.innerHTML = '<div class="people-empty">Analyzing…</div>';
 
@@ -138,5 +144,8 @@ export function renderFaceSearch(container){
         '<div class="people-row-meta">' + (t.dist < 0.6 ? "Likely match" : "Possible match") + ' · ' + pct + '% similarity</div></div>' +
       '</div>';
     }).join("");
-  };
+  }
+
+  document.getElementById("faceFile").onchange = function(){ if(this.files[0]) runFaceSearch(this.files[0]); };
+  document.getElementById("faceGalleryFile").onchange = function(){ if(this.files[0]) runFaceSearch(this.files[0]); };
 }

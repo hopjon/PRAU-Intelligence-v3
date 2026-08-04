@@ -45,3 +45,12 @@
 .people-card-info{padding:10px 12px;}
 .people-card-name{color:#fff;font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .people-card-meta{color:#888;font-size:11px;margin-top:2px;}
+.pf-encounter{border:1px solid #2b3038;border-radius:12px;padding:14px;margin-bottom:12px;background:#141414;}
+.pf-encounter-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.pf-encounter-head span{color:#D4AF37;font-weight:700;font-size:13px;}
+.pf-encounter-remove{background:transparent;border:none;color:#ef5350;font-size:13px;cursor:pointer;}
+.pf-add-encounter{width:100%;padding:10px;border:1px dashed #3a3120;border-radius:9px;background:transparent;
+  color:#D4AF37;font-weight:700;font-size:13px;cursor:pointer;margin-top:4px;}
+.pf-add-encounter:disabled{opacity:0.4;cursor:not-allowed;}
+.pf-photo-caption{font-size:9px;color:#666;text-align:center;margin-top:2px;max-width:70px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
