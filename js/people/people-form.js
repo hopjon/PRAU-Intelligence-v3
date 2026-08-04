@@ -1,11 +1,27 @@
 import { db } from "../firebase.js";
 import { collection, addDoc, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { ensureModelsLoaded, computeDescriptor, photoUrl } from "../face.js";
 
+ensureModelsLoaded();
 function escapeHtml(s){
   return (s||"").replace(/[&<>"']/g, function(c){
     return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
   });
 }
+function dataUrlToCanvas(dataUrl){
+  return new Promise(function(resolve, reject){
+    var img = new Image();
+    img.onload = function(){
+      var canvas = document.createElement("canvas");
+      canvas.width = img.width; canvas.height = img.height;
+      canvas.getContext("2d").drawImage(img, 0, 0);
+      resolve(canvas);
+    };
+    img.onerror = reject;
+    img.src = dataUrl;
+  });
+}
+
 
 function fileToCompressedDataUrl(file, maxDim){
   return new Promise(function(resolve, reject){
@@ -71,7 +87,7 @@ export function openPersonForm(existing, onSaved){
   function renderPhotos(){
     var html = "";
     pendingPhotos.forEach(function(p, i){
-      html += '<div class="pf-photo-chip"><img src="' + p + '"><button class="pf-rm" data-i="' + i + '" type="button">✕</button></div>';
+      html += '<div class="pf-photo-chip"><img src="' + photoUrl(p) + '"><button class="pf-rm" data-i="' + i + '" type="button">✕</button></div>';
     });
     photosRow.innerHTML = html;
     photosRow.appendChild(addPhotoBtn);
@@ -88,11 +104,13 @@ export function openPersonForm(existing, onSaved){
     document.getElementById("pfPhotoFile").value = "";
     document.getElementById("pfPhotoFile").click();
   };
-  document.getElementById("pfPhotoFile").onchange = async function(){
+ document.getElementById("pfPhotoFile").onchange = async function(){
     var file = this.files[0];
     if(!file) return;
     var dataUrl = await fileToCompressedDataUrl(file, 480);
-    pendingPhotos.push(dataUrl);
+    var canvas = await dataUrlToCanvas(dataUrl);
+    var descriptor = await computeDescriptor(canvas);
+    pendingPhotos.push({ dataUrl: dataUrl, descriptor: descriptor });
     renderPhotos();
   };
   document.getElementById("pfImportFile").onchange = async function(){
@@ -100,7 +118,9 @@ export function openPersonForm(existing, onSaved){
     for(var i = 0; i < files.length; i++){
       try{
         var dataUrl = await fileToCompressedDataUrl(files[i], 480);
-        pendingPhotos.push(dataUrl);
+        var canvas = await dataUrlToCanvas(dataUrl);
+        var descriptor = await computeDescriptor(canvas);
+        pendingPhotos.push({ dataUrl: dataUrl, descriptor: descriptor });
         renderPhotos();
       }catch(e){ console.error(e); }
     }

@@ -3,6 +3,7 @@ import { db } from "./firebase.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { renderPeople } from "./people/people.js";
 import { renderVehicles } from "./vehicles.js";
+import { renderFaceSearch } from "./face.js";
 
 var currentView = "dashboard";
 var currentUser = null;
@@ -24,6 +25,8 @@ function getMenu(){
           '<i class="bi bi-person-fill"></i> People</button>' +
         '<button class="menu-item' + (currentView === "vehicles" ? " active" : "") + '" id="navVehicles">' +
           '<i class="bi bi-car-front-fill"></i> Vehicles</button>' +
+        '<button class="menu-item' + (currentView === "face" ? " active" : "") + '" id="navFace">' +
+          '<i class="bi bi-camera-fill"></i> Face Search</button>' +
       '</nav>' +
     '</aside>';
 }
@@ -62,11 +65,14 @@ function renderShell(displayName){
   document.getElementById("navDashboard").onclick = function(){ currentView = "dashboard"; renderShell(displayName); };
  document.getElementById("navPeople").onclick = function(){ currentView = "people"; renderShell(displayName); };
   document.getElementById("navVehicles").onclick = function(){ currentView = "vehicles"; renderShell(displayName); };
+  document.getElementById("navFace").onclick = function(){ currentView = "face"; renderShell(displayName); };
   var contentArea = document.getElementById("contentArea");
   if(currentView === "people"){
     renderPeople(contentArea);
   } else if(currentView === "vehicles"){
     renderVehicles(contentArea);
+  } else if(currentView === "face"){
+    renderFaceSearch(contentArea);
   } else {
     contentArea.innerHTML = getCards();
   }
