@@ -38,7 +38,21 @@ console.log("showPeople() was called");
 
     const list = document.getElementById("peopleList");
 
-    const snapshot = await getDocs(collection(db, "people"));
+    
+    const people = [];
+
+snapshot.forEach(doc => {
+    people.push({
+        id: doc.id,
+        ...doc.data()
+    });
+});
+
+people.sort((a, b) => {
+    const aName = `${a.name ?? ""} ${a.surname ?? ""}`.toLowerCase();
+    const bName = `${b.name ?? ""} ${b.surname ?? ""}`.toLowerCase();
+    return aName.localeCompare(bName);
+});
 
     if(snapshot.empty){
 
@@ -55,9 +69,9 @@ console.log("showPeople() was called");
 
     list.innerHTML = "";
 
-snapshot.forEach(doc => {
+people.forEach(person => {
 
-    const person = doc.data();
+    
 
     list.innerHTML += `
     <div class="person-row">
@@ -83,7 +97,36 @@ snapshot.forEach(doc => {
 
 });
 document.getElementById("addPersonBtn").onclick = function () {
-    alert("Add Person form coming next.");
+
+    const modal = document.createElement("div");
+
+    modal.className = "modal-backdrop-custom";
+
+    modal.innerHTML = `
+        <div class="modal-card">
+
+            <h2>Add Person</h2>
+
+            <label>Full Name</label>
+            <input type="text" placeholder="Enter full name">
+
+            <label>ID Number</label>
+            <input type="text" placeholder="Enter ID Number">
+
+            <div class="modal-actions">
+                <button class="btn-ghost" id="cancelPerson">Cancel</button>
+                <button class="btn-primary">Save</button>
+            </div>
+
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    document.getElementById("cancelPerson").onclick = function () {
+        modal.remove();
+    };
+
 };
 
 }
