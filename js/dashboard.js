@@ -1,29 +1,49 @@
 import { logout } from "./auth.js";
 import { db } from "./firebase.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+function getCards(){
 
-export async function showDashboard(user) {
+    return `
 
-    const app = document.getElementById("app");
+        <div class="cards">
 
-    var displayName = user.email.split("@")[0];
-    displayName = displayName.charAt(0).toUpperCase() + displayName.slice(1);
+            <div class="card">
+                <h3>People Database</h3>
+                <p>Coming Soon</p>
+            </div>
 
-    try{
-      var snap = await getDoc(doc(db, "teamMembers", user.email));
-      if(snap.exists() && snap.data().name){
-        displayName = snap.data().name;
-      }
-    }catch(e){ console.error("name lookup failed", e); }
+            <div class="card">
+                <h3>Vehicle Database</h3>
+                <p>Coming Soon</p>
+            </div>
 
-    app.innerHTML = `
-    <div class="dashboard">
+            <div class="card">
+                <h3>Face Recognition</h3>
+                <p>Coming Soon</p>
+            </div>
+
+            <div class="card">
+                <h3>Plate Recognition</h3>
+                <p>Coming Soon</p>
+            </div>
+
+        </div>
+
+    `;
+
+}
+function getMenu(){
+
+    return `
 
         <aside class="sidebar">
 
             <div class="logo">
-                 <img src="images/prau-logo.png" alt="PRAU">
+
+                <img src="images/prau-logo.png" alt="PRAU">
+
                 <h2>PRAU Intelligence</h2>
+
             </div>
 
             <nav>
@@ -67,14 +87,75 @@ export async function showDashboard(user) {
 
         </aside>
 
+    `;
+
+}
+function getDateTime() {
+
+    const now = new Date();
+
+    return now.toLocaleString("en-ZA", {
+
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+
+    });
+
+}
+function getGreeting() {
+
+    const hour = new Date().getHours();
+
+    if (hour < 12) {
+        return "☀️ Good Morning";
+    }
+
+    if (hour < 18) {
+        return "🌤 Good Afternoon";
+    }
+
+    return "🌙 Good Evening";
+
+}
+export async function showDashboard(user) {
+
+    const app = document.getElementById("app");
+
+    var displayName = user.email.split("@")[0];
+    displayName = displayName.charAt(0).toUpperCase() + displayName.slice(1);
+
+    try{
+      var snap = await getDoc(doc(db, "teamMembers", user.email));
+      if(snap.exists() && snap.data().name){
+        displayName = snap.data().name;
+      }
+    }catch(e){ console.error("name lookup failed", e); }
+
+    app.innerHTML = `
+    <div class="dashboard">
+  ${getMenu()}
+
         <main class="content">
 
             <div class="topbar">
 
                 <div>
-                    <h1>Welcome Back</h1>
-                    <small>${displayName}</small>
-                </div>
+
+    <h1>${getGreeting()}</h1>
+
+    <small>${displayName}</small>
+
+    <div class="date-time">
+
+        ${getDateTime()}
+
+    </div>
+
+</div>
 
                 <button id="logoutBtn" class="logout-btn">
                     <i class="bi bi-box-arrow-right"></i>
@@ -82,30 +163,8 @@ export async function showDashboard(user) {
                 </button>
 
             </div>
+${getCards()}
 
-            <div class="cards">
-
-                <div class="card">
-                    <h3>People Database</h3>
-                    <p>Coming Soon</p>
-                </div>
-
-                <div class="card">
-                    <h3>Vehicle Database</h3>
-                    <p>Coming Soon</p>
-                </div>
-
-                <div class="card">
-                    <h3>Face Recognition</h3>
-                    <p>Coming Soon</p>
-                </div>
-
-                <div class="card">
-                    <h3>Plate Recognition</h3>
-                    <p>Coming Soon</p>
-                </div>
-
-            </div>
 
         </main>
 
