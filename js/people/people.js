@@ -170,15 +170,15 @@ Save Person
 
     document.body.appendChild(modal);
 
-    document.getElementById("cancelPerson").onclick = function () {
-        modal.remove();
-    };
-
+// Cancel
+document.getElementById("cancelPerson").onclick = function () {
+    modal.remove();
 };
+
+// Save
 document.getElementById("savePerson").onclick = async function () {
 
     console.log("Save button clicked");
-
 
     const person = {
 
@@ -205,6 +205,28 @@ document.getElementById("savePerson").onclick = async function () {
         created: serverTimestamp()
 
     };
+
+    if (!person.name || !person.surname) {
+
+        document.getElementById("personError").textContent =
+            "Name and Surname are required.";
+
+        return;
+
+    }
+
+    await addDoc(collection(db, "people"), person);
+
+    modal.remove();
+
+    showPeople();
+
+};
+
+
+
+
+
 
     if (!person.name || !person.surname) {
 
