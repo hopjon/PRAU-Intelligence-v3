@@ -1,4 +1,9 @@
-import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import {
+    collection,
+    getDocs,
+    addDoc,
+    serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { db } from "../firebase.js";
 
 export async function showPeople() {
@@ -168,6 +173,53 @@ Save Person
     document.getElementById("cancelPerson").onclick = function () {
         modal.remove();
     };
+
+};
+document.getElementById("savePerson").onclick = async function () {
+
+    console.log("Save button clicked");
+
+
+    const person = {
+
+        name: document.getElementById("personName").value.trim(),
+
+        surname: document.getElementById("personSurname").value.trim(),
+
+        dob: document.getElementById("personDOB").value,
+
+        idNumber: document.getElementById("personID").value.trim(),
+
+        aliases: document.getElementById("personAlias").value.trim(),
+
+        origin: document.getElementById("personOrigin").value.trim(),
+
+        residence: document.getElementById("personResidence").value.trim(),
+
+        previousArrests: document.getElementById("personArrests").value.trim(),
+
+        profilingLocation: document.getElementById("personLocation").value.trim(),
+
+        itemsFound: document.getElementById("personItems").value.trim(),
+
+        created: serverTimestamp()
+
+    };
+
+    if (!person.name || !person.surname) {
+
+        document.getElementById("personError").textContent =
+            "Name and Surname are required.";
+
+        return;
+
+    }
+
+    await addDoc(collection(db, "people"), person);
+
+    modal.remove();
+
+    showPeople();
 
 };
 
