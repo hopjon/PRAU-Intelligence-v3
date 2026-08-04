@@ -5,12 +5,10 @@ export function registerRoute(name, callback) {
 }
 
 export function navigate(name) {
-
     if (!routes[name]) {
         console.error("Route not found:", name);
         return;
     }
 
     routes[name]();
-
 }
