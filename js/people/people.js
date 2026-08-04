@@ -3,7 +3,7 @@ import { db } from "../firebase.js";
 
 export async function showPeople() {
 
-    const content = document.querySelector(".content");
+    const content = document.getElementById("contentArea");
 
     content.innerHTML = `
         <div class="page-header">

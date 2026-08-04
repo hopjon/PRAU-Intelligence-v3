@@ -64,8 +64,6 @@ function renderShell(displayName){
 
   document.getElementById("logoutBtn").onclick = logout;
 document
-    .getElementById("peopleMenu")
-    .onclick = showPeople;
   document.getElementById("navDashboard").onclick = function(){ currentView = "dashboard"; renderShell(displayName); };
  document.getElementById("navPeople").onclick = function(){ currentView = "people"; renderShell(displayName); };
   document.getElementById("navVehicles").onclick = function(){ currentView = "vehicles"; renderShell(displayName); };
