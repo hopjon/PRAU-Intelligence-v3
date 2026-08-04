@@ -1,47 +1,76 @@
+import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { db } from "../firebase.js";
-import { collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { renderPeopleList } from "./people-list.js";
-import { openPersonForm } from "./people-form.js";
 
-var allPeople = [];
-var unsub = null;
+export async function showPeople() {
 
-export function renderPeople(container){
-  container.innerHTML =
-    '<div class="people-header">' +
-      '<h1>People Database</h1>' +
-      '<button id="addPersonBtn" class="btn-primary"><i class="bi bi-plus-lg"></i> Add Person</button>' +
-    '</div>' +
-    '<div class="people-search">' +
-      '<i class="bi bi-search"></i>' +
-      '<input type="text" id="peopleSearchInput" placeholder="Search…">' +
-    '</div>' +
-    '<div id="peopleListArea"></div>';
+    const content = document.querySelector(".content");
 
-  var listArea = document.getElementById("peopleListArea");
+    content.innerHTML = `
+        <div class="page-header">
+            <h1><i class="bi bi-person-fill"></i> People Database</h1>
+        </div>
 
-  document.getElementById("addPersonBtn").onclick = function(){
-    openPersonForm(null, function(){});
-  };
+        <div class="search-bar">
+            <input
+                type="text"
+                id="peopleSearch"
+                placeholder="Search people..."
+            >
 
-  document.getElementById("peopleSearchInput").oninput = function(){
-    applyFilter(this.value, listArea);
-  };
+            <button class="gold-btn" id="addPersonBtn">
+                <i class="bi bi-plus-circle-fill"></i>
+                Add Person
+            </button>
+        </div>
 
-  if(unsub) unsub();
-  unsub = onSnapshot(query(collection(db, "suspects"), orderBy("addedAt", "asc")), function(snap){
-    allPeople = snap.docs.map(function(d){ var v = d.data(); v.id = d.id; return v; });
-    applyFilter(document.getElementById("peopleSearchInput").value, listArea);
-  });
-}
+        <div id="peopleList" class="people-list">
 
-function applyFilter(q, listArea){
-  q = (q || "").trim().toLowerCase();
-  var filtered = !q ? allPeople : allPeople.filter(function(r){
-    return (r.name || "").toLowerCase().indexOf(q) !== -1;
-  });
-  renderPeopleList(listArea, filtered, function(id){
-    var record = allPeople.find(function(r){ return r.id === id; });
-    if(record) openPersonForm(record, function(){});
-  });
+            Loading...
+
+        </div>
+    `;
+
+    const list = document.getElementById("peopleList");
+
+    const snapshot = await getDocs(collection(db, "people"));
+
+    if(snapshot.empty){
+
+        list.innerHTML = `
+            <div class="empty-state">
+                <i class="bi bi-person-x-fill"></i>
+                <p>No people found.</p>
+            </div>
+        `;
+
+        return;
+
+    }
+
+    list.innerHTML = "";
+
+    snapshot.forEach(doc=>{
+
+        const person = doc.data();
+
+        list.innerHTML += `
+            <div class="person-row">
+
+                <div class="person-avatar">
+                    <i class="bi bi-person-fill"></i>
+                </div>
+
+                <div class="person-details">
+
+                    <strong>${person.name ?? "Unnamed Person"}</strong>
+
+                    <small>${doc.id}</small>
+
+                </div>
+
+            </div>
+        `;
+
+    });
+
 }
