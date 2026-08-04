@@ -4,7 +4,7 @@ import { db } from "../firebase.js";
 export async function showPeople() {
 
     const content = document.getElementById("contentArea");
-
+console.log("showPeople() was called");
     content.innerHTML = `
         <div class="page-header">
             <h1><i class="bi bi-person-fill"></i> People Database</h1>

@@ -70,7 +70,7 @@ document
   document.getElementById("navFace").onclick = function(){ currentView = "face"; renderShell(displayName); };
   var contentArea = document.getElementById("contentArea");
   if(currentView === "people"){
-    renderPeople(contentArea);
+    showPeople();
   } else if(currentView === "vehicles"){
     renderVehicles(contentArea);
   } else if(currentView === "face"){
