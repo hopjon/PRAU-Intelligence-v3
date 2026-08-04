@@ -1,7 +1,7 @@
 import { logout } from "./auth.js";
 import { db } from "./firebase.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { renderPeople } from "./people/people.js";
+import { showPeople } from "./people/people.js";
 import { renderVehicles } from "./vehicles.js";
 import { renderFaceSearch } from "./face.js";
 import { navigate } from "./layout/router.js";
@@ -63,9 +63,9 @@ function renderShell(displayName){
     '</div>';
 
   document.getElementById("logoutBtn").onclick = logout;
- document
-.getElementById("peopleMenu")
-.onclick = () => navigate("people");
+document
+    .getElementById("peopleMenu")
+    .onclick = showPeople;
   document.getElementById("navDashboard").onclick = function(){ currentView = "dashboard"; renderShell(displayName); };
  document.getElementById("navPeople").onclick = function(){ currentView = "people"; renderShell(displayName); };
   document.getElementById("navVehicles").onclick = function(){ currentView = "vehicles"; renderShell(displayName); };
