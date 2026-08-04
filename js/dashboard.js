@@ -2,6 +2,7 @@ import { logout } from "./auth.js";
 import { db } from "./firebase.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { renderPeople } from "./people/people.js";
+import { renderVehicles } from "./vehicles.js";
 
 var currentView = "dashboard";
 var currentUser = null;
@@ -57,11 +58,13 @@ function renderShell(displayName){
 
   document.getElementById("logoutBtn").onclick = logout;
   document.getElementById("navDashboard").onclick = function(){ currentView = "dashboard"; renderShell(displayName); };
-  document.getElementById("navPeople").onclick = function(){ currentView = "people"; renderShell(displayName); };
-
+ document.getElementById("navPeople").onclick = function(){ currentView = "people"; renderShell(displayName); };
+  document.getElementById("navVehicles").onclick = function(){ currentView = "vehicles"; renderShell(displayName); };
   var contentArea = document.getElementById("contentArea");
   if(currentView === "people"){
     renderPeople(contentArea);
+  } else if(currentView === "vehicles"){
+    renderVehicles(contentArea);
   } else {
     contentArea.innerHTML = getCards();
   }
