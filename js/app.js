@@ -1,5 +1,7 @@
 import { watchAuth, login, logout } from "./auth.js";
 import { showDashboard } from "./dashboard.js";
+import { registerRoute } from "./layout/router.js";
+import { showPeople } from "./people/people.js";
 
 const appEl = document.getElementById("app");
 
@@ -52,3 +54,4 @@ function renderLogin(){
 
 
 watchAuth(showDashboard, renderLogin);
+registerRoute("people", showPeople);

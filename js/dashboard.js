@@ -4,7 +4,7 @@ import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase
 import { renderPeople } from "./people/people.js";
 import { renderVehicles } from "./vehicles.js";
 import { renderFaceSearch } from "./face.js";
-import { showPeople } from "./people/people.js";
+import { navigate } from "./layout/router.js";
 
 var currentView = "dashboard";
 var currentUser = null;
@@ -63,9 +63,9 @@ function renderShell(displayName){
     '</div>';
 
   document.getElementById("logoutBtn").onclick = logout;
-  document
-    .getElementById("peopleMenu")
-    .onclick = showPeople;
+ document
+.getElementById("peopleMenu")
+.onclick = () => navigate("people");
   document.getElementById("navDashboard").onclick = function(){ currentView = "dashboard"; renderShell(displayName); };
  document.getElementById("navPeople").onclick = function(){ currentView = "people"; renderShell(displayName); };
   document.getElementById("navVehicles").onclick = function(){ currentView = "vehicles"; renderShell(displayName); };
