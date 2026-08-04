@@ -159,3 +159,58 @@ function openVehicleForm(existing){
   renderPhotos();
 
   addPhotoBtn.onclick = function(){
+    document.getElementById("vfPhotoFile").value = "";
+    document.getElementById("vfPhotoFile").click();
+  };
+  document.getElementById("vfPhotoFile").onchange = async function(){
+    var file = this.files[0];
+    if(!file) return;
+    var dataUrl = await fileToCompressedDataUrl(file, 480);
+    pendingPhotos.push(dataUrl);
+    renderPhotos();
+  };
+  document.getElementById("vfImportFile").onchange = async function(){
+    var files = Array.prototype.slice.call(this.files);
+    for(var i = 0; i < files.length; i++){
+      try{
+        var dataUrl = await fileToCompressedDataUrl(files[i], 480);
+        pendingPhotos.push(dataUrl);
+        renderPhotos();
+      }catch(e){ console.error(e); }
+    }
+  };
+
+  document.getElementById("vfCancel").onclick = function(){ backdrop.remove(); };
+  backdrop.onclick = function(e){ if(e.target === backdrop) backdrop.remove(); };
+
+  document.getElementById("vfSave").onclick = async function(){
+    var make = document.getElementById("vfMake").value.trim();
+    var model = document.getElementById("vfModel").value.trim();
+    var plate = document.getElementById("vfPlate").value.trim();
+    var errEl = document.getElementById("vfError");
+    if(!make && !model && !plate){ errEl.textContent = "Enter at least a make, model, or plate."; return; }
+    var fields = {
+      make: make, model: model,
+      color: document.getElementById("vfColor").value.trim(),
+      plate: plate,
+      owner: document.getElementById("vfOwner").value.trim(),
+      notes: document.getElementById("vfNotes").value.trim(),
+      photos: pendingPhotos
+    };
+    this.disabled = true;
+    this.textContent = "Saving…";
+    try{
+      if(existing){
+        await updateDoc(doc(db, "vehicles", existing.id), fields);
+      } else {
+        fields.addedAt = new Date().toISOString();
+        await addDoc(collection(db, "vehicles"), fields);
+      }
+      backdrop.remove();
+    }catch(e){
+      errEl.textContent = "Could not save — check your connection.";
+      this.disabled = false;
+      this.textContent = "Save";
+    }
+  };
+}

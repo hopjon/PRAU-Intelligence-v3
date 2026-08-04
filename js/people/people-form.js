@@ -65,6 +65,12 @@ export function openPersonForm(existing, onSaved){
       '<textarea id="pfArrest">' + (existing ? escapeHtml(existing.arrestInfo) : "") + '</textarea>' +
       '<label>Items found</label>' +
       '<textarea id="pfItems">' + (existing ? escapeHtml(existing.itemsFound) : "") + '</textarea>' +
+      `'<label>Location profiled</label>' +
+      '<div style="display:flex;gap:8px;">' +
+        '<input type="text" id="pfProfileLoc" style="flex:1;" value="' + (existing ? escapeHtml(existing.profileLoc) : "") + '" placeholder="Where this profiling took place">' +
+        '<button class="btn-ghost" id="pfGpsBtn" type="button" style="flex-shrink:0;padding:11px 14px;">📍</button>' +
+      '</div>' +
+      '<div class="modal-error" id="pfGpsStatus" style="text-align:left;margin-top:4px;color:#888;"></div>' +
       '<label>Notes</label>' +
       '<textarea id="pfNotes">' + (existing ? escapeHtml(existing.details) : "") + '</textarea>' +
       '<label>Photos</label>' +
@@ -80,6 +86,44 @@ export function openPersonForm(existing, onSaved){
     '</div>';
 
   document.body.appendChild(backdrop);
+
+  var pendingCoords = existing && existing.profileCoords ? existing.profileCoords : null;
+
+  function setupGps(){
+    var btn = document.getElementById("pfGpsBtn");
+    var input = document.getElementById("pfProfileLoc");
+    var statusEl = document.getElementById("pfGpsStatus");
+
+    async function reverseGeocode(lat, lng){
+      try{
+        var url = "https://nominatim.openstreetmap.org/reverse?format=json&lat=" + lat + "&lon=" + lng + "&zoom=17&addressdetails=1";
+        var res = await fetch(url, { headers: { "Accept": "application/json" } });
+        var data = await res.json();
+        var a = data.address || {};
+        var road = a.road || a.pedestrian || a.footway || "";
+        var suburb = a.neighbourhood || a.suburb || "";
+        var label = [road, suburb].filter(Boolean).join(", ");
+        if(label){ input.value = label; statusEl.textContent = "Location captured."; }
+        else{ statusEl.textContent = "No road/suburb found — coordinates saved instead."; }
+      }catch(e){ statusEl.textContent = "Location captured, but the address lookup failed."; }
+    }
+
+    btn.onclick = function(){
+      if(!navigator.geolocation){ statusEl.textContent = "Location isn't available — enter it manually."; return; }
+      statusEl.textContent = "Getting current location…";
+      navigator.geolocation.getCurrentPosition(function(pos){
+        pendingCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        input.value = pendingCoords.lat.toFixed(6) + ", " + pendingCoords.lng.toFixed(6);
+        statusEl.textContent = "Location captured — looking up address…";
+        reverseGeocode(pendingCoords.lat, pendingCoords.lng);
+      }, function(){
+        statusEl.textContent = "Couldn't get location — enter it manually.";
+      }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
+    };
+
+    if(!existing) btn.onclick();
+  }
+  setupGps();
 
   var photosRow = document.getElementById("pfPhotosRow");
   var addPhotoBtn = document.getElementById("pfAddPhotoBtn");
@@ -141,6 +185,8 @@ export function openPersonForm(existing, onSaved){
       arrestInfo: document.getElementById("pfArrest").value.trim(),
       itemsFound: document.getElementById("pfItems").value.trim(),
       details: document.getElementById("pfNotes").value.trim(),
+      profileLoc: document.getElementById("pfProfileLoc").value.trim(),
+      profileCoords: pendingCoords,
       photos: pendingPhotos
     };
     this.disabled = true;
