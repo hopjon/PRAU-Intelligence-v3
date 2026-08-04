@@ -143,19 +143,18 @@ export async function showDashboard(user) {
 
             <div class="topbar">
 
-                <div>
+               
+    
 
-    <h1>${getGreeting()}</h1>
-
-    <small>${displayName}</small>
-
-    <div class="date-time">
-
-        ${getDateTime()}
-
+    <div class="welcome-text">
+        <h1>${getGreeting()}, ${displayName}</h1>
+        <div class="date-time">${getDateTime()}</div>
+        <div class="user-role">Administrator</div>
     </div>
 
-</div>
+
+
+
 
                 <button id="logoutBtn" class="logout-btn">
                     <i class="bi bi-box-arrow-right"></i>
