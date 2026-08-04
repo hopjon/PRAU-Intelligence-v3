@@ -21,23 +21,20 @@ console.log("showPeople() was called");
 </div>
 
         <div class="search-bar">
-            <input
-                type="text"
-                id="peopleSearch"
-                placeholder="Search people..."
-            >
+    <input
+        type="text"
+        id="peopleSearch"
+        placeholder="Search people..."
+    >
+</div>
 
-            
-
-        <div id="peopleList" class="people-list">
-
-            Loading...
-
-        </div>
+<div id="peopleList" class="people-list">
+    Loading...
+</div>
     `;
 
     const list = document.getElementById("peopleList");
-
+const snapshot = await getDocs(collection(db, "people"));
     
     const people = [];
 
@@ -103,23 +100,68 @@ document.getElementById("addPersonBtn").onclick = function () {
     modal.className = "modal-backdrop-custom";
 
     modal.innerHTML = `
-        <div class="modal-card">
+<div class="modal-card">
 
-            <h2>Add Person</h2>
+<h2>Add Person</h2>
 
-            <label>Full Name</label>
-            <input type="text" placeholder="Enter full name">
+<label>Name</label>
+<input id="personName" type="text">
 
-            <label>ID Number</label>
-            <input type="text" placeholder="Enter ID Number">
+<label>Surname</label>
+<input id="personSurname" type="text">
 
-            <div class="modal-actions">
-                <button class="btn-ghost" id="cancelPerson">Cancel</button>
-                <button class="btn-primary">Save</button>
-            </div>
+<label>Date of Birth</label>
+<input id="personDOB" type="date">
 
-        </div>
-    `;
+<label>ID Number</label>
+<input id="personID" type="text">
+
+<label>Known Aliases</label>
+<input id="personAlias" type="text" placeholder="Comma separated">
+
+<hr>
+
+<label>Originally From / Place of Birth</label>
+<input id="personOrigin" type="text">
+
+<label>Current Residence</label>
+<input id="personResidence" type="text">
+
+<hr>
+
+<label>Previous Arrests / Convictions</label>
+<textarea id="personArrests"></textarea>
+
+<label>Profiling Location</label>
+<input id="personLocation" type="text">
+
+<label>Items Found in Possession</label>
+<textarea id="personItems"></textarea>
+
+<hr>
+
+<label>Main Photograph</label>
+<input id="personPhoto" type="file" accept="image/*">
+
+<label>Additional Photographs</label>
+<input id="personPhotos" type="file" multiple accept="image/*">
+
+<div class="modal-actions">
+
+<button class="btn-ghost" id="cancelPerson">
+Cancel
+</button>
+
+<button class="btn-primary" id="savePerson">
+Save Person
+</button>
+
+</div>
+
+<div class="modal-error" id="personError"></div>
+
+</div>
+`;
 
     document.body.appendChild(modal);
 
