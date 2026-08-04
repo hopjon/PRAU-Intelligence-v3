@@ -36,6 +36,12 @@
   color:#888;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 .pf-import-label{display:block;text-align:center;padding:10px;border:1px solid #3a3120;border-radius:9px;
   color:#D4AF37;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px;}
-.people-row{display:flex;align-items:center;gap:12px;}
-.people-row-thumb{width:44px;height:44px;border-radius:8px;object-fit:cover;object-position:top;
-  background:#0f0f0f;flex-shrink:0;}
+.people-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px;}
+.people-card{background:#161616;border:1px solid #2b3038;border-radius:12px;overflow:hidden;cursor:pointer;}
+.people-card:hover{border-color:#D4AF37;}
+.people-card-thumb{width:100%;aspect-ratio:3/4;object-fit:cover;object-position:top;background:#0f0f0f;display:block;}
+.people-card-thumb-empty{width:100%;aspect-ratio:3/4;background:#0f0f0f;display:flex;align-items:center;
+  justify-content:center;color:#3a3120;font-size:28px;}
+.people-card-info{padding:10px 12px;}
+.people-card-name{color:#fff;font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.people-card-meta{color:#888;font-size:11px;margin-top:2px;}
