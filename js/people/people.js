@@ -6,9 +6,19 @@ export async function showPeople() {
     const content = document.getElementById("contentArea");
 console.log("showPeople() was called");
     content.innerHTML = `
-        <div class="page-header">
-            <h1><i class="bi bi-person-fill"></i> People Database</h1>
-        </div>
+        <div class="people-header">
+
+    <h1>
+        <i class="bi bi-person-fill"></i>
+        People Database
+    </h1>
+
+    <button class="btn-primary" id="addPersonBtn">
+        <i class="bi bi-plus-circle-fill"></i>
+        Add
+    </button>
+
+</div>
 
         <div class="search-bar">
             <input
@@ -17,11 +27,7 @@ console.log("showPeople() was called");
                 placeholder="Search people..."
             >
 
-            <button class="gold-btn" id="addPersonBtn">
-                <i class="bi bi-plus-circle-fill"></i>
-                Add Person
-            </button>
-        </div>
+            
 
         <div id="peopleList" class="people-list">
 
@@ -49,28 +55,32 @@ console.log("showPeople() was called");
 
     list.innerHTML = "";
 
-    snapshot.forEach(doc=>{
+snapshot.forEach(doc => {
 
-        const person = doc.data();
+    const person = doc.data();
 
-        list.innerHTML += `
-            <div class="person-row">
+    list.innerHTML += `
+    <div class="person-row">
 
-                <div class="person-avatar">
-                    <i class="bi bi-person-fill"></i>
-                </div>
+        <div class="person-avatar">
+            <i class="bi bi-person-fill"></i>
+        </div>
 
-                <div class="person-details">
+        <div class="person-details">
 
-                    <strong>${person.name ?? "Unnamed Person"}</strong>
-
-                    <small>${doc.id}</small>
-
-                </div>
-
+            <div class="people-row-name">
+                ${person.name ?? "Unnamed Person"}
             </div>
-        `;
 
-    });
+            <div class="people-row-meta">
+                ID: ${person.idNumber ?? "Unknown"} • ${person.category ?? "Person"}
+            </div>
+
+        </div>
+
+    </div>
+    `;
+
+});
 
 }
