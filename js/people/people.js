@@ -1,9 +1,4 @@
-import {
-    collection,
-    getDocs,
-    addDoc,
-    serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
 import { db } from "../firebase.js";
 import {
     collection,
@@ -326,10 +321,6 @@ async function openPersonProfile(id) {
     };
 
 }
-import {
-    doc,
-    getDoc
-} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 
 }
