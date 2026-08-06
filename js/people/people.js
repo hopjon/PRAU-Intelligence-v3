@@ -1,6 +1,6 @@
 import { db, auth } from "../firebase.js";
 import {
-  collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc
+  collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc, query, where
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { ensureModelsLoaded, computeDescriptor, euclidean, photoUrl } from "../face.js";
 
@@ -71,7 +71,10 @@ export async function showPeople(){
 
   var snapshot = await getDocs(collection(db, "people"));
   var people = [];
-  snapshot.forEach(function(d){ people.push(Object.assign({ id: d.id }, d.data())); });
+  snapshot.forEach(function(d){
+    var data = d.data();
+    if(!data.deleted) people.push(Object.assign({ id: d.id }, data));
+  });
 
   document.getElementById("peopleSearchInput").oninput = function(){ renderList(this.value); };
 
@@ -95,7 +98,7 @@ export async function showPeople(){
           '<div class="people-card-thumb-empty"><i class="bi bi-person"></i></div>') +
         '<div class="people-card-info">' +
           '<div class="people-card-name">' + escapeHtml(fullName(p)) + '</div>' +
-      
+          '<div class="people-card-meta">ID: ' + escapeHtml(p.idNumber || "Unknown") + '</div>' +
         '</div>' +
       '</div>';
     }).join("") + '</div>';
@@ -124,21 +127,19 @@ async function findDuplicateByIdNumber(idNumber, excludeId){
 }
 
 // ---------- duplicate face check ----------
-async function findDuplicateFace(descriptor, excludeId){
+async function findDuplicateFace(descriptor, excludeId, peopleList){
   if(!descriptor) return null;
-  var snapshot = await getDocs(collection(db, "people"));
   var best = null;
   var bestDist = Infinity;
-  snapshot.forEach(function(d){
-    if(d.id === excludeId) return;
-    var data = d.data();
+  peopleList.forEach(function(data){
+    if(data.id === excludeId) return;
     (data.photos || []).forEach(function(ph){
       var desc = (typeof ph === "object") ? ph.descriptor : null;
       if(!desc) return;
       var dist = euclidean(descriptor, desc);
       if(dist < bestDist){
         bestDist = dist;
-        best = Object.assign({ id: d.id }, data);
+        best = data;
       }
     });
   });
@@ -316,8 +317,15 @@ async function openMergeModal(currentPerson, currentId, onMerged){
           var otherSnap = await getDoc(doc(db, "people", otherId));
           var other = otherSnap.data();
           var mergedPhotos = (currentPerson.photos || []).concat(other.photos || []);
-          var mergedEncounters = (currentPerson.encounters || []).concat(other.encounters || []).slice(0, MAX_ENCOUNTERS);
-          await updateDoc(doc(db, "people", currentId), { photos: mergedPhotos, encounters: mergedEncounters });
+          await updateDoc(doc(db, "people", currentId), { photos: mergedPhotos });
+
+          var otherEncSnap = await getDocs(query(collection(db, "encounters"), where("personId", "==", otherId)));
+          var reassignJobs = [];
+          otherEncSnap.forEach(function(d){
+            reassignJobs.push(updateDoc(doc(db, "encounters", d.id), { personId: currentId }));
+          });
+          await Promise.all(reassignJobs);
+
           await deleteDoc(doc(db, "people", otherId));
           backdrop.remove();
           onMerged();
@@ -340,7 +348,24 @@ async function renderPersonProfile(id){
   var p = Object.assign({ id: id }, snap.data());
   var editMode = false;
   var pendingPhotos = p.photos ? p.photos.slice() : [];
-  var encounters = p.encounters || [];
+  var encounters = [];
+  var allPeopleCache = null;
+  async function getAllPeopleCached(){
+    if(!allPeopleCache){
+      var snap0 = await getDocs(collection(db, "people"));
+      allPeopleCache = [];
+      snap0.forEach(function(d){ allPeopleCache.push(Object.assign({ id: d.id }, d.data())); });
+    }
+    return allPeopleCache;
+  }
+
+  async function loadEncounters(){
+    var q = query(collection(db, "encounters"), where("personId", "==", id));
+    var snap2 = await getDocs(q);
+    encounters = [];
+    snap2.forEach(function(d){ encounters.push(Object.assign({ id: d.id }, d.data())); });
+    encounters.sort(function(a, b){ return (a.date || "").localeCompare(b.date || ""); });
+  }
 
   function render(){
     content.innerHTML =
@@ -357,6 +382,7 @@ async function renderPersonProfile(id){
           field("Date of Birth", "pfDob", p.dob, editMode, "date") +
           field("Known Aliases", "pfAliases", p.aliases, editMode) +
           field("Originally From", "pfOrigin", p.origin, editMode) +
+          field("Current Residence", "pfResidence", p.residence, editMode) +
           field("Previous Arrests", "pfPreviousArrests", p.previousArrests, editMode, "textarea") +
           field("📍 Profiling Location", "pfProfilingLocation", p.profilingLocation, editMode) +
         '</div>' +
@@ -434,7 +460,13 @@ async function renderPersonProfile(id){
       var itemsPhotos = enc.itemsPhotos || [];
       return '<div class="pf-encounter">' +
         '<div class="pf-encounter-head"><span>Encounter ' + (i + 1) + ' — ' + escapeHtml(enc.date || "") + '</span>' +
-        '<button class="pf-encounter-remove" data-i="' + i + '" type="button">Remove</button></div>' +
+        '<div style="display:flex;gap:8px;">' +
+
+'<button class="pf-encounter-edit" data-i="' + i + '" type="button">✏ Edit</button>' +
+
+'<button class="pf-encounter-remove" data-id="' + enc.id + '" type="button">Remove</button></div>' +
+
+'</div>' +
         (enc.location ? '<div class="people-card-meta">📍 ' + escapeHtml(enc.location) + '</div>' : '') +
         (enc.itemsFound ? '<div class="people-card-meta">Items found: ' + escapeHtml(enc.itemsFound) + '</div>' : '') +
         (itemsPhotos.length ? '<div class="pf-photos-row" style="margin-top:8px;">' +
@@ -519,7 +551,8 @@ async function renderPersonProfile(id){
         entry.descriptor = descriptor;
         await updateDoc(doc(db, "people", id), { photos: pendingPhotos });
 
-        var dupFace = await findDuplicateFace(descriptor, id);
+        var peopleList = await getAllPeopleCached();
+        var dupFace = await findDuplicateFace(descriptor, id, peopleList);
         if(dupFace){
           var pct = Math.max(0, Math.round((1 - dupFace.distance) * 100));
           document.getElementById("faceWarningArea").innerHTML =
@@ -531,11 +564,16 @@ async function renderPersonProfile(id){
           document.getElementById("viewDupBtn").onclick = function(){ renderPersonProfile(dupFace.record.id); };
           document.getElementById("mergeDupBtn").onclick = async function(){
             if(!confirm("Merge " + fullName(dupFace.record) + " into " + fullName(p) + "? The other record will be permanently deleted.")) return;
-            var mergedPhotos = pendingPhotos.concat(dupFace.record.photos || []).filter(function(ph2){
-              return photoUrl(ph2) !== dataUrl || pendingPhotos.indexOf(ph2) === -1;
+            var mergedPhotos = pendingPhotos.concat(dupFace.record.photos || []);
+            await updateDoc(doc(db, "people", id), { photos: mergedPhotos });
+
+            var otherEncSnap2 = await getDocs(query(collection(db, "encounters"), where("personId", "==", dupFace.record.id)));
+            var reassignJobs2 = [];
+            otherEncSnap2.forEach(function(d){
+              reassignJobs2.push(updateDoc(doc(db, "encounters", d.id), { personId: id }));
             });
-            var mergedEncounters = encounters.concat(dupFace.record.encounters || []).slice(0, MAX_ENCOUNTERS);
-            await updateDoc(doc(db, "people", id), { photos: pendingPhotos.concat(dupFace.record.photos || []), encounters: mergedEncounters });
+            await Promise.all(reassignJobs2);
+
             await deleteDoc(doc(db, "people", dupFace.record.id));
             renderPersonProfile(id);
           };
@@ -597,9 +635,18 @@ async function renderPersonProfile(id){
       };
 
       document.getElementById("deletePersonBtn").onclick = async function(){
-        if(!confirm("Delete " + fullName(p) + "? This can't be undone.")) return;
+        var typed = prompt('Type the full name "' + fullName(p) + '" to confirm deletion.');
+        if(typed === null) return;
+        if(typed.trim().toLowerCase() !== fullName(p).trim().toLowerCase()){
+          alert("Name didn't match — deletion cancelled.");
+          return;
+        }
         try{
-          await deleteDoc(doc(db, "people", id));
+          await updateDoc(doc(db, "people", id), {
+            deleted: true,
+            deletedAt: new Date().toISOString(),
+            deletedBy: auth.currentUser ? auth.currentUser.email : "unknown"
+          });
           showPeople();
         }catch(e){
           document.getElementById("profileError").textContent = "Could not delete — check your connection.";
@@ -657,10 +704,10 @@ if (editMode) {
 
     Array.prototype.forEach.call(document.querySelectorAll(".pf-encounter-remove"), function(btn){
       btn.onclick = async function(){
-        var i = parseInt(btn.getAttribute("data-i"), 10);
+        var encId = btn.getAttribute("data-id");
         if(!confirm("Remove this encounter?")) return;
-        encounters.splice(i, 1);
-        try{ await updateDoc(doc(db, "people", id), { encounters: encounters }); }catch(e){}
+        try{ await deleteDoc(doc(db, "encounters", encId)); }catch(e){}
+        await loadEncounters();
         document.getElementById("encounterList").innerHTML = renderEncounters();
         wireUp();
       };
@@ -755,19 +802,21 @@ if (editMode) {
 
     document.getElementById("encSave").onclick = async function(){
       var newEnc = {
+        personId: id,
         date: document.getElementById("encDate").value,
         location: document.getElementById("encLocation").value.trim(),
         coords: encCoords,
         itemsFound: document.getElementById("encItems").value.trim(),
         itemsPhotos: itemsPhotos,
         notes: document.getElementById("encNotes").value.trim(),
-        loggedBy: currentUserShortName()
+        loggedBy: currentUserShortName(),
+        createdAt: new Date().toISOString()
       };
       this.disabled = true;
       this.textContent = "Saving…";
       try{
-        encounters.push(newEnc);
-        await updateDoc(doc(db, "people", id), { encounters: encounters });
+        await addDoc(collection(db, "encounters"), newEnc);
+        await loadEncounters();
         backdrop.remove();
         document.getElementById("encounterList").innerHTML = renderEncounters();
         wireUp();
@@ -779,5 +828,6 @@ if (editMode) {
     };
   }
 
+  await loadEncounters();
   render();
 }

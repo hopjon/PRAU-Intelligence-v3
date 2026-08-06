@@ -254,3 +254,30 @@
 .merge-search-row{padding:10px;border:1px solid #2b3038;border-radius:8px;margin-bottom:6px;
   cursor:pointer;font-size:13px;}
 .merge-search-row:hover{border-color:#D4AF37;}
+.pf-encounter-edit{
+    padding:6px 12px;
+    border:none;
+    border-radius:8px;
+    background:#2b2b2b;
+    color:#d4af37;
+    cursor:pointer;
+    font-weight:600;
+}
+
+.pf-encounter-edit:hover{
+    background:#393939;
+}
+
+.pf-encounter-remove{
+    padding:6px 12px;
+    border:none;
+    border-radius:8px;
+    background:#5b1d1d;
+    color:#fff;
+    cursor:pointer;
+    font-weight:600;
+}
+
+.pf-encounter-remove:hover{
+    background:#7c2626;
+}
