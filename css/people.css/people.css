@@ -281,3 +281,5 @@
 .pf-encounter-remove:hover{
     background:#7c2626;
 }
+.owner-link{color:#D4AF37;text-decoration:underline;cursor:pointer;}
+.owner-search-box{margin-top:8px;}

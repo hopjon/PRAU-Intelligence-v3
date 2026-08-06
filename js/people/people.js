@@ -57,6 +57,8 @@ function dataUrlToCanvas(dataUrl){
 }
 
 // ---------- list ----------
+window.__openPersonProfile = function(id){ renderPersonProfile(id); };
+
 export async function showPeople(){
   var content = document.getElementById("contentArea");
   content.innerHTML =
