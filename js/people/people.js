@@ -187,6 +187,7 @@ function openAddPersonModal(){
     '</div>';
   document.body.appendChild(backdrop);
   backdrop.onclick = function(e){ if(e.target === backdrop) backdrop.remove(); };
+  document.getElementById("apCancel").onclick = function(){ backdrop.remove(); };
 
   function renderApPhotos(){
     var row = document.getElementById("apPhotosRow");
