@@ -112,9 +112,9 @@ document.querySelectorAll(".person-row").forEach(row => {
 
     row.onclick = function () {
 
-        openPersonProfile(this.dataset.id);
+    loadPersonProfile(this.dataset.id);
 
-    };
+};
 
 });
 document.getElementById("addPersonBtn").onclick = function () {
@@ -168,9 +168,23 @@ document.getElementById("addPersonBtn").onclick = function () {
 
 <h3>Encounters</h3>
 
+<div id="encounterList">
+
 <div class="people-empty">
 
 No encounters recorded yet.
+
+</div>
+
+</div>
+
+<div style="margin-top:15px;">
+
+<button class="btn-primary" id="newEncounterBtn">
+
++ New Encounter
+
+</button>
 
 </div>
 
@@ -339,6 +353,76 @@ async function openPersonProfile(id) {
     };
 
 }
+async function loadPersonProfile(id) {
 
+    const snap = await getDoc(doc(db, "people", id));
+
+    if (!snap.exists()) return;
+
+    const p = snap.data();
+
+    document.getElementById("contentArea").innerHTML = `
+
+<div class="people-header">
+
+<button class="btn-ghost" id="backToPeople">
+
+← Back
+
+</button>
+
+<h1>
+
+${p.name ?? ""} ${p.surname ?? ""}
+
+</h1>
+
+</div>
+
+<div class="modal-card" style="max-width:100%;">
+
+<label>Name</label>
+<input value="${p.name ?? ""}" readonly>
+
+<label>Surname</label>
+<input value="${p.surname ?? ""}" readonly>
+
+<label>ID Number</label>
+<input value="${p.idNumber ?? ""}" readonly>
+
+<label>Date of Birth</label>
+<input value="${p.dob ?? ""}" readonly>
+
+<label>Known Aliases</label>
+<input value="${p.aliases ?? ""}" readonly>
+
+<label>Originally From</label>
+<input value="${p.origin ?? ""}" readonly>
+
+<label>Current Residence</label>
+<input value="${p.residence ?? ""}" readonly>
+
+<label>Previous Arrests</label>
+<textarea readonly>${p.previousArrests ?? ""}</textarea>
+
+<label>Items Found</label>
+<textarea readonly>${p.itemsFound ?? ""}</textarea>
+
+</div>
+
+`;
+
+    document.getElementById("backToPeople").onclick = function () {
+
+        showPeople();
+
+    };
+    document.getElementById("newEncounterBtn").onclick = function () {
+
+    alert("New Encounter");
+
+};
+
+}
 
 }
