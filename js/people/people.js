@@ -244,9 +244,10 @@ var profilingLocation = document.getElementById("apProfilingLocation").value.tri
 
     this.textContent = "Saving…";
     try{
-      var ref = await addDoc(collection(db, "people"), person);
-      previousArrests: previousArrests,
-profilingLocation: profilingLocation,
+      var ref = await addDoc(collection(db, "people"), Object.assign({}, person, {
+        previousArrests: previousArrests,
+        profilingLocation: profilingLocation
+      }));
       backdrop.remove();
       renderPersonProfile(ref.id);
     }catch(e){
@@ -276,8 +277,6 @@ async function openMergeModal(currentPerson, currentId, onMerged){
   document.getElementById("mergeCancel").onclick = function(){ backdrop.remove(); };
 
   var snapshot = await getDocs(collection(db, "people"));
-  previousArrests: previousArrests,
-profilingLocation: profilingLocation,
   var all = [];
   snapshot.forEach(function(d){ if(d.id !== currentId) all.push(Object.assign({ id: d.id }, d.data())); });
 
