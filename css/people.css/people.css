@@ -64,3 +64,18 @@
 .profile-actions{display:flex;gap:10px;margin:16px 0;}
 .duplicate-warning{background:#2a1a0a;border:1px solid #a8791f;color:#f2d675;padding:12px 16px;
   border-radius:9px;font-size:13px;margin-bottom:16px;}
+  .deceased-badge{display:inline-block;background:#3a1a1a;color:#ef5350;border:1px solid #ef5350;
+  font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;
+  border-radius:6px;margin-left:10px;vertical-align:middle;}
+.people-card{position:relative;}
+.people-card .deceased-tag{position:absolute;top:6px;right:6px;background:#3a1a1a;color:#ef5350;
+  border:1px solid #ef5350;font-size:9px;font-weight:800;padding:2px 6px;border-radius:5px;}
+.face-warning{background:#2a1a0a;border:1px solid #a8791f;color:#f2d675;padding:12px 16px;
+  border-radius:9px;font-size:13px;margin-top:10px;}
+.face-warning button{margin-top:8px;}
+.deceased-checkbox-row{display:flex;align-items:center;gap:8px;margin:14px 0;}
+.deceased-checkbox-row input{width:auto;}
+.merge-search-results{max-height:200px;overflow-y:auto;margin-top:8px;}
+.merge-search-row{padding:10px;border:1px solid #2b3038;border-radius:8px;margin-bottom:6px;
+  cursor:pointer;font-size:13px;}
+.merge-search-row:hover{border-color:#D4AF37;}

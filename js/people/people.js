@@ -2,11 +2,12 @@ import { db, auth } from "../firebase.js";
 import {
   collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { ensureModelsLoaded, computeDescriptor, photoUrl } from "../face.js";
+import { ensureModelsLoaded, computeDescriptor, euclidean, photoUrl } from "../face.js";
 
 ensureModelsLoaded();
 
 var MAX_ENCOUNTERS = 6;
+var FACE_MATCH_THRESHOLD = 0.6;
 
 // ---------- helpers ----------
 function escapeHtml(s){
@@ -72,9 +73,7 @@ export async function showPeople(){
   var people = [];
   snapshot.forEach(function(d){ people.push(Object.assign({ id: d.id }, d.data())); });
 
-  document.getElementById("peopleSearchInput").oninput = function(){
-    renderList(this.value);
-  };
+  document.getElementById("peopleSearchInput").oninput = function(){ renderList(this.value); };
 
   function renderList(q){
     q = (q || "").trim().toLowerCase();
@@ -91,6 +90,7 @@ export async function showPeople(){
     listArea.innerHTML = '<div class="people-grid">' + filtered.map(function(p){
       var thumb = p.photos && p.photos[0] ? photoUrl(p.photos[0]) : null;
       return '<div class="people-card" data-id="' + p.id + '">' +
+        (p.deceased ? '<span class="deceased-tag">DECEASED</span>' : '') +
         (thumb ? '<img class="people-card-thumb" src="' + thumb + '">' :
           '<div class="people-card-thumb-empty"><i class="bi bi-person"></i></div>') +
         '<div class="people-card-info">' +
@@ -108,7 +108,7 @@ export async function showPeople(){
   renderList("");
 }
 
-// ---------- duplicate check ----------
+// ---------- duplicate ID check ----------
 async function findDuplicateByIdNumber(idNumber, excludeId){
   if(!idNumber) return null;
   var snapshot = await getDocs(collection(db, "people"));
@@ -121,6 +121,31 @@ async function findDuplicateByIdNumber(idNumber, excludeId){
     }
   });
   return match;
+}
+
+// ---------- duplicate face check ----------
+async function findDuplicateFace(descriptor, excludeId){
+  if(!descriptor) return null;
+  var snapshot = await getDocs(collection(db, "people"));
+  var best = null;
+  var bestDist = Infinity;
+  snapshot.forEach(function(d){
+    if(d.id === excludeId) return;
+    var data = d.data();
+    (data.photos || []).forEach(function(ph){
+      var desc = (typeof ph === "object") ? ph.descriptor : null;
+      if(!desc) return;
+      var dist = euclidean(descriptor, desc);
+      if(dist < bestDist){
+        bestDist = dist;
+        best = Object.assign({ id: d.id }, data);
+      }
+    });
+  });
+  if(best && bestDist < FACE_MATCH_THRESHOLD){
+    return { record: best, distance: bestDist };
+  }
+  return null;
 }
 
 // ---------- add person (modal) ----------
@@ -171,6 +196,7 @@ function openAddPersonModal(){
       aliases: document.getElementById("apAliases").value.trim(),
       origin: document.getElementById("apOrigin").value.trim(),
       residence: document.getElementById("apResidence").value.trim(),
+      deceased: false,
       encounters: [],
       photos: [],
       addedAt: new Date().toISOString(),
@@ -187,6 +213,56 @@ function openAddPersonModal(){
       this.disabled = false;
       this.textContent = "Save";
     }
+  };
+}
+
+// ---------- merge duplicate profiles ----------
+async function openMergeModal(currentPerson, currentId, onMerged){
+  var backdrop = document.createElement("div");
+  backdrop.className = "modal-backdrop-custom";
+  backdrop.innerHTML =
+    '<div class="modal-card">' +
+      '<h2>Merge With Another Record</h2>' +
+      '<p style="color:#888;font-size:13px;">Search for the duplicate record. Its photos and encounters will be copied into <strong>' + escapeHtml(fullName(currentPerson)) + '</strong>, then it will be deleted.</p>' +
+      '<label>Search by name</label>' +
+      '<input id="mergeSearch" placeholder="Type a name…">' +
+      '<div class="merge-search-results" id="mergeResults"></div>' +
+      '<div class="modal-actions"><button class="btn-ghost" id="mergeCancel">Cancel</button></div>' +
+      '<div class="modal-error" id="mergeError"></div>' +
+    '</div>';
+  document.body.appendChild(backdrop);
+  backdrop.onclick = function(e){ if(e.target === backdrop) backdrop.remove(); };
+  document.getElementById("mergeCancel").onclick = function(){ backdrop.remove(); };
+
+  var snapshot = await getDocs(collection(db, "people"));
+  var all = [];
+  snapshot.forEach(function(d){ if(d.id !== currentId) all.push(Object.assign({ id: d.id }, d.data())); });
+
+  document.getElementById("mergeSearch").oninput = function(){
+    var q = this.value.trim().toLowerCase();
+    var matches = !q ? [] : all.filter(function(p){ return fullName(p).toLowerCase().indexOf(q) !== -1; });
+    document.getElementById("mergeResults").innerHTML = matches.map(function(p){
+      return '<div class="merge-search-row" data-id="' + p.id + '">' + escapeHtml(fullName(p)) +
+        ' <span style="color:#888;">(ID: ' + escapeHtml(p.idNumber || "none") + ')</span></div>';
+    }).join("");
+    Array.prototype.forEach.call(document.getElementById("mergeResults").querySelectorAll(".merge-search-row"), function(row){
+      row.onclick = async function(){
+        var otherId = row.getAttribute("data-id");
+        if(!confirm("Merge this record into " + fullName(currentPerson) + "? The other record will be permanently deleted.")) return;
+        try{
+          var otherSnap = await getDoc(doc(db, "people", otherId));
+          var other = otherSnap.data();
+          var mergedPhotos = (currentPerson.photos || []).concat(other.photos || []);
+          var mergedEncounters = (currentPerson.encounters || []).concat(other.encounters || []).slice(0, MAX_ENCOUNTERS);
+          await updateDoc(doc(db, "people", currentId), { photos: mergedPhotos, encounters: mergedEncounters });
+          await deleteDoc(doc(db, "people", otherId));
+          backdrop.remove();
+          onMerged();
+        }catch(e){
+          document.getElementById("mergeError").textContent = "Merge failed — check your connection.";
+        }
+      };
+    });
   };
 }
 
@@ -207,7 +283,7 @@ async function renderPersonProfile(id){
     content.innerHTML =
       '<div class="people-header">' +
         '<button class="btn-ghost" id="backToPeople">← Back</button>' +
-        '<h1>' + escapeHtml(fullName(p)) + '</h1>' +
+        '<h1>' + escapeHtml(fullName(p)) + (p.deceased ? '<span class="deceased-badge">Deceased</span>' : '') + '</h1>' +
         '<button class="btn-ghost" id="toggleEditBtn">' + (editMode ? "Cancel Edit" : "Edit") + '</button>' +
       '</div>' +
       '<div class="modal-card profile-view">' +
@@ -221,8 +297,13 @@ async function renderPersonProfile(id){
           field("Current Residence", "pfResidence", p.residence, editMode) +
         '</div>' +
         (editMode ?
+          '<div class="deceased-checkbox-row">' +
+            '<input type="checkbox" id="pfDeceased"' + (p.deceased ? ' checked' : '') + '>' +
+            '<label style="margin:0;">Mark as deceased</label>' +
+          '</div>' +
           '<div class="profile-actions">' +
             '<button class="btn-primary" id="saveProfileBtn">Save Changes</button>' +
+            '<button class="btn-ghost" id="mergeBtn">Merge With Another Record</button>' +
             '<button class="btn-ghost" id="deletePersonBtn" style="color:#ef5350;border-color:#ef5350;">Delete Person</button>' +
           '</div>' +
           '<div class="modal-error" id="profileError"></div>'
@@ -234,6 +315,7 @@ async function renderPersonProfile(id){
         '<label class="pf-import-label" for="pfImportFile">🖼 Import from gallery</label>' +
         '<input type="file" id="pfPhotoFile" accept="image/*" capture="environment" style="display:none;">' +
         '<input type="file" id="pfImportFile" accept="image/*" multiple style="display:none;">' +
+        '<div id="faceWarningArea"></div>' +
 
         '<hr>' +
         '<h3>Encounters</h3>' +
@@ -254,11 +336,15 @@ async function renderPersonProfile(id){
   function renderEncounters(){
     if(!encounters.length) return '<div class="people-empty">No encounters recorded yet.</div>';
     return encounters.map(function(enc, i){
+      var itemsPhotos = enc.itemsPhotos || [];
       return '<div class="pf-encounter">' +
         '<div class="pf-encounter-head"><span>Encounter ' + (i + 1) + ' — ' + escapeHtml(enc.date || "") + '</span>' +
         '<button class="pf-encounter-remove" data-i="' + i + '" type="button">Remove</button></div>' +
         (enc.location ? '<div class="people-card-meta">📍 ' + escapeHtml(enc.location) + '</div>' : '') +
         (enc.itemsFound ? '<div class="people-card-meta">Items found: ' + escapeHtml(enc.itemsFound) + '</div>' : '') +
+        (itemsPhotos.length ? '<div class="pf-photos-row" style="margin-top:8px;">' +
+          itemsPhotos.map(function(ph){ return '<div class="pf-photo-chip"><img src="' + photoUrl(ph) + '"></div>'; }).join("") +
+        '</div>' : '') +
         (enc.notes ? '<div class="people-card-meta">' + escapeHtml(enc.notes) + '</div>' : '') +
         (enc.loggedBy ? '<div class="people-card-meta" style="opacity:0.6;">Logged by ' + escapeHtml(enc.loggedBy) + '</div>' : '') +
       '</div>';
@@ -291,13 +377,35 @@ async function renderPersonProfile(id){
     pendingPhotos.push(entry);
     await updateDoc(doc(db, "people", id), { photos: pendingPhotos });
     renderPhotos();
-    // background face analysis, doesn't block UI
+
     try{
       var canvas = await dataUrlToCanvas(dataUrl);
       var descriptor = await computeDescriptor(canvas);
       if(descriptor){
         entry.descriptor = descriptor;
         await updateDoc(doc(db, "people", id), { photos: pendingPhotos });
+
+        var dupFace = await findDuplicateFace(descriptor, id);
+        if(dupFace){
+          var pct = Math.max(0, Math.round((1 - dupFace.distance) * 100));
+          document.getElementById("faceWarningArea").innerHTML =
+            '<div class="face-warning">⚠️ This photo closely resembles an existing record: <strong>' +
+            escapeHtml(fullName(dupFace.record)) + '</strong> (' + pct + '% similarity). This might be a duplicate.<br>' +
+            '<button class="btn-ghost" id="viewDupBtn" type="button">View that profile</button>' +
+            '<button class="btn-ghost" id="mergeDupBtn" type="button" style="margin-left:8px;">Merge into this record</button>' +
+            '</div>';
+          document.getElementById("viewDupBtn").onclick = function(){ renderPersonProfile(dupFace.record.id); };
+          document.getElementById("mergeDupBtn").onclick = async function(){
+            if(!confirm("Merge " + fullName(dupFace.record) + " into " + fullName(p) + "? The other record will be permanently deleted.")) return;
+            var mergedPhotos = pendingPhotos.concat(dupFace.record.photos || []).filter(function(ph2){
+              return photoUrl(ph2) !== dataUrl || pendingPhotos.indexOf(ph2) === -1;
+            });
+            var mergedEncounters = encounters.concat(dupFace.record.encounters || []).slice(0, MAX_ENCOUNTERS);
+            await updateDoc(doc(db, "people", id), { photos: pendingPhotos.concat(dupFace.record.photos || []), encounters: mergedEncounters });
+            await deleteDoc(doc(db, "people", dupFace.record.id));
+            renderPersonProfile(id);
+          };
+        }
       }
     }catch(e){ console.error("background face analysis failed", e); }
   }
@@ -333,7 +441,8 @@ async function renderPersonProfile(id){
           dob: document.getElementById("pfDob").value,
           aliases: document.getElementById("pfAliases").value.trim(),
           origin: document.getElementById("pfOrigin").value.trim(),
-          residence: document.getElementById("pfResidence").value.trim()
+          residence: document.getElementById("pfResidence").value.trim(),
+          deceased: document.getElementById("pfDeceased").checked
         };
         try{
           await updateDoc(doc(db, "people", id), updates);
@@ -345,6 +454,10 @@ async function renderPersonProfile(id){
           this.disabled = false;
           this.textContent = "Save Changes";
         }
+      };
+
+      document.getElementById("mergeBtn").onclick = function(){
+        openMergeModal(p, id, function(){ renderPersonProfile(id); });
       };
 
       document.getElementById("deletePersonBtn").onclick = async function(){
@@ -397,6 +510,7 @@ async function renderPersonProfile(id){
   }
 
   function openNewEncounterModal(){
+    var itemsPhotos = [];
     var backdrop = document.createElement("div");
     backdrop.className = "modal-backdrop-custom";
     backdrop.innerHTML =
@@ -410,6 +524,9 @@ async function renderPersonProfile(id){
         '</div>' +
         '<div class="modal-error" id="encGpsStatus" style="text-align:left;color:#888;"></div>' +
         '<label>Items found</label><textarea id="encItems"></textarea>' +
+        '<label>Photos of items found</label>' +
+        '<div class="pf-photos-row" id="encItemsPhotosRow"><button class="pf-add-photo" id="encAddItemsPhotoBtn" type="button">＋</button></div>' +
+        '<input type="file" id="encItemsPhotoFile" accept="image/*" capture="environment" style="display:none;">' +
         '<label>Notes</label><textarea id="encNotes"></textarea>' +
         '<div class="modal-actions">' +
           '<button class="btn-ghost" id="encCancel">Cancel</button>' +
@@ -420,6 +537,31 @@ async function renderPersonProfile(id){
     document.body.appendChild(backdrop);
     backdrop.onclick = function(e){ if(e.target === backdrop) backdrop.remove(); };
     document.getElementById("encCancel").onclick = function(){ backdrop.remove(); };
+
+    function renderItemsPhotos(){
+      var row = document.getElementById("encItemsPhotosRow");
+      var addBtn = document.getElementById("encAddItemsPhotoBtn");
+      var html = "";
+      itemsPhotos.forEach(function(ph, i){
+        html += '<div class="pf-photo-chip"><img src="' + ph + '"><button class="pf-rm" data-i="' + i + '" type="button">✕</button></div>';
+      });
+      row.innerHTML = html;
+      row.appendChild(addBtn);
+      Array.prototype.forEach.call(row.querySelectorAll(".pf-rm"), function(btn){
+        btn.onclick = function(){ itemsPhotos.splice(parseInt(btn.getAttribute("data-i"), 10), 1); renderItemsPhotos(); };
+      });
+    }
+    document.getElementById("encAddItemsPhotoBtn").onclick = function(){
+      document.getElementById("encItemsPhotoFile").value = "";
+      document.getElementById("encItemsPhotoFile").click();
+    };
+    document.getElementById("encItemsPhotoFile").onchange = async function(){
+      var file = this.files[0];
+      if(!file) return;
+      var dataUrl = await fileToCompressedDataUrl(file, 480);
+      itemsPhotos.push(dataUrl);
+      renderItemsPhotos();
+    };
 
     var encCoords = null;
     document.getElementById("encGpsBtn").onclick = function(){
@@ -452,6 +594,7 @@ async function renderPersonProfile(id){
         location: document.getElementById("encLocation").value.trim(),
         coords: encCoords,
         itemsFound: document.getElementById("encItems").value.trim(),
+        itemsPhotos: itemsPhotos,
         notes: document.getElementById("encNotes").value.trim(),
         loggedBy: currentUserShortName()
       };
