@@ -26,6 +26,8 @@ console.log("showPeople() was called");
 </div>
 
         <div class="search-bar">
+
+
     <input
         type="text"
         id="peopleSearch"
@@ -228,21 +230,6 @@ document.getElementById("savePerson").onclick = async function () {
 
 
 
-    if (!person.name || !person.surname) {
+    
 
-        document.getElementById("personError").textContent =
-            "Name and Surname are required.";
-
-        return;
-
-    }
-
-    await addDoc(collection(db, "people"), person);
-
-    modal.remove();
-
-    showPeople();
-
-};
-
-}
+}}
