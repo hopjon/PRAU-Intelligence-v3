@@ -151,11 +151,18 @@ async function findDuplicateFace(descriptor, excludeId, peopleList){
 
 // ---------- add person (modal) ----------
 function openAddPersonModal(){
+  var pendingPhotos = [];
+
   var backdrop = document.createElement("div");
   backdrop.className = "modal-backdrop-custom";
   backdrop.innerHTML =
     '<div class="modal-card">' +
       '<h2>Add Person</h2>' +
+      '<label>Photos</label>' +
+      '<div class="pf-photos-row" id="apPhotosRow"><button class="pf-add-photo" id="apAddPhotoBtn" type="button">＋</button></div>' +
+      '<label class="pf-import-label" for="apImportFile">🖼 Import from gallery</label>' +
+      '<input type="file" id="apPhotoFile" accept="image/*" capture="environment" style="display:none;">' +
+      '<input type="file" id="apImportFile" accept="image/*" multiple style="display:none;">' +
       '<label>Name</label><input id="apName">' +
       '<label>Surname</label><input id="apSurname">' +
       '<label>ID Number</label><input id="apIdNumber">' +
@@ -180,6 +187,47 @@ function openAddPersonModal(){
     '</div>';
   document.body.appendChild(backdrop);
   backdrop.onclick = function(e){ if(e.target === backdrop) backdrop.remove(); };
+
+  function renderApPhotos(){
+    var row = document.getElementById("apPhotosRow");
+    var addBtn = document.getElementById("apAddPhotoBtn");
+    var html = "";
+    pendingPhotos.forEach(function(ph, i){
+      html += '<div class="pf-photo-chip"><img src="' + ph.dataUrl + '"><button class="pf-rm" data-i="' + i + '" type="button">✕</button></div>';
+    });
+    row.innerHTML = html;
+    row.appendChild(addBtn);
+    Array.prototype.forEach.call(row.querySelectorAll(".pf-rm"), function(btn){
+      btn.onclick = function(){ pendingPhotos.splice(parseInt(btn.getAttribute("data-i"), 10), 1); renderApPhotos(); };
+    });
+  }
+
+  document.getElementById("apAddPhotoBtn").onclick = function(){
+    document.getElementById("apPhotoFile").value = "";
+    document.getElementById("apPhotoFile").click();
+  };
+  document.getElementById("apPhotoFile").onchange = async function(){
+    var file = this.files[0];
+    if(!file) return;
+    var dataUrl = await fileToCompressedDataUrl(file, 480);
+    var canvas = await dataUrlToCanvas(dataUrl);
+    var descriptor = await computeDescriptor(canvas);
+    pendingPhotos.push({ dataUrl: dataUrl, descriptor: descriptor, takenBy: currentUserShortName(), addedAt: new Date().toISOString() });
+    renderApPhotos();
+  };
+  document.getElementById("apImportFile").onchange = async function(){
+    var files = Array.prototype.slice.call(this.files);
+    for(var i = 0; i < files.length; i++){
+      try{
+        var dataUrl = await fileToCompressedDataUrl(files[i], 480);
+        var canvas = await dataUrlToCanvas(dataUrl);
+        var descriptor = await computeDescriptor(canvas);
+        pendingPhotos.push({ dataUrl: dataUrl, descriptor: descriptor, takenBy: currentUserShortName(), addedAt: new Date().toISOString() });
+        renderApPhotos();
+      }catch(e){ console.error(e); }
+    }
+  };
+
   document.getElementById("apGpsBtn").onclick = function () {
 
     const status = document.getElementById("apGpsStatus");
@@ -257,7 +305,7 @@ var profilingLocation = document.getElementById("apProfilingLocation").value.tri
 
   encounters: [],
 
-  photos: [],
+  photos: pendingPhotos,
 
   addedAt: new Date().toISOString(),
 
