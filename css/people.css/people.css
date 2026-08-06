@@ -54,3 +54,13 @@
 .pf-add-encounter:disabled{opacity:0.4;cursor:not-allowed;}
 .pf-photo-caption{font-size:9px;color:#666;text-align:center;margin-top:2px;max-width:70px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .profile-view{max-width:900px;}
+.profile-field-group{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;}
+.profile-field label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:1px;
+  color:#aaa;margin-bottom:6px;font-weight:700;}
+.profile-field input,.profile-field textarea{width:100%;background:#161616;border:1px solid #3a3120;
+  color:#fff;padding:10px 13px;border-radius:8px;font-size:14px;font-family:inherit;box-sizing:border-box;}
+.profile-field input[readonly],.profile-field textarea[readonly]{background:transparent;border-color:#222;color:#ddd;}
+.profile-actions{display:flex;gap:10px;margin:16px 0;}
+.duplicate-warning{background:#2a1a0a;border:1px solid #a8791f;color:#f2d675;padding:12px 16px;
+  border-radius:9px;font-size:13px;margin-bottom:16px;}
