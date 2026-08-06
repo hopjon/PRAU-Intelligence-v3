@@ -95,7 +95,7 @@ export async function showPeople(){
           '<div class="people-card-thumb-empty"><i class="bi bi-person"></i></div>') +
         '<div class="people-card-info">' +
           '<div class="people-card-name">' + escapeHtml(fullName(p)) + '</div>' +
-          '<div class="people-card-meta">ID: ' + escapeHtml(p.idNumber || "Unknown") + '</div>' +
+      
         '</div>' +
       '</div>';
     }).join("") + '</div>';
@@ -162,6 +162,15 @@ function openAddPersonModal(){
       '<label>Known Aliases</label><input id="apAliases">' +
       '<label>Originally From</label><input id="apOrigin">' +
       '<label>Current Residence</label><input id="apResidence">' +
+      'Previous Arrests' +
+'<textarea id="apPreviousArrests"></textarea>' +
+
+'<label><i class="bi bi-geo-alt-fill"></i> Profiling Location</label>' +
+'<div style="display:flex;gap:8px;">' +
+    '<input id="apProfilingLocation" style="flex:1;" placeholder="Where was this person first profiled?">' +
+    '<button class="btn-ghost" id="apGpsBtn" type="button">📍</button>' +
+'</div>' +
+'<div class="modal-error" id="apGpsStatus" style="text-align:left;color:#888;"></div>' +
       '<div class="modal-actions">' +
         '<button class="btn-ghost" id="apCancel">Cancel</button>' +
         '<button class="btn-primary" id="apSave">Save</button>' +
@@ -170,13 +179,43 @@ function openAddPersonModal(){
     '</div>';
   document.body.appendChild(backdrop);
   backdrop.onclick = function(e){ if(e.target === backdrop) backdrop.remove(); };
-  document.getElementById("apCancel").onclick = function(){ backdrop.remove(); };
+  document.getElementById("apGpsBtn").onclick = function () {
+
+    const status = document.getElementById("apGpsStatus");
+
+    status.textContent = "Getting location...";
+
+    navigator.geolocation.getCurrentPosition(
+
+        function (pos) {
+
+            const lat = pos.coords.latitude.toFixed(6);
+            const lng = pos.coords.longitude.toFixed(6);
+
+            document.getElementById("apProfilingLocation").value = lat + ", " + lng;
+
+            status.textContent = "GPS captured.";
+
+        },
+
+        function () {
+
+            status.textContent = "Unable to get GPS location.";
+
+        }
+
+    );
+
+};
+  
 
   document.getElementById("apSave").onclick = async function(){
     var errEl = document.getElementById("apError");
     var name = document.getElementById("apName").value.trim();
     var surname = document.getElementById("apSurname").value.trim();
     var idNumber = document.getElementById("apIdNumber").value.trim();
+    var previousArrests = document.getElementById("apPreviousArrests").value.trim();
+var profilingLocation = document.getElementById("apProfilingLocation").value.trim();
     if(!name || !surname){ errEl.textContent = "Name and Surname are required."; return; }
 
     this.disabled = true;
@@ -206,6 +245,8 @@ function openAddPersonModal(){
     this.textContent = "Saving…";
     try{
       var ref = await addDoc(collection(db, "people"), person);
+      previousArrests: previousArrests,
+profilingLocation: profilingLocation,
       backdrop.remove();
       renderPersonProfile(ref.id);
     }catch(e){
@@ -235,6 +276,8 @@ async function openMergeModal(currentPerson, currentId, onMerged){
   document.getElementById("mergeCancel").onclick = function(){ backdrop.remove(); };
 
   var snapshot = await getDocs(collection(db, "people"));
+  previousArrests: previousArrests,
+profilingLocation: profilingLocation,
   var all = [];
   snapshot.forEach(function(d){ if(d.id !== currentId) all.push(Object.assign({ id: d.id }, d.data())); });
 
