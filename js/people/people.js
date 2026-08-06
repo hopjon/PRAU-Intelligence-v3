@@ -609,24 +609,26 @@ async function renderPersonProfile(id){
     document.getElementById("encGpsBtn").onclick = function(){
       var statusEl = document.getElementById("encGpsStatus");
       var input = document.getElementById("encLocation");
-      if(!navigator.geolocation){ statusEl.textContent = "Location isn't available — enter it manually."; return; }
+      if(!navigator.geolocation){
+        statusEl.textContent = "Location isn't available — enter it manually.";
+        return;
+      }
       statusEl.textContent = "Getting current location…";
-      navigator.geolocation.getCurrentPosition(async function(pos){
-        encCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-        input.value = encCoords.lat.toFixed(6) + ", " + encCoords.lng.toFixed(6);
-        statusEl.textContent = "Location captured — looking up address…";
-        try{
-          var url = "https://nominatim.openstreetmap.org/reverse?format=json&lat=" + encCoords.lat + "&lon=" + encCoords.lng + "&zoom=17&addressdetails=1";
-          var res = await fetch(url, { headers: { "Accept": "application/json" } });
-          var data = await res.json();
-          var a = data.address || {};
-          var label = [a.road || a.pedestrian || a.footway || "", a.neighbourhood || a.suburb || ""].filter(Boolean).join(", ");
-          if(label){ input.value = label; statusEl.textContent = "Location captured."; }
-          else{ statusEl.textContent = "No road/suburb found — coordinates saved instead."; }
-        }catch(e){ statusEl.textContent = "Location captured, but address lookup failed."; }
-      }, function(){
-        statusEl.textContent = "Couldn't get location — enter it manually.";
-      }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
+      navigator.geolocation.getCurrentPosition(
+        function(position){
+          encCoords = [position.coords.latitude, position.coords.longitude];
+          input.value = "Lat " + position.coords.latitude.toFixed(5) + ", Lon " + position.coords.longitude.toFixed(5);
+          statusEl.textContent = "Location found.";
+        },
+        function(){
+          statusEl.textContent = "Could not determine location — enter it manually.";
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 15000,
+          maximumAge: 0
+        }
+      );
     };
     document.getElementById("encGpsBtn").click();
 
