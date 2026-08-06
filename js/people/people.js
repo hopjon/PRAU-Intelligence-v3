@@ -713,6 +713,13 @@ if (editMode) {
       };
     });
 
+    Array.prototype.forEach.call(document.querySelectorAll(".pf-encounter-edit"), function(btn){
+      btn.onclick = function(){
+        var i = parseInt(btn.getAttribute("data-i"), 10);
+        openEditEncounterModal(encounters[i]);
+      };
+    });
+
     document.getElementById("newEncounterBtn").onclick = function(){
       if(encounters.length >= MAX_ENCOUNTERS) return;
       openNewEncounterModal();
@@ -824,6 +831,109 @@ if (editMode) {
         document.getElementById("encError").textContent = "Could not save — check your connection.";
         this.disabled = false;
         this.textContent = "Save Encounter";
+      }
+    };
+  }
+
+  function openEditEncounterModal(existing){
+    var itemsPhotos = existing.itemsPhotos ? existing.itemsPhotos.slice() : [];
+    var encCoords = existing.coords || null;
+
+    var backdrop = document.createElement("div");
+    backdrop.className = "modal-backdrop-custom";
+    backdrop.innerHTML =
+      '<div class="modal-card">' +
+        '<h2>Edit Encounter</h2>' +
+        '<label>Date</label><input type="date" id="encDate" value="' + escapeHtml(existing.date || "") + '">' +
+        '<label>Location profiled</label>' +
+        '<div style="display:flex;gap:8px;">' +
+          '<input id="encLocation" style="flex:1;" value="' + escapeHtml(existing.location || "") + '" placeholder="Where this took place">' +
+          '<button class="btn-ghost" id="encGpsBtn" type="button" style="flex-shrink:0;padding:11px 14px;">📍</button>' +
+        '</div>' +
+        '<div class="modal-error" id="encGpsStatus" style="text-align:left;color:#888;"></div>' +
+        '<label>Items found</label><textarea id="encItems">' + escapeHtml(existing.itemsFound || "") + '</textarea>' +
+        '<label>Photos of items found</label>' +
+        '<div class="pf-photos-row" id="encItemsPhotosRow"><button class="pf-add-photo" id="encAddItemsPhotoBtn" type="button">＋</button></div>' +
+        '<input type="file" id="encItemsPhotoFile" accept="image/*" capture="environment" style="display:none;">' +
+        '<label>Notes</label><textarea id="encNotes">' + escapeHtml(existing.notes || "") + '</textarea>' +
+        '<div class="modal-actions">' +
+          '<button class="btn-ghost" id="encCancel">Cancel</button>' +
+          '<button class="btn-primary" id="encSave">Save Changes</button>' +
+        '</div>' +
+        '<div class="modal-error" id="encError"></div>' +
+      '</div>';
+    document.body.appendChild(backdrop);
+    backdrop.onclick = function(e){ if(e.target === backdrop) backdrop.remove(); };
+    document.getElementById("encCancel").onclick = function(){ backdrop.remove(); };
+
+    function renderItemsPhotos(){
+      var row = document.getElementById("encItemsPhotosRow");
+      var addBtn = document.getElementById("encAddItemsPhotoBtn");
+      var html = "";
+      itemsPhotos.forEach(function(ph, i){
+        html += '<div class="pf-photo-chip"><img src="' + ph + '"><button class="pf-rm" data-i="' + i + '" type="button">✕</button></div>';
+      });
+      row.innerHTML = html;
+      row.appendChild(addBtn);
+      Array.prototype.forEach.call(row.querySelectorAll(".pf-rm"), function(btn){
+        btn.onclick = function(){ itemsPhotos.splice(parseInt(btn.getAttribute("data-i"), 10), 1); renderItemsPhotos(); };
+      });
+    }
+    renderItemsPhotos();
+    document.getElementById("encAddItemsPhotoBtn").onclick = function(){
+      document.getElementById("encItemsPhotoFile").value = "";
+      document.getElementById("encItemsPhotoFile").click();
+    };
+    document.getElementById("encItemsPhotoFile").onchange = async function(){
+      var file = this.files[0];
+      if(!file) return;
+      var dataUrl = await fileToCompressedDataUrl(file, 480);
+      itemsPhotos.push(dataUrl);
+      renderItemsPhotos();
+    };
+
+    document.getElementById("encGpsBtn").onclick = function(){
+      var statusEl = document.getElementById("encGpsStatus");
+      var input = document.getElementById("encLocation");
+      if(!navigator.geolocation){
+        statusEl.textContent = "Location isn't available — enter it manually.";
+        return;
+      }
+      statusEl.textContent = "Getting current location…";
+      navigator.geolocation.getCurrentPosition(
+        function(position){
+          encCoords = [position.coords.latitude, position.coords.longitude];
+          input.value = "Lat " + position.coords.latitude.toFixed(5) + ", Lon " + position.coords.longitude.toFixed(5);
+          statusEl.textContent = "Location found.";
+        },
+        function(){
+          statusEl.textContent = "Could not determine location — enter it manually.";
+        },
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+      );
+    };
+
+    document.getElementById("encSave").onclick = async function(){
+      var updates = {
+        date: document.getElementById("encDate").value,
+        location: document.getElementById("encLocation").value.trim(),
+        coords: encCoords,
+        itemsFound: document.getElementById("encItems").value.trim(),
+        itemsPhotos: itemsPhotos,
+        notes: document.getElementById("encNotes").value.trim()
+      };
+      this.disabled = true;
+      this.textContent = "Saving…";
+      try{
+        await updateDoc(doc(db, "encounters", existing.id), updates);
+        await loadEncounters();
+        backdrop.remove();
+        document.getElementById("encounterList").innerHTML = renderEncounters();
+        wireUp();
+      }catch(e){
+        document.getElementById("encError").textContent = "Could not save — check your connection.";
+        this.disabled = false;
+        this.textContent = "Save Changes";
       }
     };
   }
