@@ -74,11 +74,15 @@ people.sort((a, b) => {
     list.innerHTML = "";
 
 people.forEach(person => {
+    console.log(document.querySelectorAll(".person-row").length);
+
+    console.log(person);
+
 
     
 
     list.innerHTML += `
-    <div class="person-row">
+    <div class="person-row" data-id="${person.id}">
 
         <div class="person-avatar">
             <i class="bi bi-person-fill"></i>
@@ -98,6 +102,15 @@ people.forEach(person => {
 
     </div>
     `;
+
+});
+document.querySelectorAll(".person-row").forEach(row => {
+
+    row.onclick = function () {
+
+        openPersonProfile(this.dataset.id);
+
+    };
 
 });
 document.getElementById("addPersonBtn").onclick = function () {
@@ -247,7 +260,11 @@ if (duplicate) {
     showPeople();
 
 };
+async function openPersonProfile(id) {
 
+    alert("Opening profile for: " + id);
+
+}
 
 
 
