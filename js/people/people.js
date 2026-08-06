@@ -374,12 +374,25 @@ async function renderPersonProfile(id){
         : '') +
 
         '<hr>' +
-        '<h3>Photos</h3>' +
-        '<div class="pf-photos-row" id="pfPhotosRow"><button class="pf-add-photo" id="pfAddPhotoBtn" type="button">＋</button></div>' +
-        '<label class="pf-import-label" for="pfImportFile">🖼 Import from gallery</label>' +
-        '<input type="file" id="pfPhotoFile" accept="image/*" capture="environment" style="display:none;">' +
-        '<input type="file" id="pfImportFile" accept="image/*" multiple style="display:none;">' +
-        '<div id="faceWarningArea"></div>' +
+        '<hr>' +
+
+'<h3>Photos</h3>' +
+
+'<div class="pf-photos-row" id="pfPhotosRow"></div>' +
+
+(editMode ?
+
+'<button class="pf-add-photo" id="pfAddPhotoBtn" type="button">＋ Add Photo</button>' +
+
+'<label class="pf-import-label" for="pfImportFile">🖼 Import from Gallery</label>' +
+
+'<input type="file" id="pfPhotoFile" accept="image/*" capture="environment" style="display:none;">' +
+
+'<input type="file" id="pfImportFile" accept="image/*" multiple style="display:none;">'
+
+: '') +
+
+'<div id="faceWarningArea"></div>' +
 
         '<hr>' +
         '<h3>Encounters</h3>' +
@@ -393,9 +406,27 @@ async function renderPersonProfile(id){
   }
 
   function field(label, id, value, editable, type){
-    return '<div class="profile-field"><label>' + label + '</label>' +
-      '<input type="' + (type || "text") + '" id="' + id + '" value="' + escapeHtml(value || "") + '"' + (editable ? '' : ' readonly') + '></div>';
-  }
+
+    if(type === "textarea"){
+
+        return '<div class="profile-field">' +
+            '<label>' + label + '</label>' +
+            '<textarea id="' + id + '"' +
+            (editable ? '' : ' readonly') +
+            '>' + escapeHtml(value || "") + '</textarea>' +
+        '</div>';
+
+    }
+
+    return '<div class="profile-field">' +
+        '<label>' + label + '</label>' +
+        '<input type="' + (type || "text") + '" id="' + id + '"' +
+        ' value="' + escapeHtml(value || "") + '"' +
+        (editable ? '' : ' readonly') +
+        '>' +
+    '</div>';
+
+}
 
   function renderEncounters(){
     if(!encounters.length) return '<div class="people-empty">No encounters recorded yet.</div>';
@@ -416,25 +447,64 @@ async function renderPersonProfile(id){
   }
 
   function renderPhotos(){
+
     var row = document.getElementById("pfPhotosRow");
+
     var addBtn = document.getElementById("pfAddPhotoBtn");
+
     var html = "";
+
     pendingPhotos.forEach(function(ph, i){
-      var takenBy = (typeof ph === "object" && ph.takenBy) ? ph.takenBy : "";
-      html += '<div><div class="pf-photo-chip"><img src="' + photoUrl(ph) + '">' +
-        '<button class="pf-rm" data-i="' + i + '" type="button">✕</button></div>' +
-        (takenBy ? '<div class="pf-photo-caption">' + escapeHtml(takenBy) + '</div>' : '') + '</div>';
+
+        var takenBy = (typeof ph === "object" && ph.takenBy)
+            ? ph.takenBy
+            : "";
+
+        html += '<div><div class="pf-photo-chip">' +
+
+            '<img src="' + photoUrl(ph) + '">' +
+
+            (editMode
+                ? '<button class="pf-rm" data-i="' + i + '" type="button">✕</button>'
+                : ''
+            ) +
+
+            '</div>' +
+
+            (takenBy
+                ? '<div class="pf-photo-caption">' + escapeHtml(takenBy) + '</div>'
+                : ''
+            ) +
+
+            '</div>';
+
     });
+
     row.innerHTML = html;
-    row.appendChild(addBtn);
-    Array.prototype.forEach.call(row.querySelectorAll(".pf-rm"), function(btn){
-      btn.onclick = async function(){
-        pendingPhotos.splice(parseInt(btn.getAttribute("data-i"), 10), 1);
-        await updateDoc(doc(db, "people", id), { photos: pendingPhotos });
-        renderPhotos();
-      };
-    });
-  }
+
+    if(editMode && addBtn){
+
+        row.appendChild(addBtn);
+
+        Array.prototype.forEach.call(row.querySelectorAll(".pf-rm"), function(btn){
+
+            btn.onclick = async function(){
+
+                pendingPhotos.splice(parseInt(btn.getAttribute("data-i"),10),1);
+
+                await updateDoc(doc(db,"people",id),{
+                    photos: pendingPhotos
+                });
+
+                renderPhotos();
+
+            };
+
+        });
+
+    }
+
+}
 
   async function addPhoto(dataUrl){
     var entry = { dataUrl: dataUrl, descriptor: null, takenBy: currentUserShortName(), addedAt: new Date().toISOString() };
@@ -538,25 +608,52 @@ async function renderPersonProfile(id){
     }
 
     renderPhotos();
-    document.getElementById("pfAddPhotoBtn").onclick = function(){
-      document.getElementById("pfPhotoFile").value = "";
-      document.getElementById("pfPhotoFile").click();
+
+if (editMode) {
+
+    document.getElementById("pfAddPhotoBtn").onclick = function () {
+
+        document.getElementById("pfPhotoFile").value = "";
+
+        document.getElementById("pfPhotoFile").click();
+
     };
-    document.getElementById("pfPhotoFile").onchange = async function(){
-      var file = this.files[0];
-      if(!file) return;
-      var dataUrl = await fileToCompressedDataUrl(file, 480);
-      addPhoto(dataUrl);
+
+    document.getElementById("pfPhotoFile").onchange = async function () {
+
+        var file = this.files[0];
+
+        if (!file) return;
+
+        var dataUrl = await fileToCompressedDataUrl(file, 480);
+
+        addPhoto(dataUrl);
+
     };
-    document.getElementById("pfImportFile").onchange = async function(){
-      var files = Array.prototype.slice.call(this.files);
-      for(var i = 0; i < files.length; i++){
-        try{
-          var dataUrl = await fileToCompressedDataUrl(files[i], 480);
-          await addPhoto(dataUrl);
-        }catch(e){ console.error(e); }
-      }
+
+    document.getElementById("pfImportFile").onchange = async function () {
+
+        var files = Array.prototype.slice.call(this.files);
+
+        for (var i = 0; i < files.length; i++) {
+
+            try {
+
+                var dataUrl = await fileToCompressedDataUrl(files[i], 480);
+
+                await addPhoto(dataUrl);
+
+            } catch (e) {
+
+                console.error(e);
+
+            }
+
+        }
+
     };
+
+}
 
     Array.prototype.forEach.call(document.querySelectorAll(".pf-encounter-remove"), function(btn){
       btn.onclick = async function(){
