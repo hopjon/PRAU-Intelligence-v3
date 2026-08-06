@@ -191,6 +191,12 @@ function openAddPersonModal(){
 
             const lat = pos.coords.latitude.toFixed(6);
             const lng = pos.coords.longitude.toFixed(6);
+            console.log(pos.coords);
+alert(
+`Latitude: ${lat}
+Longitude: ${lng}
+Accuracy: ${pos.coords.accuracy} metres`
+);
 
             document.getElementById("apProfilingLocation").value = lat + ", " + lng;
 
@@ -230,17 +236,32 @@ var profilingLocation = document.getElementById("apProfilingLocation").value.tri
     }
 
     var person = {
-      name: name, surname: surname, idNumber: idNumber,
-      dob: document.getElementById("apDob").value,
-      aliases: document.getElementById("apAliases").value.trim(),
-      origin: document.getElementById("apOrigin").value.trim(),
-      residence: document.getElementById("apResidence").value.trim(),
-      deceased: false,
-      encounters: [],
-      photos: [],
-      addedAt: new Date().toISOString(),
-      addedBy: auth.currentUser ? auth.currentUser.email : "unknown"
-    };
+  name: name,
+  surname: surname,
+  idNumber: idNumber,
+
+  dob: document.getElementById("apDob").value,
+
+  aliases: document.getElementById("apAliases").value.trim(),
+
+  origin: document.getElementById("apOrigin").value.trim(),
+
+  residence: document.getElementById("apResidence").value.trim(),
+
+  previousArrests: previousArrests,
+
+  profilingLocation: profilingLocation,
+
+  deceased: false,
+
+  encounters: [],
+
+  photos: [],
+
+  addedAt: new Date().toISOString(),
+
+  addedBy: auth.currentUser ? auth.currentUser.email : "unknown"
+};
 
     this.textContent = "Saving…";
     try{
@@ -336,7 +357,8 @@ async function renderPersonProfile(id){
           field("Date of Birth", "pfDob", p.dob, editMode, "date") +
           field("Known Aliases", "pfAliases", p.aliases, editMode) +
           field("Originally From", "pfOrigin", p.origin, editMode) +
-          field("Current Residence", "pfResidence", p.residence, editMode) +
+          field("Previous Arrests", "pfPreviousArrests", p.previousArrests, editMode, "textarea") +
+          field("📍 Profiling Location", "pfProfilingLocation", p.profilingLocation, editMode) +
         '</div>' +
         (editMode ?
           '<div class="deceased-checkbox-row">' +
@@ -484,6 +506,8 @@ async function renderPersonProfile(id){
           aliases: document.getElementById("pfAliases").value.trim(),
           origin: document.getElementById("pfOrigin").value.trim(),
           residence: document.getElementById("pfResidence").value.trim(),
+          previousArrests: document.getElementById("pfPreviousArrests").value.trim(),
+          profilingLocation: document.getElementById("pfProfilingLocation").value.trim(),
           deceased: document.getElementById("pfDeceased").checked
         };
         try{
