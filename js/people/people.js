@@ -264,12 +264,18 @@ async function openPersonProfile(id) {
 
     alert("Opening profile for: " + id);
 
+}await addDoc(collection(db, "people"), person);
+
+    modal.remove();
+
+    showPeople();
+
+};
+
+};
+
+async function openPersonProfile(id) {
+
+    alert("Opening profile for: " + id);
+
 }
-
-
-
-
-
-    
-
-}}
