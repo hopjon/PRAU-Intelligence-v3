@@ -124,65 +124,83 @@ document.getElementById("addPersonBtn").onclick = function () {
     modal.className = "modal-backdrop-custom";
 
     modal.innerHTML = `
-<div class="modal-card">
+<div class="modal-card" style="max-width:900px;">
 
-<h2>Add Person</h2>
+<h2>${p.name ?? ""} ${p.surname ?? ""}</h2>
 
-<label>Name</label>
-<input id="personName" type="text">
+<div class="people-profile-grid">
 
-<label>Surname</label>
-<input id="personSurname" type="text">
+<div>
 
 <label>Date of Birth</label>
-<input id="personDOB" type="date">
+<input value="${p.dob ?? ""}" readonly>
 
 <label>ID Number</label>
-<input id="personID" type="text">
+<input value="${p.idNumber ?? ""}" readonly>
 
 <label>Known Aliases</label>
-<input id="personAlias" type="text" placeholder="Comma separated">
+<input value="${p.aliases ?? ""}" readonly>
 
-<hr>
-
-<label>Originally From / Place of Birth</label>
-<input id="personOrigin" type="text">
+<label>Originally From</label>
+<input value="${p.origin ?? ""}" readonly>
 
 <label>Current Residence</label>
-<input id="personResidence" type="text">
-
-<hr>
-
-<label>Previous Arrests / Convictions</label>
-<textarea id="personArrests"></textarea>
-
-<label>Profiling Location</label>
-<input id="personLocation" type="text">
-
-<label>Items Found in Possession</label>
-<textarea id="personItems"></textarea>
-
-<hr>
-
-<label>Main Photograph</label>
-<input id="personPhoto" type="file" accept="image/*">
-
-<label>Additional Photographs</label>
-<input id="personPhotos" type="file" multiple accept="image/*">
-
-<div class="modal-actions">
-
-<button class="btn-ghost" id="cancelPerson">
-Cancel
-</button>
-
-<button class="btn-primary" id="savePerson">
-Save Person
-</button>
+<input value="${p.residence ?? ""}" readonly>
 
 </div>
 
-<div class="modal-error" id="personError"></div>
+<div>
+
+<label>Previous Arrests</label>
+<textarea readonly>${p.previousArrests ?? ""}</textarea>
+
+<label>Items Found in Possession</label>
+<textarea readonly>${p.itemsFound ?? ""}</textarea>
+
+<label>Profiling Location</label>
+<input value="${p.profilingLocation ?? ""}" readonly>
+
+</div>
+
+</div>
+
+<hr>
+
+<h3>Encounters</h3>
+
+<div class="people-empty">
+
+No encounters recorded yet.
+
+</div>
+
+<hr>
+
+<h3>Linked Vehicles</h3>
+
+<div class="people-empty">
+
+No vehicles linked.
+
+</div>
+
+<hr>
+
+<div class="modal-actions">
+
+<button class="btn-ghost" id="editPerson">
+
+Edit
+
+</button>
+
+<button class="btn-primary" id="closeProfile">
+
+Close
+
+</button>
+
+</div>
 
 </div>
 `;

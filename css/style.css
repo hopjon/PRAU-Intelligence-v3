@@ -1,0 +1,19 @@
+.people-profile-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:20px;
+}
+
+.people-profile-grid textarea{
+min-height:120px;
+}
+
+@media(max-width:768px){
+
+.people-profile-grid{
+
+grid-template-columns:1fr;
+
+}
+
+}

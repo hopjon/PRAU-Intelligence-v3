@@ -58,7 +58,7 @@ function renderShell(displayName){
           '</div>' +
           '<button id="logoutBtn" class="logout-btn"><i class="bi bi-box-arrow-right"></i> Logout</button>' +
         '</div>' +
-        '<div id="contentArea"></div>' +
+        '<div id="contentArea" class="content"></div>' +
       '</main>' +
     '</div>';
 
