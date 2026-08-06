@@ -5,6 +5,14 @@ import {
     serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { db } from "../firebase.js";
+import {
+    collection,
+    getDocs,
+    addDoc,
+    serverTimestamp,
+    doc,
+    getDoc
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 export async function showPeople() {
 
@@ -74,7 +82,7 @@ people.sort((a, b) => {
     list.innerHTML = "";
 
 people.forEach(person => {
-    console.log(document.querySelectorAll(".person-row").length);
+    
 
     console.log(person);
 
@@ -104,6 +112,7 @@ people.forEach(person => {
     `;
 
 });
+console.log(document.querySelectorAll(".person-row").length);
 document.querySelectorAll(".person-row").forEach(row => {
 
     row.onclick = function () {
@@ -253,29 +262,74 @@ if (duplicate) {
 
     return;
 }
-    await addDoc(collection(db, "people"), person);
+        await addDoc(collection(db, "people"), person);
 
     modal.remove();
 
     showPeople();
 
-};
+}; // end savePerson
+
+}; // end addPersonBtn.onclick
 async function openPersonProfile(id) {
 
-    alert("Opening profile for: " + id);
+    const snap = await getDoc(doc(db, "people", id));
 
-}await addDoc(collection(db, "people"), person);
+    if (!snap.exists()) return;
 
-    modal.remove();
+    const p = snap.data();
 
-    showPeople();
+    const modal = document.createElement("div");
 
-};
+    modal.className = "modal-backdrop-custom";
 
-};
+    modal.innerHTML = `
+<div class="modal-card">
 
-async function openPersonProfile(id) {
+<h2>${p.name ?? ""} ${p.surname ?? ""}</h2>
 
-    alert("Opening profile for: " + id);
+<label>ID Number</label>
+<input value="${p.idNumber ?? ""}" readonly>
+
+<label>Date of Birth</label>
+<input value="${p.dob ?? ""}" readonly>
+
+<label>Known Aliases</label>
+<input value="${p.aliases ?? ""}" readonly>
+
+<label>Originally From</label>
+<input value="${p.origin ?? ""}" readonly>
+
+<label>Current Residence</label>
+<input value="${p.residence ?? ""}" readonly>
+
+<label>Previous Arrests</label>
+<textarea readonly>${p.previousArrests ?? ""}</textarea>
+
+<label>Profiling Location</label>
+<input value="${p.profilingLocation ?? ""}" readonly>
+
+<label>Items Found</label>
+<textarea readonly>${p.itemsFound ?? ""}</textarea>
+
+<div class="modal-actions">
+    <button class="btn-primary" id="closeProfile">Close</button>
+</div>
+
+</div>
+`;
+
+    document.body.appendChild(modal);
+
+    document.getElementById("closeProfile").onclick = function () {
+        modal.remove();
+    };
+
+}
+import {
+    doc,
+    getDoc
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
 
 }
