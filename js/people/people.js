@@ -217,6 +217,29 @@ document.getElementById("savePerson").onclick = async function () {
 
     }
 
+    const existing = await getDocs(collection(db, "people"));
+
+let duplicate = false;
+
+existing.forEach(doc => {
+    const data = doc.data();
+
+    if (
+        person.idNumber &&
+        data.idNumber &&
+        data.idNumber === person.idNumber
+    ) {
+        duplicate = true;
+    }
+});
+
+if (duplicate) {
+
+    document.getElementById("personError").textContent =
+        "A person with this ID Number already exists.";
+
+    return;
+}
     await addDoc(collection(db, "people"), person);
 
     modal.remove();
