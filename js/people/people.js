@@ -42,16 +42,107 @@ function fileToCompressedDataUrl(file, maxDim){
     reader.readAsDataURL(file);
   });
 }
-function openImageViewer(src){
-  var viewer = document.getElementById("imageViewer");
+var viewerImages = [];
+var viewerIndex = 0;
+var viewerScale = 1;
+var viewerPanX = 0, viewerPanY = 0;
+var viewerTouchState = null;
+
+function applyViewerTransform(){
   var img = document.getElementById("imageViewerImg");
-  if(!viewer || !img){ console.error("Image viewer elements are missing from index.html"); return; }
-  img.src = src;
-  viewer.style.display = "flex";
-  var closeBtn = document.getElementById("imageViewerClose");
-  if(closeBtn){ closeBtn.onclick = function(){ viewer.style.display = "none"; }; }
-  viewer.onclick = function(e){ if(e.target === viewer){ viewer.style.display = "none"; } };
+  if(img) img.style.transform = "translate(" + viewerPanX + "px," + viewerPanY + "px) scale(" + viewerScale + ")";
 }
+function showViewerImage(){
+  var img = document.getElementById("imageViewerImg");
+  var counter = document.getElementById("imageViewerCounter");
+  if(!img || !viewerImages.length) return;
+  viewerScale = 1; viewerPanX = 0; viewerPanY = 0;
+  applyViewerTransform();
+  img.src = viewerImages[viewerIndex];
+  if(counter) counter.textContent = (viewerIndex + 1) + " / " + viewerImages.length;
+  var prevBtn = document.getElementById("imageViewerPrev");
+  var nextBtn = document.getElementById("imageViewerNext");
+  if(prevBtn) prevBtn.style.display = viewerImages.length > 1 ? "block" : "none";
+  if(nextBtn) nextBtn.style.display = viewerImages.length > 1 ? "block" : "none";
+}
+function openImageViewer(images, startIndex){
+  var viewer = document.getElementById("imageViewer");
+  if(!viewer){ console.error("Image viewer elements are missing from index.html"); return; }
+  viewerImages = images;
+  viewerIndex = startIndex || 0;
+  viewer.style.display = "flex";
+  showViewerImage();
+}
+function closeImageViewer(){
+  var viewer = document.getElementById("imageViewer");
+  if(viewer) viewer.style.display = "none";
+}
+function viewerNext(){ if(!viewerImages.length) return; viewerIndex = (viewerIndex + 1) % viewerImages.length; showViewerImage(); }
+function viewerPrev(){ if(!viewerImages.length) return; viewerIndex = (viewerIndex - 1 + viewerImages.length) % viewerImages.length; showViewerImage(); }
+
+(function setupViewerControls(){
+  var closeBtn = document.getElementById("imageViewerClose");
+  var nextBtn = document.getElementById("imageViewerNext");
+  var prevBtn = document.getElementById("imageViewerPrev");
+  var viewer = document.getElementById("imageViewer");
+  var stage = document.getElementById("imageViewerStage");
+  if(!viewer || !stage) return;
+
+  if(closeBtn) closeBtn.onclick = closeImageViewer;
+  if(nextBtn) nextBtn.onclick = function(e){ e.stopPropagation(); viewerNext(); };
+  if(prevBtn) prevBtn.onclick = function(e){ e.stopPropagation(); viewerPrev(); };
+  viewer.onclick = function(e){ if(e.target === viewer) closeImageViewer(); };
+
+  var touchStartX = 0, touchStartTime = 0;
+
+  stage.addEventListener("touchstart", function(e){
+    if(e.touches.length === 2){
+      var dx = e.touches[0].clientX - e.touches[1].clientX;
+      var dy = e.touches[0].clientY - e.touches[1].clientY;
+      viewerTouchState = { mode: "pinch", startDist: Math.sqrt(dx*dx+dy*dy), startScale: viewerScale };
+    } else if(e.touches.length === 1){
+      touchStartX = e.touches[0].clientX;
+      touchStartTime = Date.now();
+      viewerTouchState = viewerScale > 1
+        ? { mode: "pan", startX: e.touches[0].clientX, startY: e.touches[0].clientY, startPanX: viewerPanX, startPanY: viewerPanY }
+        : { mode: "swipe" };
+    }
+  }, { passive: true });
+
+  stage.addEventListener("touchmove", function(e){
+    if(!viewerTouchState) return;
+    if(viewerTouchState.mode === "pinch" && e.touches.length === 2){
+      var dx = e.touches[0].clientX - e.touches[1].clientX;
+      var dy = e.touches[0].clientY - e.touches[1].clientY;
+      var dist = Math.sqrt(dx*dx+dy*dy);
+      viewerScale = Math.max(1, Math.min(4, viewerTouchState.startScale * (dist / viewerTouchState.startDist)));
+      applyViewerTransform();
+    } else if(viewerTouchState.mode === "pan" && e.touches.length === 1){
+      viewerPanX = viewerTouchState.startPanX + (e.touches[0].clientX - viewerTouchState.startX);
+      viewerPanY = viewerTouchState.startPanY + (e.touches[0].clientY - viewerTouchState.startY);
+      applyViewerTransform();
+    }
+  }, { passive: true });
+
+  stage.addEventListener("touchend", function(e){
+    if(viewerTouchState && viewerTouchState.mode === "swipe"){
+      var touchEndX = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientX : touchStartX;
+      var dx = touchEndX - touchStartX;
+      if(Date.now() - touchStartTime < 600 && Math.abs(dx) > 50){
+        if(dx < 0) viewerNext(); else viewerPrev();
+      }
+    }
+    if(viewerScale <= 1.02){ viewerScale = 1; viewerPanX = 0; viewerPanY = 0; applyViewerTransform(); }
+    viewerTouchState = null;
+  }, { passive: true });
+
+  stage.addEventListener("dblclick", function(){
+    viewerScale = viewerScale > 1 ? 1 : 2;
+    viewerPanX = 0; viewerPanY = 0;
+    applyViewerTransform();
+  });
+})();
+
 function dataUrlToCanvas(dataUrl){
   return new Promise(function(resolve, reject){
     var img = new Image();
@@ -530,7 +621,7 @@ async function renderPersonProfile(id){
         (enc.location ? '<div class="people-card-meta">📍 ' + escapeHtml(enc.location) + '</div>' : '') +
         (enc.itemsFound ? '<div class="people-card-meta">Items found: ' + escapeHtml(enc.itemsFound) + '</div>' : '') +
         (itemsPhotos.length ? '<div class="pf-photos-row" style="margin-top:8px;">' +
-          itemsPhotos.map(function(ph){ return '<div class="pf-photo-chip"><img src="' + photoUrl(ph) + '"></div>'; }).join("") +
+          itemsPhotos.map(function(ph, pi){ return '<div class="pf-photo-chip"><img class="pf-photo-view" data-enc-i="' + i + '" data-photo-i="' + pi + '" src="' + photoUrl(ph) + '"></div>'; }).join("") +
         '</div>' : '') +
         (enc.notes ? '<div class="people-card-meta">' + escapeHtml(enc.notes) + '</div>' : '') +
         (enc.loggedBy ? '<div class="people-card-meta" style="opacity:0.6;">Logged by ' + escapeHtml(enc.loggedBy) + '</div>' : '') +
@@ -546,7 +637,7 @@ async function renderPersonProfile(id){
     pendingPhotos.forEach(function(ph, i){
       var takenBy = (typeof ph === "object" && ph.takenBy) ? ph.takenBy : "";
       html += '<div><div class="pf-photo-chip">' +
-        '<img class="pf-photo-view" src="' + photoUrl(ph) + '">' +
+            '<img class="pf-photo-view" data-photo-i="' + i + '" src="' + photoUrl(ph) + '">' +
         (editMode ? '<button class="pf-rm" data-i="' + i + '" type="button">✕</button>' : '') +
         '</div>' +
         (takenBy ? '<div class="pf-photo-caption">' + escapeHtml(takenBy) + '</div>' : '') +
@@ -556,7 +647,10 @@ async function renderPersonProfile(id){
     row.innerHTML = html;
 
     Array.prototype.forEach.call(row.querySelectorAll(".pf-photo-view"), function(img){
-      img.onclick = function(){ openImageViewer(this.src); };
+      img.onclick = function(){
+        var allSrcs = pendingPhotos.map(function(ph){ return photoUrl(ph); });
+        openImageViewer(allSrcs, parseInt(img.getAttribute("data-photo-i"), 10));
+      };
     });
 
     if(editMode && addBtn){
@@ -751,7 +845,15 @@ if (editMode) {
         openEditEncounterModal(encounters[i]);
       };
     });
+Array.prototype.forEach.call(document.querySelectorAll("#encounterList .pf-photo-view"), function(img){
+      img.onclick = function(){
+        var enc = encounters[parseInt(img.getAttribute("data-enc-i"), 10)];
+        var srcs = (enc.itemsPhotos || []).map(function(ph){ return photoUrl(ph); });
+        openImageViewer(srcs, parseInt(img.getAttribute("data-photo-i"), 10));
+      };
+    });
 
+    document.getElementById("newEncounterBtn").onclick = function(){
     document.getElementById("newEncounterBtn").onclick = function(){
       if(encounters.length >= MAX_ENCOUNTERS) return;
       openNewEncounterModal();
@@ -972,4 +1074,5 @@ if (editMode) {
 
   await loadEncounters();
   render();
+}
 }
