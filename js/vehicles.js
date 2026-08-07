@@ -184,9 +184,9 @@ function openAddVehicleModal(){
       '<label class="pf-import-label" for="avImportFile">🖼 Import from gallery</label>' +
       '<input type="file" id="avPhotoFile" accept="image/*" capture="environment" style="display:none;">' +
       '<input type="file" id="avImportFile" accept="image/*" multiple style="display:none;">' +
-      '<label>Registration</label><input id="avRegistration">' +
-      '<label>Make and Model</label><input id="avMake" placeholder="e.g. Toyota Hilux">' +
-      '<label>Colour</label><input id="avColour">' +
+      '<label>Registration</label><input id="avRegistration" placeholder="e.g. CAA123456">' +
+      '<label>Make and Model</label><input id="avMake" placeholder="e.g. VW Citi Golf">' +
+      '<label>Colour</label><input id="avColour" placeholder="e.g. White">' +
       '<div id="avOwnerWidget"></div>' +
       '<div class="modal-actions">' +
         '<button class="btn-ghost" id="avCancel">Cancel</button>' +
@@ -316,12 +316,12 @@ async function renderVehicleProfile(id){
       '</div>' +
       '<div class="modal-card profile-view">' +
         '<div class="profile-field-group">' +
-          field("Registration", "vfRegistration", v.registration, editMode) +
+          field("Registration", "vfRegistration", v.registration, editMode, null, "e.g. CAA123456") +
           '<div class="profile-field" style="grid-column:1 / -1;">' +
-            '<label>Make and Model</label><input type="text" id="vfMake" value="' + escapeHtml(vehicleTitle(v)) + '"' + (editMode ? '' : ' readonly') + '>' +
+            '<label>Make and Model</label><input type="text" id="vfMake" value="' + escapeHtml(vehicleTitle(v)) + '"' + (editMode ? '' : ' readonly') + ' placeholder="e.g. VW Citi Golf">' +
           '</div>' +
-          field("Colour", "vfColour", v.colour, editMode) +
-          field("Distinct Markings", "vfMarkings", v.markings, editMode, "textarea") +
+          field("Colour", "vfColour", v.colour, editMode, null, "e.g. White") +
+          field("Distinct Markings", "vfMarkings", v.markings, editMode, "textarea", "e.g. Missing front headlight") +
         '</div>' +
         '<label>Location spotted</label>' +
         '<div style="display:flex;gap:8px;">' +
@@ -363,9 +363,10 @@ async function renderVehicleProfile(id){
     wireUp();
   }
 
-  function field(label, id, value, editable, type){
+  function field(label, id, value, editable, type, placeholder){
+    var ph = placeholder ? ' placeholder="' + escapeHtml(placeholder) + '"' : '';
     return '<div class="profile-field"><label>' + label + '</label>' +
-      '<input type="' + (type || "text") + '" id="' + id + '" value="' + escapeHtml(value || "") + '"' + (editable ? '' : ' readonly') + '></div>';
+      '<input type="' + (type || "text") + '" id="' + id + '" value="' + escapeHtml(value || "") + '"' + ph + (editable ? '' : ' readonly') + '></div>';
   }
 
   function renderEncounters(){
