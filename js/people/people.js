@@ -494,8 +494,6 @@ async function renderPersonProfile(id){
   content.innerHTML = '<div class="people-empty">Loading…</div>';
 
   var snap = await getDoc(doc(db, "people", id));
-  console.log("Person ID:", id);
-console.log("Exists:", snap.exists());
   if(!snap.exists()){ content.innerHTML = '<div class="people-empty">Record not found.</div>'; return; }
 
   var p = Object.assign({ id: id }, snap.data());
