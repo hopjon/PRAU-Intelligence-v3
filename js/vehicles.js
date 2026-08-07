@@ -324,7 +324,14 @@ async function renderVehicleProfile(id){
           field("Make", "vfMake", v.make, editMode) +
           field("Model", "vfModel", v.model, editMode) +
           field("Colour", "vfColour", v.colour, editMode) +
+          field("Distinct Markings", "vfMarkings", v.markings, editMode, "textarea") +
         '</div>' +
+        '<label>Location spotted</label>' +
+        '<div style="display:flex;gap:8px;">' +
+          '<input id="vfLocationSpotted" style="flex:1;" value="' + escapeHtml(v.locationSpotted || "") + '"' + (editMode ? '' : ' readonly') + ' placeholder="Where this vehicle was seen">' +
+          (editMode ? '<button class="btn-ghost" id="vfLocationGpsBtn" type="button" style="flex-shrink:0;padding:11px 14px;">📍</button>' : '') +
+        '</div>' +
+        (editMode ? '<div class="modal-error" id="vfLocationGpsStatus" style="text-align:left;color:#888;"></div>' : '') +
         '<div id="ownerWidgetArea">' +
           (v.ownerName ? '<label>Owner (linked to People)</label><div><span class="owner-link" id="ownerViewLink">' + escapeHtml(v.ownerName) + '</span></div>' :
             '<label>Owner</label><div style="color:#888;">No owner linked</div>') +
@@ -433,6 +440,20 @@ async function renderVehicleProfile(id){
       ownerSearchWidget(document.getElementById("vfOwnerWidget"), editOwnerId, editOwnerName, function(oid, oname){
         editOwnerId = oid; editOwnerName = oname;
       });
+      if(document.getElementById("vfLocationGpsBtn")){
+        document.getElementById("vfLocationGpsBtn").onclick = function(){
+          var statusEl = document.getElementById("vfLocationGpsStatus");
+          var input = document.getElementById("vfLocationSpotted");
+          if(!navigator.geolocation){ statusEl.textContent = "Location isn't available — enter it manually."; return; }
+          statusEl.textContent = "Getting current location…";
+          navigator.geolocation.getCurrentPosition(function(pos){
+            input.value = "Lat " + pos.coords.latitude.toFixed(5) + ", Lon " + pos.coords.longitude.toFixed(5);
+            statusEl.textContent = "Location found.";
+          }, function(){
+            statusEl.textContent = "Could not determine location — enter it manually.";
+          }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
+        };
+      }
 
       document.getElementById("saveProfileBtn").onclick = async function(){
         var errEl = document.getElementById("profileError");
@@ -454,6 +475,8 @@ async function renderVehicleProfile(id){
           make: document.getElementById("vfMake").value.trim(),
           model: document.getElementById("vfModel").value.trim(),
           colour: document.getElementById("vfColour").value.trim(),
+          markings: document.getElementById("vfMarkings").value.trim(),
+          locationSpotted: document.getElementById("vfLocationSpotted").value.trim(),
           ownerId: editOwnerId,
           ownerName: editOwnerName
         };

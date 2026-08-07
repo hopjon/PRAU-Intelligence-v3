@@ -427,11 +427,13 @@ async function renderPersonProfile(id){
       '</div>' +
       '<div class="modal-card profile-view">' +
         '<div class="profile-field-group">' +
-          field("Name", "pfName", p.name, editMode) +
-          field("Surname", "pfSurname", p.surname, editMode) +
+          '<div class="profile-field" style="grid-column:1 / -1;display:flex;gap:10px;">' +
+            '<div style="flex:1;"><label>Name</label><input type="text" id="pfName" value="' + escapeHtml(p.name || "") + '"' + (editMode ? '' : ' readonly') + '></div>' +
+            '<div style="flex:1;"><label>Surname</label><input type="text" id="pfSurname" value="' + escapeHtml(p.surname || "") + '"' + (editMode ? '' : ' readonly') + '></div>' +
+          '</div>' +
           field("ID Number", "pfIdNumber", p.idNumber, editMode) +
           field("Date of Birth", "pfDob", p.dob, editMode, "date") +
-          field("Known Aliases", "pfAliases", p.aliases, editMode) +
+          field("Known Alias", "pfAliases", p.aliases, editMode) +
           field("Originally From", "pfOrigin", p.origin, editMode) +
           field("Current Residence", "pfResidence", p.residence, editMode) +
           field("Previous Arrests", "pfPreviousArrests", p.previousArrests, editMode, "textarea") +
