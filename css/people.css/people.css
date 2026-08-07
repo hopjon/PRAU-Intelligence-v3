@@ -289,3 +289,29 @@
   background:transparent;color:#D4AF37;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px;width:100%;}
 .pf-take-photo-btn i{margin-right:6px;}
 .pf-import-label i{margin-right:6px;}
+.image-viewer{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.92);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:99999;
+}
+
+.image-viewer img{
+    max-width:95%;
+    max-height:95%;
+    border-radius:12px;
+    box-shadow:0 0 25px rgba(0,0,0,.7);
+}
+
+.image-viewer span{
+    position:absolute;
+    top:20px;
+    right:30px;
+    color:white;
+    font-size:42px;
+    cursor:pointer;
+    user-select:none;
+}

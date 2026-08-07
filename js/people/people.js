@@ -42,6 +42,29 @@ function fileToCompressedDataUrl(file, maxDim){
     reader.readAsDataURL(file);
   });
 }
+function openImageViewer(src){
+
+    document.getElementById("imageViewerImg").src = src;
+
+    document.getElementById("imageViewer").style.display = "flex";
+
+}
+
+document.getElementById("imageViewerClose").onclick = function(){
+
+    document.getElementById("imageViewer").style.display = "none";
+
+};
+
+document.getElementById("imageViewer").onclick = function(e){
+
+    if(e.target === this){
+
+        this.style.display = "none";
+
+    }
+
+};
 function dataUrlToCanvas(dataUrl){
   return new Promise(function(resolve, reject){
     var img = new Image();
