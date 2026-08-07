@@ -165,7 +165,7 @@ function openAddPersonModal(){
       '<label class="pf-import-label" for="apImportFile">🖼 Import from gallery</label>' +
       '<input type="file" id="apPhotoFile" accept="image/*" capture="environment" style="display:none;">' +
       '<input type="file" id="apImportFile" accept="image/*" multiple style="display:none;">' +
-      '<label>Full Name</label><input id="apName" placeholder="e.g. John Doe">' +
+      '<label>Name and Surname</label><input id="apName" placeholder="e.g. John Doe">' +
       '<label>ID Number</label><input id="apIdNumber">' +
       '<label>Date of Birth</label><input type="date" id="apDob">' +
       '<label>Known Aliases</label><input id="apAliases">' +
@@ -427,7 +427,7 @@ async function renderPersonProfile(id){
       '<div class="modal-card profile-view">' +
         '<div class="profile-field-group">' +
           '<div class="profile-field" style="grid-column:1 / -1;">' +
-            '<label>Full Name</label><input type="text" id="pfName" value="' + escapeHtml(fullName(p)) + '"' + (editMode ? '' : ' readonly') + '>' +
+            '<label>Name and Surname</label><input type="text" id="pfName" value="' + escapeHtml(fullName(p)) + '"' + (editMode ? '' : ' readonly') + '>' +
           '</div>' +
           field("ID Number", "pfIdNumber", p.idNumber, editMode) +
           field("Date of Birth", "pfDob", p.dob, editMode, "date") +
@@ -646,7 +646,7 @@ async function renderPersonProfile(id){
         var errEl = document.getElementById("profileError");
         var name = document.getElementById("pfName").value.trim();
         var idNumber = document.getElementById("pfIdNumber").value.trim();
-        if(!name){ errEl.textContent = "Full name is required."; return; }
+        if(!name){ errEl.textContent = "Name and Surname are required."; return; }
 
         this.disabled = true;
         this.textContent = "Checking…";
