@@ -709,7 +709,7 @@ async function renderPersonProfile(id){
     }catch(e){ console.error("background face analysis failed", e); }
   }
 
-  function wireUp(){
+  async function wireUp(){
     document.getElementById("backToPeople").onclick = function(){ showPeople(); };
 
     document.getElementById("toggleEditBtn").onclick = function(){
