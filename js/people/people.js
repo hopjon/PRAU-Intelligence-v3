@@ -43,7 +43,7 @@ function fileToCompressedDataUrl(file, maxDim){
   });
 }
 function openImageViewer(src){
-
+console.log("Opening image:", src);
     document.getElementById("imageViewerImg").src = src;
 
     document.getElementById("imageViewer").style.display = "flex";
@@ -567,7 +567,7 @@ async function renderPersonProfile(id){
 
         html += '<div><div class="pf-photo-chip">' +
 
-            '<img src="' + photoUrl(ph) + '">' +
+            '<img class="pf-photo-view" src="' + photoUrl(ph) + '">' +
 
             (editMode
                 ? '<button class="pf-rm" data-i="' + i + '" type="button">✕</button>'
@@ -582,6 +582,18 @@ async function renderPersonProfile(id){
             ) +
 
             '</div>';
+            Array.prototype.forEach.call(
+    row.querySelectorAll(".pf-photo-view"),
+    function(img){
+
+        img.onclick = function(){
+
+            openImageViewer(this.src);
+
+        };
+
+    }
+);
 
     });
 
@@ -590,24 +602,19 @@ async function renderPersonProfile(id){
     if(editMode && addBtn){
 
         row.appendChild(addBtn);
+Array.prototype.forEach.call(
+    row.querySelectorAll(".pf-photo-view"),
+    function(img){
 
-        Array.prototype.forEach.call(row.querySelectorAll(".pf-rm"), function(btn){
+        img.onclick = function(){
 
-            btn.onclick = async function(){
+            openImageViewer(this.src);
 
-                pendingPhotos.splice(parseInt(btn.getAttribute("data-i"),10),1);
-
-                await updateDoc(doc(db,"people",id),{
-                    photos: pendingPhotos
-                });
-
-                renderPhotos();
-
-            };
-
-        });
+        };
 
     }
+);
+        
 
 }
 
