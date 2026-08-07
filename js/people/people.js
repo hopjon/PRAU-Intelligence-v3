@@ -207,7 +207,11 @@ export async function showPeople(){
     }).join("") + '</div>';
 
     Array.prototype.forEach.call(listArea.querySelectorAll(".people-card"), function(el){
-      el.onclick = function(){ renderPersonProfile(el.getAttribute("data-id")); };
+      el.onclick = function(){
+        var id = el.getAttribute("data-id");
+        console.log("Opening person:", id);
+        renderPersonProfile(id);
+      };
     });
   }
 
@@ -493,7 +497,11 @@ async function renderPersonProfile(id){
   var content = document.getElementById("contentArea");
   content.innerHTML = '<div class="people-empty">Loading…</div>';
 
-  var snap = await getDoc(doc(db, "people", id));
+  console.log("Loading person:", id);
+
+var snap = await getDoc(doc(db, "people", id));
+
+console.log("Document exists:", snap.exists());
   if(!snap.exists()){ content.innerHTML = '<div class="people-empty">Record not found.</div>'; return; }
 
   var p = Object.assign({ id: id }, snap.data());
