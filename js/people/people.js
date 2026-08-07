@@ -165,8 +165,7 @@ function openAddPersonModal(){
       '<label class="pf-import-label" for="apImportFile">🖼 Import from gallery</label>' +
       '<input type="file" id="apPhotoFile" accept="image/*" capture="environment" style="display:none;">' +
       '<input type="file" id="apImportFile" accept="image/*" multiple style="display:none;">' +
-      '<label>Name</label><input id="apName">' +
-      '<label>Surname</label><input id="apSurname">' +
+      '<label>Full Name</label><input id="apName" placeholder="e.g. John Doe">' +
       '<label>ID Number</label><input id="apIdNumber">' +
       '<label>Date of Birth</label><input type="date" id="apDob">' +
       '<label>Known Aliases</label><input id="apAliases">' +
@@ -270,11 +269,11 @@ Accuracy: ${pos.coords.accuracy} metres`
   document.getElementById("apSave").onclick = async function(){
     var errEl = document.getElementById("apError");
     var name = document.getElementById("apName").value.trim();
-    var surname = document.getElementById("apSurname").value.trim();
+    var surname = "";
     var idNumber = document.getElementById("apIdNumber").value.trim();
     var previousArrests = document.getElementById("apPreviousArrests").value.trim();
 var profilingLocation = document.getElementById("apProfilingLocation").value.trim();
-    if(!name || !surname){ errEl.textContent = "Name and Surname are required."; return; }
+    if(!name){ errEl.textContent = "Full name is required."; return; }
 
     this.disabled = true;
     this.textContent = "Checking…";
@@ -427,9 +426,8 @@ async function renderPersonProfile(id){
       '</div>' +
       '<div class="modal-card profile-view">' +
         '<div class="profile-field-group">' +
-          '<div class="profile-field" style="grid-column:1 / -1;display:flex;gap:10px;">' +
-            '<div style="flex:1;"><label>Name</label><input type="text" id="pfName" value="' + escapeHtml(p.name || "") + '"' + (editMode ? '' : ' readonly') + '></div>' +
-            '<div style="flex:1;"><label>Surname</label><input type="text" id="pfSurname" value="' + escapeHtml(p.surname || "") + '"' + (editMode ? '' : ' readonly') + '></div>' +
+          '<div class="profile-field" style="grid-column:1 / -1;">' +
+            '<label>Full Name</label><input type="text" id="pfName" value="' + escapeHtml(fullName(p)) + '"' + (editMode ? '' : ' readonly') + '>' +
           '</div>' +
           field("ID Number", "pfIdNumber", p.idNumber, editMode) +
           field("Date of Birth", "pfDob", p.dob, editMode, "date") +
@@ -647,9 +645,8 @@ async function renderPersonProfile(id){
       document.getElementById("saveProfileBtn").onclick = async function(){
         var errEl = document.getElementById("profileError");
         var name = document.getElementById("pfName").value.trim();
-        var surname = document.getElementById("pfSurname").value.trim();
         var idNumber = document.getElementById("pfIdNumber").value.trim();
-        if(!name || !surname){ errEl.textContent = "Name and Surname are required."; return; }
+        if(!name){ errEl.textContent = "Full name is required."; return; }
 
         this.disabled = true;
         this.textContent = "Checking…";
@@ -662,7 +659,7 @@ async function renderPersonProfile(id){
         }
 
         var updates = {
-          name: name, surname: surname, idNumber: idNumber,
+          name: name, surname: "", idNumber: idNumber,
           dob: document.getElementById("pfDob").value,
           aliases: document.getElementById("pfAliases").value.trim(),
           origin: document.getElementById("pfOrigin").value.trim(),
