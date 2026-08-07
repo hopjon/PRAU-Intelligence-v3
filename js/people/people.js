@@ -166,17 +166,17 @@ function openAddPersonModal(){
       '<input type="file" id="apPhotoFile" accept="image/*" capture="environment" style="display:none;">' +
       '<input type="file" id="apImportFile" accept="image/*" multiple style="display:none;">' +
       '<label>Name and Surname</label><input id="apName" placeholder="e.g. John Doe">' +
-      '<label>ID Number</label><input id="apIdNumber">' +
-      '<label>Date of Birth</label><input type="date" id="apDob">' +
-      '<label>Known Aliases</label><input id="apAliases">' +
-      '<label>Originally From</label><input id="apOrigin">' +
-      '<label>Current Residence</label><input id="apResidence">' +
-      'Previous Arrests' +
-'<textarea id="apPreviousArrests"></textarea>' +
+      '<label>ID Number</label><input id="apIdNumber" placeholder="e.g. 9001015800086">' +
+      '<label>Date of Birth</label><input type="text" id="apDob" placeholder="DD/MM/YYYY">' +
+      '<label>Known Alias</label><input id="apAliases" placeholder="e.g. Skhokho">' +
+      '<label>Originally From</label><input id="apOrigin" placeholder="e.g. Gugulethu">' +
+      '<label>Current Residence</label><input id="apResidence" placeholder="e.g. 12 Main Road, Khayelitsha">' +
+      '<label>Previous Arrests</label>' +
+'<textarea id="apPreviousArrests" placeholder="e.g. Shoplifting, March 2024"></textarea>' +
 
 '<label><i class="bi bi-geo-alt-fill"></i> Profiling Location</label>' +
 '<div style="display:flex;gap:8px;">' +
-    '<input id="apProfilingLocation" style="flex:1;" placeholder="Where was this person first profiled?">' +
+    '<input id="apProfilingLocation" style="flex:1;" placeholder="e.g. Corner of Main and Voortrekker">' +
     '<button class="btn-ghost" id="apGpsBtn" type="button">📍</button>' +
 '</div>' +
 '<div class="modal-error" id="apGpsStatus" style="text-align:left;color:#888;"></div>' +
@@ -427,15 +427,15 @@ async function renderPersonProfile(id){
       '<div class="modal-card profile-view">' +
         '<div class="profile-field-group">' +
           '<div class="profile-field" style="grid-column:1 / -1;">' +
-            '<label>Name and Surname</label><input type="text" id="pfName" value="' + escapeHtml(fullName(p)) + '"' + (editMode ? '' : ' readonly') + '>' +
+            '<label>Name and Surname</label><input type="text" id="pfName" value="' + escapeHtml(fullName(p)) + '"' + (editMode ? '' : ' readonly') + ' placeholder="e.g. John Doe">' +
           '</div>' +
-          field("ID Number", "pfIdNumber", p.idNumber, editMode) +
-          field("Date of Birth", "pfDob", p.dob, editMode, "date") +
-          field("Known Alias", "pfAliases", p.aliases, editMode) +
-          field("Originally From", "pfOrigin", p.origin, editMode) +
-          field("Current Residence", "pfResidence", p.residence, editMode) +
-          field("Previous Arrests", "pfPreviousArrests", p.previousArrests, editMode, "textarea") +
-          field("📍 Profiling Location", "pfProfilingLocation", p.profilingLocation, editMode) +
+          field("ID Number", "pfIdNumber", p.idNumber, editMode, null, "e.g. 9001015800086") +
+          field("Date of Birth", "pfDob", p.dob, editMode, "text", "DD/MM/YYYY") +
+          field("Known Alias", "pfAliases", p.aliases, editMode, null, "e.g. Skhokho") +
+          field("Originally From", "pfOrigin", p.origin, editMode, null, "e.g. Gugulethu") +
+          field("Current Residence", "pfResidence", p.residence, editMode, null, "e.g. 12 Main Road, Khayelitsha") +
+          field("Previous Arrests", "pfPreviousArrests", p.previousArrests, editMode, "textarea", "e.g. Shoplifting, March 2024") +
+          field("📍 Profiling Location", "pfProfilingLocation", p.profilingLocation, editMode, null, "e.g. Corner of Main and Voortrekker") +
         '</div>' +
         (editMode ?
           '<div class="deceased-checkbox-row">' +
