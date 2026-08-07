@@ -43,28 +43,15 @@ function fileToCompressedDataUrl(file, maxDim){
   });
 }
 function openImageViewer(src){
-console.log("Opening image:", src);
-    document.getElementById("imageViewerImg").src = src;
-
-    document.getElementById("imageViewer").style.display = "flex";
-
+  var viewer = document.getElementById("imageViewer");
+  var img = document.getElementById("imageViewerImg");
+  if(!viewer || !img){ console.error("Image viewer elements are missing from index.html"); return; }
+  img.src = src;
+  viewer.style.display = "flex";
+  var closeBtn = document.getElementById("imageViewerClose");
+  if(closeBtn){ closeBtn.onclick = function(){ viewer.style.display = "none"; }; }
+  viewer.onclick = function(e){ if(e.target === viewer){ viewer.style.display = "none"; } };
 }
-
-document.getElementById("imageViewerClose").onclick = function(){
-
-    document.getElementById("imageViewer").style.display = "none";
-
-};
-
-document.getElementById("imageViewer").onclick = function(e){
-
-    if(e.target === this){
-
-        this.style.display = "none";
-
-    }
-
-};
 function dataUrlToCanvas(dataUrl){
   return new Promise(function(resolve, reject){
     var img = new Image();
@@ -552,71 +539,37 @@ async function renderPersonProfile(id){
   }
 
   function renderPhotos(){
-
     var row = document.getElementById("pfPhotosRow");
-
     var addBtn = document.getElementById("pfAddPhotoBtn");
-
     var html = "";
 
     pendingPhotos.forEach(function(ph, i){
-
-        var takenBy = (typeof ph === "object" && ph.takenBy)
-            ? ph.takenBy
-            : "";
-
-        html += '<div><div class="pf-photo-chip">' +
-
-            '<img class="pf-photo-view" src="' + photoUrl(ph) + '">' +
-
-            (editMode
-                ? '<button class="pf-rm" data-i="' + i + '" type="button">✕</button>'
-                : ''
-            ) +
-
-            '</div>' +
-
-            (takenBy
-                ? '<div class="pf-photo-caption">' + escapeHtml(takenBy) + '</div>'
-                : ''
-            ) +
-
-            '</div>';
-            Array.prototype.forEach.call(
-    row.querySelectorAll(".pf-photo-view"),
-    function(img){
-
-        img.onclick = function(){
-
-            openImageViewer(this.src);
-
-        };
-
-    }
-);
-
+      var takenBy = (typeof ph === "object" && ph.takenBy) ? ph.takenBy : "";
+      html += '<div><div class="pf-photo-chip">' +
+        '<img class="pf-photo-view" src="' + photoUrl(ph) + '">' +
+        (editMode ? '<button class="pf-rm" data-i="' + i + '" type="button">✕</button>' : '') +
+        '</div>' +
+        (takenBy ? '<div class="pf-photo-caption">' + escapeHtml(takenBy) + '</div>' : '') +
+        '</div>';
     });
 
     row.innerHTML = html;
 
+    Array.prototype.forEach.call(row.querySelectorAll(".pf-photo-view"), function(img){
+      img.onclick = function(){ openImageViewer(this.src); };
+    });
+
     if(editMode && addBtn){
-
-        row.appendChild(addBtn);
-Array.prototype.forEach.call(
-    row.querySelectorAll(".pf-photo-view"),
-    function(img){
-
-        img.onclick = function(){
-
-            openImageViewer(this.src);
-
+      row.appendChild(addBtn);
+      Array.prototype.forEach.call(row.querySelectorAll(".pf-rm"), function(btn){
+        btn.onclick = async function(){
+          pendingPhotos.splice(parseInt(btn.getAttribute("data-i"), 10), 1);
+          await updateDoc(doc(db, "people", id), { photos: pendingPhotos });
+          renderPhotos();
         };
-
+      });
     }
-);
-        
-
-}
+  }
 
   async function addPhoto(dataUrl){
     var entry = { dataUrl: dataUrl, descriptor: null, takenBy: currentUserShortName(), addedAt: new Date().toISOString() };
