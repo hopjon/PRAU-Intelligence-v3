@@ -185,8 +185,7 @@ function openAddVehicleModal(){
       '<input type="file" id="avPhotoFile" accept="image/*" capture="environment" style="display:none;">' +
       '<input type="file" id="avImportFile" accept="image/*" multiple style="display:none;">' +
       '<label>Registration</label><input id="avRegistration">' +
-      '<label>Make</label><input id="avMake">' +
-      '<label>Model</label><input id="avModel">' +
+      '<label>Make and Model</label><input id="avMake" placeholder="e.g. Toyota Hilux">' +
       '<label>Colour</label><input id="avColour">' +
       '<div id="avOwnerWidget"></div>' +
       '<div class="modal-actions">' +
@@ -242,7 +241,7 @@ function openAddVehicleModal(){
     var errEl = document.getElementById("avError");
     var registration = document.getElementById("avRegistration").value.trim();
     var make = document.getElementById("avMake").value.trim();
-    var model = document.getElementById("avModel").value.trim();
+    var model = "";
     if(!registration && !make && !model){
       errEl.textContent = "Enter at least a registration, make, or model.";
       return;
@@ -318,8 +317,9 @@ async function renderVehicleProfile(id){
       '<div class="modal-card profile-view">' +
         '<div class="profile-field-group">' +
           field("Registration", "vfRegistration", v.registration, editMode) +
-          field("Make", "vfMake", v.make, editMode) +
-          field("Model", "vfModel", v.model, editMode) +
+          '<div class="profile-field" style="grid-column:1 / -1;">' +
+            '<label>Make and Model</label><input type="text" id="vfMake" value="' + escapeHtml(vehicleTitle(v)) + '"' + (editMode ? '' : ' readonly') + '>' +
+          '</div>' +
           field("Colour", "vfColour", v.colour, editMode) +
           field("Distinct Markings", "vfMarkings", v.markings, editMode, "textarea") +
         '</div>' +
@@ -469,7 +469,7 @@ async function renderVehicleProfile(id){
         var updates = {
           registration: registration,
           make: document.getElementById("vfMake").value.trim(),
-          model: document.getElementById("vfModel").value.trim(),
+          model: "",
           colour: document.getElementById("vfColour").value.trim(),
           markings: document.getElementById("vfMarkings").value.trim(),
           locationSpotted: document.getElementById("vfLocationSpotted").value.trim(),
