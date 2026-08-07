@@ -1,0 +1,33 @@
+"filename", "language", "HTML", "JavaScript", "Markdown", "PostCSS", "comment", "blank", "total"
+"c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\README.md", "Markdown", 0, 0, 1, 0, 0, 0, 1
+"c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\css\dashboard.css", "PostCSS", 0, 0, 0, 156, 20, 121, 297
+"c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\css\forms.css", "PostCSS", 0, 0, 0, 0, 0, 1, 1
+"c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\css\login.css", "PostCSS", 0, 0, 0, 19, 0, 0, 19
+"c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\css\mobile.css", "PostCSS", 0, 0, 0, 0, 0, 1, 1
+"c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\css\people.css\people.css", "PostCSS", 0, 0, 0, 206, 0, 79, 285
+"c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\css\style.css", "PostCSS", 0, 0, 0, 13, 0, 6, 19
+"c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\css\variables.css", "PostCSS", 0, 0, 0, 14, 5, 13, 32
+"c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\css\vehicles.css", "PostCSS", 0, 0, 0, 21, 0, 0, 21
+"c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\docs\BrandGuide.md", "Markdown", 0, 0, 0, 0, 0, 1, 1
+"c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\docs\Changelog.md", "Markdown", 0, 0, 0, 0, 0, 1, 1
+"c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\docs\Database.md", "Markdown", 0, 0, 0, 0, 0, 1, 1
+"c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\docs\Ideas.md", "Markdown", 0, 0, 0, 0, 0, 1, 1
+"c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\docs\Roadmap.md", "Markdown", 0, 0, 0, 0, 0, 1, 1
+"c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\index.html", "HTML", 30, 0, 0, 0, 7, 12, 49
+"c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\js\app.js", "JavaScript", 0, 50, 0, 0, 0, 7, 57
+"c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\js\auth.js", "JavaScript", 0, 15, 0, 0, 0, 3, 18
+"c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\js\dashboard.js", "JavaScript", 0, 86, 0, 0, 0, 10, 96
+"c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\js\face.js", "JavaScript", 0, 132, 0, 0, 1, 19, 152
+"c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\js\firebase.js", "JavaScript", 0, 14, 0, 0, 0, 3, 17
+"c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\js\import.js", "JavaScript", 0, 0, 0, 0, 0, 1, 1
+"c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\js\layout\router.js", "JavaScript", 0, 11, 0, 0, 0, 3, 14
+"c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\js\mobile.js", "JavaScript", 0, 0, 0, 0, 0, 1, 1
+"c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\js\ocr.js", "JavaScript", 0, 0, 0, 0, 0, 1, 1
+"c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\js\people\people-form.js", "JavaScript", 0, 281, 0, 0, 6, 23, 310
+"c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\js\people\people-list.js", "JavaScript", 0, 30, 0, 0, 0, 5, 35
+"c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\js\people\people-profile.js", "JavaScript", 0, 0, 0, 0, 0, 1, 1
+"c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\js\people\people.js", "JavaScript", 0, 831, 0, 0, 7, 156, 994
+"c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\js\ui.js", "JavaScript", 0, 0, 0, 0, 0, 1, 1
+"c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\js\utils.js", "JavaScript", 0, 0, 0, 0, 0, 1, 1
+"c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\js\vehicles.js", "JavaScript", 0, 615, 0, 0, 6, 58, 679
+"Total", "-", 30, 2065, 1, 429, 52, 531, 3108

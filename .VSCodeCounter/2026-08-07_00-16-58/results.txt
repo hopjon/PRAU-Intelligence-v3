@@ -1,0 +1,67 @@
+Date : 2026-08-07 00:16:58
+Directory : c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3
+Total : 31 files,  2525 codes, 52 comments, 531 blanks, all 3108 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| JavaScript |         16 |      2,065 |         20 |        293 |      2,378 |
+| PostCSS    |          8 |        429 |         25 |        221 |        675 |
+| HTML       |          1 |         30 |          7 |         12 |         49 |
+| Markdown   |          6 |          1 |          0 |          5 |          6 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++----------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                         | files      | code       | comment    | blank      | total      |
++----------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                            |         31 |      2,525 |         52 |        531 |      3,108 |
+| . (Files)                                                                                    |          2 |         31 |          7 |         12 |         50 |
+| css                                                                                          |          8 |        429 |         25 |        221 |        675 |
+| css (Files)                                                                                  |          7 |        223 |         25 |        142 |        390 |
+| css\people.css                                                                               |          1 |        206 |          0 |         79 |        285 |
+| docs                                                                                         |          5 |          0 |          0 |          5 |          5 |
+| js                                                                                           |         16 |      2,065 |         20 |        293 |      2,378 |
+| js (Files)                                                                                   |         11 |        912 |          7 |        105 |      1,024 |
+| js\layout                                                                                    |          1 |         11 |          0 |          3 |         14 |
+| js\people                                                                                    |          4 |      1,142 |         13 |        185 |      1,340 |
++----------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++----------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                                     | language   | code       | comment    | blank      | total      |
++----------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\README.md                   | Markdown   |          1 |          0 |          0 |          1 |
+| c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\css\dashboard.css           | PostCSS    |        156 |         20 |        121 |        297 |
+| c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\css\forms.css               | PostCSS    |          0 |          0 |          1 |          1 |
+| c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\css\login.css               | PostCSS    |         19 |          0 |          0 |         19 |
+| c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\css\mobile.css              | PostCSS    |          0 |          0 |          1 |          1 |
+| c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\css\people.css\people.css   | PostCSS    |        206 |          0 |         79 |        285 |
+| c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\css\style.css               | PostCSS    |         13 |          0 |          6 |         19 |
+| c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\css\variables.css           | PostCSS    |         14 |          5 |         13 |         32 |
+| c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\css\vehicles.css            | PostCSS    |         21 |          0 |          0 |         21 |
+| c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\docs\BrandGuide.md          | Markdown   |          0 |          0 |          1 |          1 |
+| c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\docs\Changelog.md           | Markdown   |          0 |          0 |          1 |          1 |
+| c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\docs\Database.md            | Markdown   |          0 |          0 |          1 |          1 |
+| c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\docs\Ideas.md               | Markdown   |          0 |          0 |          1 |          1 |
+| c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\docs\Roadmap.md             | Markdown   |          0 |          0 |          1 |          1 |
+| c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\index.html                  | HTML       |         30 |          7 |         12 |         49 |
+| c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\js\app.js                   | JavaScript |         50 |          0 |          7 |         57 |
+| c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\js\auth.js                  | JavaScript |         15 |          0 |          3 |         18 |
+| c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\js\dashboard.js             | JavaScript |         86 |          0 |         10 |         96 |
+| c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\js\face.js                  | JavaScript |        132 |          1 |         19 |        152 |
+| c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\js\firebase.js              | JavaScript |         14 |          0 |          3 |         17 |
+| c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\js\import.js                | JavaScript |          0 |          0 |          1 |          1 |
+| c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\js\layout\router.js         | JavaScript |         11 |          0 |          3 |         14 |
+| c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\js\mobile.js                | JavaScript |          0 |          0 |          1 |          1 |
+| c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\js\ocr.js                   | JavaScript |          0 |          0 |          1 |          1 |
+| c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\js\people\people-form.js    | JavaScript |        281 |          6 |         23 |        310 |
+| c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\js\people\people-list.js    | JavaScript |         30 |          0 |          5 |         35 |
+| c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\js\people\people-profile.js | JavaScript |          0 |          0 |          1 |          1 |
+| c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\js\people\people.js         | JavaScript |        831 |          7 |        156 |        994 |
+| c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\js\ui.js                    | JavaScript |          0 |          0 |          1 |          1 |
+| c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\js\utils.js                 | JavaScript |          0 |          0 |          1 |          1 |
+| c:\Users\hopjo\Desktop\PRAU Intelligence v3\PRAU-Intelligence-v3\js\vehicles.js              | JavaScript |        615 |          6 |         58 |        679 |
+| Total                                                                                        |            |      2,525 |         52 |        531 |      3,108 |
++----------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
