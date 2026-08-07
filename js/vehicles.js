@@ -64,7 +64,7 @@ export async function renderVehicles(){
   function renderList(q){
     q = (q || "").trim().toLowerCase();
     var filtered = !q ? vehicles : vehicles.filter(function(v){
-      return (vehicleTitle(v) + " " + (v.registration||"") + " " + (v.vin||"")).toLowerCase().indexOf(q) !== -1;
+      return (vehicleTitle(v) + " " + (v.registration||"")).toLowerCase().indexOf(q) !== -1;
     });
     filtered.sort(function(a, b){ return vehicleTitle(a).localeCompare(vehicleTitle(b)); });
 
@@ -185,7 +185,6 @@ function openAddVehicleModal(){
       '<input type="file" id="avPhotoFile" accept="image/*" capture="environment" style="display:none;">' +
       '<input type="file" id="avImportFile" accept="image/*" multiple style="display:none;">' +
       '<label>Registration</label><input id="avRegistration">' +
-      '<label>VIN</label><input id="avVin">' +
       '<label>Make</label><input id="avMake">' +
       '<label>Model</label><input id="avModel">' +
       '<label>Colour</label><input id="avColour">' +
@@ -262,7 +261,6 @@ function openAddVehicleModal(){
 
     var vehicle = {
       registration: registration,
-      vin: document.getElementById("avVin").value.trim(),
       make: make,
       model: model,
       colour: document.getElementById("avColour").value.trim(),
@@ -320,7 +318,6 @@ async function renderVehicleProfile(id){
       '<div class="modal-card profile-view">' +
         '<div class="profile-field-group">' +
           field("Registration", "vfRegistration", v.registration, editMode) +
-          field("VIN", "vfVin", v.vin, editMode) +
           field("Make", "vfMake", v.make, editMode) +
           field("Model", "vfModel", v.model, editMode) +
           field("Colour", "vfColour", v.colour, editMode) +
@@ -471,7 +468,6 @@ async function renderVehicleProfile(id){
 
         var updates = {
           registration: registration,
-          vin: document.getElementById("vfVin").value.trim(),
           make: document.getElementById("vfMake").value.trim(),
           model: document.getElementById("vfModel").value.trim(),
           colour: document.getElementById("vfColour").value.trim(),
