@@ -161,8 +161,8 @@ function openAddPersonModal(){
     '<div class="modal-card">' +
       '<h2>Add Person</h2>' +
       '<label>Photos</label>' +
-      '<div class="pf-photos-row" id="apPhotosRow"><button class="pf-add-photo" id="apAddPhotoBtn" type="button">＋</button></div>' +
-      '<label class="pf-import-label" for="apImportFile">🖼 Import from gallery</label>' +
+      '<div class="pf-photos-row" id="apPhotosRow"><button class="pf-add-photo" id="apAddPhotoBtn" type="button" title="Take Photo"><i class="bi bi-camera-fill"></i></button></div>' +
+      '<label class="pf-import-label" for="apImportFile"><i class="bi bi-images"></i>Import from gallery</label>' +
       '<input type="file" id="apPhotoFile" accept="image/*" capture="environment" style="display:none;">' +
       '<input type="file" id="apImportFile" accept="image/*" multiple style="display:none;">' +
       '<label>Name and Surname</label><input id="apName" placeholder="e.g. John Doe">' +
@@ -459,10 +459,9 @@ async function renderPersonProfile(id){
 
 (editMode ?
 
-'<button class="pf-add-photo" id="pfAddPhotoBtn" type="button">＋ Add Photo</button>' +
+'<button class="pf-take-photo-btn" id="pfAddPhotoBtn" type="button"><i class="bi bi-camera-fill"></i>Take Photo</button>' +
 
-'<label class="pf-import-label" for="pfImportFile">🖼 Import from Gallery</label>' +
-
+'<label class="pf-import-label" for="pfImportFile"><i class="bi bi-images"></i>Import from Gallery</label>' +
 '<input type="file" id="pfPhotoFile" accept="image/*" capture="environment" style="display:none;">' +
 
 '<input type="file" id="pfImportFile" accept="image/*" multiple style="display:none;">'

@@ -283,3 +283,9 @@
 }
 .owner-link{color:#D4AF37;text-decoration:underline;cursor:pointer;}
 .owner-search-box{margin-top:8px;}
+.pf-add-photo{color:#D4AF37;}
+.pf-add-photo i{font-size:22px;}
+.pf-take-photo-btn{display:block;text-align:center;padding:10px;border:1px solid #3a3120;border-radius:9px;
+  background:transparent;color:#D4AF37;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px;width:100%;}
+.pf-take-photo-btn i{margin-right:6px;}
+.pf-import-label i{margin-right:6px;}

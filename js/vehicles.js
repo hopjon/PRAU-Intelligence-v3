@@ -346,8 +346,8 @@ async function renderVehicleProfile(id){
         '<h3>Photos</h3>' +
         '<div class="pf-photos-row" id="vfPhotosRow"></div>' +
         (editMode ?
-          '<button class="pf-add-photo" id="vfAddPhotoBtn" type="button">＋ Add Photo</button>' +
-          '<label class="pf-import-label" for="vfImportFile">🖼 Import from Gallery</label>' +
+          '<button class="pf-take-photo-btn" id="vfAddPhotoBtn" type="button"><i class="bi bi-camera-fill"></i>Take Photo</button>' +
+          '<label class="pf-import-label" for="vfImportFile"><i class="bi bi-images"></i>Import from Gallery</label>' +
           '<input type="file" id="vfPhotoFile" accept="image/*" capture="environment" style="display:none;">' +
           '<input type="file" id="vfImportFile" accept="image/*" multiple style="display:none;">'
         : '') +
