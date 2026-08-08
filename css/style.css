@@ -1,6 +1,5 @@
-/* ========== GOLD THEME - MATCHING LOGIN SCREEN ========== */
-/* Gold gradient: #FAD06D (top) → #D4A843 (center) → #B37420 (bottom) */
-/* Text on gold buttons: #000000 (black) */
+/* ========== GOLD THEME - AGGRESSIVE OVERRIDES ========== */
+/* Targeting the exact colors from the screenshot: #f3c037 → #D4A843 */
 
 /* ========== DASHBOARD STAT CARDS ========== */
 .stat-cards {
@@ -62,7 +61,9 @@
 }
 
 /* ========== PRIMARY BUTTONS (Gold with black text) ========== */
-.btn-primary {
+.btn-primary,
+button.btn-primary,
+[type="button"].btn-primary {
   background: linear-gradient(180deg, #FAD06D, #D4A843, #B37420) !important;
   color: #000000 !important;
   font-weight: 700 !important;
@@ -71,18 +72,55 @@
   transition: all 0.3s ease !important;
 }
 
-.btn-primary:hover {
+.btn-primary:hover,
+button.btn-primary:hover {
   background: linear-gradient(180deg, #FAD06D, #E0B84D, #C48430) !important;
   box-shadow: 0 6px 25px rgba(212, 168, 67, 0.35), 0 0 50px rgba(212, 168, 67, 0.15) !important;
   transform: translateY(-1px) !important;
 }
 
-.btn-primary i {
+.btn-primary i,
+button.btn-primary i {
   color: #000000 !important;
 }
 
-/* ========== GHOST BUTTONS (Outline gold) ========== */
-.btn-ghost {
+/* ========== LOGOUT BUTTON WITH GLOW ========== */
+.logout-btn,
+button.logout-btn,
+#logoutBtn,
+button#logoutBtn {
+  background: transparent !important;
+  color: #D4A843 !important;
+  border: 1px solid rgba(212, 168, 67, 0.4) !important;
+  border-radius: 10px !important;
+  padding: 10px 20px !important;
+  box-shadow: 0 0 15px rgba(212, 168, 67, 0.1), 0 0 30px rgba(212, 168, 67, 0.05) !important;
+  transition: all 0.3s ease !important;
+  font-weight: 600 !important;
+}
+
+.logout-btn:hover,
+button.logout-btn:hover,
+#logoutBtn:hover {
+  background: rgba(212, 168, 67, 0.1) !important;
+  border-color: rgba(212, 168, 67, 0.7) !important;
+  box-shadow: 0 0 25px rgba(212, 168, 67, 0.2), 0 0 50px rgba(212, 168, 67, 0.1) !important;
+  color: #FAD06D !important;
+}
+
+.logout-btn i,
+#logoutBtn i {
+  color: #D4A843 !important;
+}
+
+.logout-btn:hover i,
+#logoutBtn:hover i {
+  color: #FAD06D !important;
+}
+
+/* ========== GHOST BUTTONS ========== */
+.btn-ghost,
+button.btn-ghost {
   background: transparent !important;
   color: #D4A843 !important;
   border: 1px solid rgba(212, 168, 67, 0.4) !important;
@@ -90,73 +128,171 @@
   transition: all 0.3s ease !important;
 }
 
-.btn-ghost:hover {
+.btn-ghost:hover,
+button.btn-ghost:hover {
   background: rgba(212, 168, 67, 0.1) !important;
   border-color: rgba(212, 168, 67, 0.7) !important;
   box-shadow: 0 0 25px rgba(212, 168, 67, 0.15) !important;
 }
 
-.btn-ghost i {
+.btn-ghost i,
+button.btn-ghost i {
   color: #D4A843 !important;
 }
 
-/* ========== ALL GOLD TEXT ========== */
-.people-header h1,
-.people-header h1 i,
-.people-card-name,
-.people-row-name,
-.pf-encounter-head span,
+/* ========== ALL GOLD TEXT - MAXIMUM SPECIFICITY ========== */
+/* Dashboard headings */
+.welcome-text h1,
+.welcome-text h1 span,
+.topbar h1,
+.topbar .welcome-text h1,
+#app h1,
+.content h1,
+main h1 {
+  color: #D4A843 !important;
+}
+
+/* Date and role */
+.date-time,
+.user-role,
+.topbar .date-time,
+.topbar .user-role,
+.welcome-text .date-time,
+.welcome-text .user-role {
+  color: #D4A843 !important;
+}
+
+/* Section headings */
 .dash-section h3,
 .dash-section h3 i,
-.dash-row-count,
-.stat-number,
-.stat-label,
+.dash-section h3 .bi,
+.dash-section h3 [class*="bi-"],
+h3 i,
+h3 .bi,
+h3 [class*="bi-"] {
+  color: #D4A843 !important;
+}
+
+/* People header */
+.people-header h1,
+.people-header h1 i,
+.people-header h1 .bi,
+.people-header h1 [class*="bi-"],
+.people-header h2,
+.people-header h2 i {
+  color: #D4A843 !important;
+}
+
+/* Card names and meta */
+.people-card-name,
+.people-row-name,
 .people-card-meta,
 .people-row-meta,
 .people-empty,
 .pf-photo-caption,
-.profile-field label,
+.pf-encounter-head span,
+.dash-row-count,
+.dash-row-sub {
+  color: #D4A843 !important;
+}
+
+/* Modal and form labels */
 .modal-card h2,
 .modal-card label,
-.login-tagline,
-.login-field i,
-.login-version,
+.profile-field label,
+.modal-card h2 i,
+.modal-card label i {
+  color: #D4A843 !important;
+}
+
+/* Menu items */
+.menu-item,
+nav .menu-item,
+.sidebar .menu-item,
+aside .menu-item,
+nav button,
+.sidebar button,
+aside button {
+  color: #D4A843 !important;
+}
+
 .menu-item i,
-.welcome-text h1,
-.date-time,
-.user-role,
+.menu-item .bi,
+.menu-item [class*="bi-"],
+nav button i,
+.sidebar button i {
+  color: #D4A843 !important;
+}
+
+.menu-item.active,
+nav .menu-item.active,
+.sidebar .menu-item.active,
+.menu-item.active i,
+.menu-item.active .bi {
+  background: rgba(212, 168, 67, 0.12) !important;
+  color: #D4A843 !important;
+  border-left: none !important;
+}
+
+.menu-item:hover,
+nav .menu-item:hover,
+.sidebar .menu-item:hover {
+  background: rgba(212, 168, 67, 0.08) !important;
+  color: #FAD06D !important;
+}
+
+/* Logo and sidebar title */
+.logo h2,
+.sidebar .logo h2,
+.sidebar h2,
+.logo span,
+.sidebar .logo span {
+  color: #D4A843 !important;
+}
+
+/* Links and interactive elements */
 .linked-person-view,
 .merge-search-row,
-.deceased-badge,
-.deceased-tag,
+.merge-search-row:hover,
+.dash-row,
+.dash-row span,
+.dash-row [data-i],
+.dash-row [data-mep] {
+  color: #D4A843 !important;
+}
+
+/* Face search */
 .face-warning,
 .modal-error,
 #faceStatus,
 #apGpsStatus,
 #encGpsStatus,
-#vfLocationGpsStatus {
+#vfLocationGpsStatus,
+#profileError,
+#apError,
+#encError,
+#avError,
+#mergeError {
   color: #D4A843 !important;
 }
 
-/* ========== MENU ========== */
-.menu-item.active {
+/* Deceased badge */
+.deceased-badge,
+.deceased-tag {
   background: rgba(212, 168, 67, 0.12) !important;
   color: #D4A843 !important;
-  border-left: 3px solid #D4A843 !important;
+  border: 1px solid rgba(212, 168, 67, 0.4) !important;
 }
 
-.menu-item:hover {
-  background: rgba(212, 168, 67, 0.08) !important;
-  color: #D4A843 !important;
-}
-
-/* ========== CARDS & BORDERS ========== */
+/* ========== ALL GOLD BORDERS ========== */
 .modal-card,
 .profile-view,
 .people-card,
 .pf-photo-chip,
 .pf-encounter,
-.login-card {
+.login-card,
+.dash-row,
+.dash-section {
   border-color: rgba(212, 168, 67, 0.25) !important;
   box-shadow: 0 0 20px rgba(212, 168, 67, 0.05) !important;
 }
@@ -164,7 +300,10 @@
 /* ========== INPUT FIELDS ========== */
 input,
 textarea,
-select {
+select,
+input[type="text"],
+input[type="date"],
+input[type="file"] {
   background: #161616 !important;
   border: 1px solid rgba(212, 168, 67, 0.2) !important;
   color: #fff !important;
@@ -172,7 +311,9 @@ select {
 
 input:focus,
 textarea:focus,
-select:focus {
+select:focus,
+input[type="text"]:focus,
+input[type="date"]:focus {
   border-color: #D4A843 !important;
   box-shadow: 0 0 0 2px rgba(212, 168, 67, 0.15), 0 0 15px rgba(212, 168, 67, 0.1) !important;
   outline: none !important;
@@ -197,15 +338,7 @@ textarea::placeholder {
   border-radius: 4px !important;
 }
 
-/* ========== DECEASED BADGE ========== */
-.deceased-badge,
-.deceased-tag {
-  background: rgba(212, 168, 67, 0.12) !important;
-  color: #D4A843 !important;
-  border: 1px solid rgba(212, 168, 67, 0.4) !important;
-}
-
-/* ========== LOGIN CARD GLOW ========== */
+/* ========== LOGIN CARD ========== */
 .login-card {
   box-shadow: 0 0 40px rgba(212, 168, 67, 0.12), 0 0 80px rgba(212, 168, 67, 0.05) !important;
   border: 1px solid rgba(212, 168, 67, 0.35) !important;
@@ -213,6 +346,28 @@ textarea::placeholder {
 
 .login-card::before {
   background: linear-gradient(90deg, transparent, #FAD06D, transparent) !important;
+}
+
+.login-tagline {
+  color: #D4A843 !important;
+}
+
+.login-field i {
+  color: #D4A843 !important;
+}
+
+.login-btn {
+  background: linear-gradient(180deg, #FAD06D, #D4A843, #B37420) !important;
+  color: #000000 !important;
+  box-shadow: 0 4px 20px rgba(212, 168, 67, 0.3), 0 0 40px rgba(212, 168, 67, 0.15) !important;
+}
+
+.login-btn i {
+  color: #000000 !important;
+}
+
+.login-version {
+  color: #8B6914 !important;
 }
 
 /* ========== SEARCH BAR ========== */
@@ -231,12 +386,11 @@ textarea::placeholder {
   border: 1px solid rgba(212, 168, 67, 0.2) !important;
 }
 
-/* ========== TOPBAR ========== */
+/* ========== TOPBAR & SIDEBAR ========== */
 .topbar {
   border-bottom: 1px solid rgba(212, 168, 67, 0.15) !important;
 }
 
-/* ========== SIDEBAR ========== */
 .sidebar {
   border-right: 1px solid rgba(212, 168, 67, 0.1) !important;
 }
