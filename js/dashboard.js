@@ -5,17 +5,23 @@ import { showPeople } from "./people/people.js";
 import { renderVehicles } from "./vehicles.js";
 import { renderFaceSearch } from "./face.js";
 import { renderPlaces } from "./places.js";
+import { renderDashboardHome } from "./dashboardHome.js";
 import { navigate } from "./layout/router.js";
 
 var currentView = "dashboard";
 var currentUser = null;
 
-function getCards(){
-  return '<div class="cards">' +
-      '<div class="card"><h3>Face Recognition</h3><p>Coming Soon</p></div>' +
-      '<div class="card"><h3>Plate Recognition</h3><p>Coming Soon</p></div>' +
-    '</div>';
-}
+if(currentView === "people"){
+    renderPeople(contentArea);
+  } else if(currentView === "vehicles"){
+    renderVehicles(contentArea);
+  } else if(currentView === "face"){
+    renderFaceSearch(contentArea);
+  } else if(currentView === "places"){
+    renderPlaces();
+  } else {
+    renderDashboardHome(contentArea, function(view){ currentView = view; renderShell(displayName); });
+  }
 
 function getMenu(){
   return '<aside class="sidebar">' +

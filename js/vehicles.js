@@ -293,6 +293,8 @@ function openAddVehicleModal(){
   };
 }
 
+window.__openVehicleProfile = function(id){ renderVehicleProfile(id); };
+
 // ---------- full profile page ----------
 async function renderVehicleProfile(id){
   var content = document.getElementById("contentArea");

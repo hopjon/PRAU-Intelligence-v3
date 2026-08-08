@@ -317,6 +317,8 @@ function openAddPlaceModal(){
   };
 }
 
+window.__openPlaceProfile = function(id){ renderPlaceProfile(id); };
+
 // ---------- full profile page ----------
 async function renderPlaceProfile(id){
   var content = document.getElementById("contentArea");
