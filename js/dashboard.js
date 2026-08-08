@@ -4,6 +4,7 @@ import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase
 import { showPeople } from "./people/people.js";
 import { renderVehicles } from "./vehicles.js";
 import { renderFaceSearch } from "./face.js";
+import { renderPlaces } from "./places.js";
 import { navigate } from "./layout/router.js";
 
 var currentView = "dashboard";
@@ -28,6 +29,8 @@ function getMenu(){
           '<i class="bi bi-car-front-fill"></i> Vehicles</button>' +
         '<button class="menu-item' + (currentView === "face" ? " active" : "") + '" id="navFace">' +
           '<i class="bi bi-camera-fill"></i> Face Search</button>' +
+        '<button class="menu-item' + (currentView === "places" ? " active" : "") + '" id="navPlaces">' +
+          '<i class="bi bi-geo-alt-fill"></i> Places</button>' +
       '</nav>' +
     '</aside>';
 }
@@ -68,6 +71,7 @@ document
  document.getElementById("navPeople").onclick = function(){ currentView = "people"; renderShell(displayName); };
   document.getElementById("navVehicles").onclick = function(){ currentView = "vehicles"; renderShell(displayName); };
   document.getElementById("navFace").onclick = function(){ currentView = "face"; renderShell(displayName); };
+  document.getElementById("navPlaces").onclick = function(){ currentView = "places"; renderShell(displayName); };
   var contentArea = document.getElementById("contentArea");
   if(currentView === "people"){
     showPeople();
@@ -75,6 +79,8 @@ document
     renderVehicles(contentArea);
   } else if(currentView === "face"){
     renderFaceSearch(contentArea);
+  } else if(currentView === "places"){
+    renderPlaces();
   } else {
     contentArea.innerHTML = getCards();
   }
