@@ -67,7 +67,7 @@
     border-color:#d4af37;
     color:#fff;
 }
-.modal-backdrop-custom{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;
+.modal-backdrop-custom{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:2000;
   display:flex;align-items:center;justify-content:center;padding:20px;}
 .modal-card{background:#0f0f0f;border:1px solid #D4AF37;border-radius:16px;padding:24px;
   width:100%;max-width:440px;max-height:85vh;overflow-y:auto;}
