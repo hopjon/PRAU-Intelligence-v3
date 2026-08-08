@@ -315,3 +315,10 @@
     cursor:pointer;
     user-select:none;
 }
+.linked-people-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;}
+.linked-person-chip{display:inline-flex;align-items:center;gap:6px;background:#161616;border:1px solid #3a3120;
+  border-radius:20px;padding:6px 10px 6px 12px;font-size:13px;color:#D4AF37;cursor:pointer;}
+.linked-person-remove{background:transparent;border:none;color:#888;font-size:13px;cursor:pointer;padding:0;line-height:1;}
+.linked-person-remove:hover{color:#ef5350;}
+.linked-person-view{display:inline-block;background:#161616;border:1px solid #3a3120;border-radius:20px;
+  padding:6px 12px;font-size:13px;margin:4px 6px 0 0;cursor:pointer;}

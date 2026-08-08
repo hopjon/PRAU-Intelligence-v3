@@ -125,54 +125,62 @@ async function searchPeople(q){
   return results;
 }
 
-function ownerSearchWidget(containerEl, currentOwnerId, currentOwnerName, onSelect){
-  containerEl.innerHTML =
-    '<label>Owner (linked to People)</label>' +
-    '<div id="ownerCurrent">' + (currentOwnerName ? '<span class="owner-link" id="ownerViewBtn">' + escapeHtml(currentOwnerName) + '</span> ' : '<span style="color:#888;">No owner linked</span> ') +
-      '<button class="btn-ghost" id="ownerChangeBtn" type="button" style="padding:4px 10px;font-size:12px;">' + (currentOwnerName ? "Change" : "Link") + '</button>' +
-    '</div>' +
-    '<div class="owner-search-box" id="ownerSearchBox" style="display:none;">' +
-      '<input id="ownerSearchInput" placeholder="Type a name…">' +
-      '<div class="merge-search-results" id="ownerResults"></div>' +
-    '</div>';
+function linkedPeopleWidget(containerEl, currentList, onChange){
+  var people = currentList.slice();
 
-  var ownerId = currentOwnerId || null;
-  var ownerName = currentOwnerName || null;
+  function renderChips(){
+    containerEl.innerHTML =
+      '<label>Linked People</label>' +
+      '<div class="linked-people-chips" id="linkedPeopleChips">' +
+        (people.length ? people.map(function(p, i){
+          return '<span class="linked-person-chip" data-i="' + i + '">' + escapeHtml(p.name) +
+            ' <button class="linked-person-remove" data-i="' + i + '" type="button">✕</button></span>';
+        }).join("") : '<span style="color:#888;">No one linked yet</span>') +
+      '</div>' +
+      '<div style="margin-top:8px;"><input id="linkedPeopleSearch" placeholder="Type a name to link…"></div>' +
+      '<div class="merge-search-results" id="linkedPeopleResults"></div>';
 
-  if(document.getElementById("ownerViewBtn")){
-    document.getElementById("ownerViewBtn").onclick = function(){
-      if(ownerId) window.__openPersonProfile && window.__openPersonProfile(ownerId);
-    };
-  }
-
-  document.getElementById("ownerChangeBtn").onclick = function(){
-    var box = document.getElementById("ownerSearchBox");
-    box.style.display = box.style.display === "none" ? "block" : "none";
-  };
-
-  document.getElementById("ownerSearchInput").oninput = async function(){
-    var results = await searchPeople(this.value);
-    document.getElementById("ownerResults").innerHTML = results.map(function(r){
-      return '<div class="merge-search-row" data-id="' + r.id + '" data-name="' + escapeHtml(r.name) + '">' + escapeHtml(r.name) + '</div>';
-    }).join("");
-    Array.prototype.forEach.call(document.getElementById("ownerResults").querySelectorAll(".merge-search-row"), function(row){
-      row.onclick = function(){
-        ownerId = row.getAttribute("data-id");
-        ownerName = row.getAttribute("data-name");
-        onSelect(ownerId, ownerName);
-        ownerSearchWidget(containerEl, ownerId, ownerName, onSelect);
+    Array.prototype.forEach.call(containerEl.querySelectorAll(".linked-person-chip"), function(chip){
+      chip.onclick = function(e){
+        if(e.target.classList.contains("linked-person-remove")) return;
+        var pid = people[parseInt(chip.getAttribute("data-i"), 10)].id;
+        if(pid && window.__openPersonProfile) window.__openPersonProfile(pid);
       };
     });
-  };
+    Array.prototype.forEach.call(containerEl.querySelectorAll(".linked-person-remove"), function(btn){
+      btn.onclick = function(e){
+        e.stopPropagation();
+        people.splice(parseInt(btn.getAttribute("data-i"), 10), 1);
+        onChange(people);
+        renderChips();
+      };
+    });
 
-  return { getOwnerId: function(){ return ownerId; }, getOwnerName: function(){ return ownerName; } };
+    document.getElementById("linkedPeopleSearch").oninput = async function(){
+      var results = await searchPeople(this.value);
+      results = results.filter(function(r){ return !people.some(function(p){ return p.id === r.id; }); });
+      document.getElementById("linkedPeopleResults").innerHTML = results.map(function(r){
+        return '<div class="merge-search-row" data-id="' + r.id + '" data-name="' + escapeHtml(r.name) + '">' + escapeHtml(r.name) + '</div>';
+      }).join("");
+      Array.prototype.forEach.call(document.getElementById("linkedPeopleResults").querySelectorAll(".merge-search-row"), function(row){
+        row.onclick = function(){
+          people.push({ id: row.getAttribute("data-id"), name: row.getAttribute("data-name") });
+          onChange(people);
+          document.getElementById("linkedPeopleSearch").value = "";
+          document.getElementById("linkedPeopleResults").innerHTML = "";
+          renderChips();
+        };
+      });
+    };
+  }
+  renderChips();
+  return { getList: function(){ return people; } };
 }
 
 // ---------- add vehicle (modal) ----------
 function openAddVehicleModal(){
   var pendingPhotos = [];
-  var linkedOwnerId = null;
-  var linkedOwnerName = null;
+  var linkedPeople = [];
 
   var backdrop = document.createElement("div");
   backdrop.className = "modal-backdrop-custom";
@@ -180,14 +188,15 @@ function openAddVehicleModal(){
     '<div class="modal-card">' +
       '<h2>Add Vehicle</h2>' +
       '<label>Photos</label>' +
-      '<div class="pf-photos-row" id="avPhotosRow"><button class="pf-add-photo" id="avAddPhotoBtn" type="button">＋</button></div>' +
-      '<label class="pf-import-label" for="avImportFile">🖼 Import from gallery</label>' +
+      '<div class="pf-photos-row" id="avPhotosRow"><button class="pf-add-photo" id="avAddPhotoBtn" type="button" title="Take Photo"><i class="bi bi-camera-fill"></i></button></div>' +
+      '<label class="pf-import-label" for="avImportFile"><i class="bi bi-images"></i>Import from gallery</label>' +
       '<input type="file" id="avPhotoFile" accept="image/*" capture="environment" style="display:none;">' +
       '<input type="file" id="avImportFile" accept="image/*" multiple style="display:none;">' +
       '<label>Registration</label><input id="avRegistration" placeholder="e.g. CAA123456">' +
       '<label>Make and Model</label><input id="avMake" placeholder="e.g. VW Citi Golf">' +
+      '<label>Year</label><input id="avYear" placeholder="e.g. 2015">' +
       '<label>Colour</label><input id="avColour" placeholder="e.g. White">' +
-      '<div id="avOwnerWidget"></div>' +
+      '<div id="avLinkedWidget"></div>' +
       '<div class="modal-actions">' +
         '<button class="btn-ghost" id="avCancel">Cancel</button>' +
         '<button class="btn-primary" id="avSave">Save</button>' +
@@ -198,8 +207,8 @@ function openAddVehicleModal(){
   backdrop.onclick = function(e){ if(e.target === backdrop) backdrop.remove(); };
   document.getElementById("avCancel").onclick = function(){ backdrop.remove(); };
 
-  ownerSearchWidget(document.getElementById("avOwnerWidget"), null, null, function(id, name){
-    linkedOwnerId = id; linkedOwnerName = name;
+  linkedPeopleWidget(document.getElementById("avLinkedWidget"), [], function(list){
+    linkedPeople = list;
   });
 
   function renderAvPhotos(){
@@ -262,9 +271,9 @@ function openAddVehicleModal(){
       registration: registration,
       make: make,
       model: model,
+      year: document.getElementById("avYear").value.trim(),
       colour: document.getElementById("avColour").value.trim(),
-      ownerId: linkedOwnerId,
-      ownerName: linkedOwnerName,
+      linkedPeople: linkedPeople,
       deceased: false,
       photos: pendingPhotos,
       addedAt: new Date().toISOString(),
@@ -296,8 +305,7 @@ async function renderVehicleProfile(id){
   var editMode = false;
   var pendingPhotos = v.photos ? v.photos.slice() : [];
   var encounters = [];
-  var editOwnerId = v.ownerId || null;
-  var editOwnerName = v.ownerName || null;
+  var editLinkedPeople = (v.linkedPeople !== undefined) ? v.linkedPeople.slice() : (v.ownerId ? [{ id: v.ownerId, name: v.ownerName }] : []);
 
   async function loadEncounters(){
     var q = query(collection(db, "vehicleEncounters"), where("vehicleId", "==", id));
@@ -308,6 +316,7 @@ async function renderVehicleProfile(id){
   }
 
   function render(){
+    var displayLinked = (v.linkedPeople !== undefined) ? v.linkedPeople : (v.ownerId ? [{ id: v.ownerId, name: v.ownerName }] : []);
     content.innerHTML =
       '<div class="people-header">' +
         '<button class="btn-ghost" id="backToVehicles">← Back</button>' +
@@ -320,6 +329,7 @@ async function renderVehicleProfile(id){
           '<div class="profile-field" style="grid-column:1 / -1;">' +
             '<label>Make and Model</label><input type="text" id="vfMake" value="' + escapeHtml(vehicleTitle(v)) + '"' + (editMode ? '' : ' readonly') + ' placeholder="e.g. VW Citi Golf">' +
           '</div>' +
+          field("Year", "vfYear", v.year, editMode, null, "e.g. 2015") +
           field("Colour", "vfColour", v.colour, editMode, null, "e.g. White") +
           field("Distinct Markings", "vfMarkings", v.markings, editMode, "textarea", "e.g. Missing front headlight") +
         '</div>' +
@@ -329,12 +339,14 @@ async function renderVehicleProfile(id){
           (editMode ? '<button class="btn-ghost" id="vfLocationGpsBtn" type="button" style="flex-shrink:0;padding:11px 14px;">📍</button>' : '') +
         '</div>' +
         (editMode ? '<div class="modal-error" id="vfLocationGpsStatus" style="text-align:left;color:#888;"></div>' : '') +
-        '<div id="ownerWidgetArea">' +
-          (v.ownerName ? '<label>Owner (linked to People)</label><div><span class="owner-link" id="ownerViewLink">' + escapeHtml(v.ownerName) + '</span></div>' :
-            '<label>Owner</label><div style="color:#888;">No owner linked</div>') +
+        '<div id="linkedPeopleDisplay">' +
+          '<label>Linked People</label>' +
+          (displayLinked.length ? '<div class="linked-people-chips">' + displayLinked.map(function(p){
+            return '<span class="linked-person-view" data-id="' + p.id + '">' + escapeHtml(p.name) + '</span>';
+          }).join("") + '</div>' : '<div style="color:#888;">No one linked</div>') +
         '</div>' +
         (editMode ?
-          '<div id="vfOwnerWidget" style="margin-top:14px;"></div>' +
+          '<div id="vfLinkedWidget" style="margin-top:14px;"></div>' +
           '<div class="profile-actions">' +
             '<button class="btn-primary" id="saveProfileBtn">Save Changes</button>' +
             '<button class="btn-ghost" id="deleteVehicleBtn" style="color:#ef5350;border-color:#ef5350;">Delete Vehicle</button>' +
@@ -428,15 +440,16 @@ async function renderVehicleProfile(id){
       render();
     };
 
-    if(document.getElementById("ownerViewLink")){
-      document.getElementById("ownerViewLink").onclick = function(){
-        if(v.ownerId && window.__openPersonProfile) window.__openPersonProfile(v.ownerId);
+    Array.prototype.forEach.call(document.querySelectorAll(".linked-person-view"), function(el){
+      el.onclick = function(){
+        var pid = el.getAttribute("data-id");
+        if(pid && window.__openPersonProfile) window.__openPersonProfile(pid);
       };
-    }
+    });
 
     if(editMode){
-      ownerSearchWidget(document.getElementById("vfOwnerWidget"), editOwnerId, editOwnerName, function(oid, oname){
-        editOwnerId = oid; editOwnerName = oname;
+      linkedPeopleWidget(document.getElementById("vfLinkedWidget"), editLinkedPeople, function(list){
+        editLinkedPeople = list;
       });
       if(document.getElementById("vfLocationGpsBtn")){
         document.getElementById("vfLocationGpsBtn").onclick = function(){
@@ -471,11 +484,11 @@ async function renderVehicleProfile(id){
           registration: registration,
           make: document.getElementById("vfMake").value.trim(),
           model: "",
+          year: document.getElementById("vfYear").value.trim(),
           colour: document.getElementById("vfColour").value.trim(),
           markings: document.getElementById("vfMarkings").value.trim(),
           locationSpotted: document.getElementById("vfLocationSpotted").value.trim(),
-          ownerId: editOwnerId,
-          ownerName: editOwnerName
+          linkedPeople: editLinkedPeople
         };
         try{
           await updateDoc(doc(db, "vehicles", id), updates);
