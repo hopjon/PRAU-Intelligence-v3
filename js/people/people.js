@@ -142,7 +142,37 @@ function viewerPrev(){ if(!viewerImages.length) return; viewerIndex = (viewerInd
     applyViewerTransform();
   });
 })();
+function getBestLocation(statusEl, onResult, timeoutMs){
+  timeoutMs = timeoutMs || 8000;
+  if(!navigator.geolocation){
+    statusEl.textContent = "Location isn't available on this device.";
+    return;
+  }
+  var best = null;
+  var watchId = null;
+  var finished = false;
 
+  function finish(){
+    if(finished) return;
+    finished = true;
+    if(watchId !== null) navigator.geolocation.clearWatch(watchId);
+    if(best){ onResult(best); }
+    else{ statusEl.textContent = "Couldn't get a location fix — enter it manually."; }
+  }
+
+  statusEl.textContent = "Getting current location…";
+  watchId = navigator.geolocation.watchPosition(function(pos){
+    if(!best || pos.coords.accuracy < best.coords.accuracy){
+      best = pos;
+      statusEl.textContent = "Refining location… (±" + Math.round(pos.coords.accuracy) + "m so far)";
+    }
+    if(pos.coords.accuracy <= 15){ finish(); }
+  }, function(){
+    if(!best) statusEl.textContent = "Couldn't get location — enter it manually.";
+  }, { enableHighAccuracy: true, maximumAge: 0, timeout: timeoutMs });
+
+  setTimeout(finish, timeoutMs);
+}
 function dataUrlToCanvas(dataUrl){
   return new Promise(function(resolve, reject){
     var img = new Image();
@@ -335,40 +365,15 @@ function openAddPersonModal(){
     }
   };
 
-  document.getElementById("apGpsBtn").onclick = function () {
-
-    const status = document.getElementById("apGpsStatus");
-
-    status.textContent = "Getting location...";
-
-    navigator.geolocation.getCurrentPosition(
-
-        function (pos) {
-
-            const lat = pos.coords.latitude.toFixed(6);
-            const lng = pos.coords.longitude.toFixed(6);
-            console.log(pos.coords);
-alert(
-`Latitude: ${lat}
-Longitude: ${lng}
-Accuracy: ${pos.coords.accuracy} metres`
-);
-
-            document.getElementById("apProfilingLocation").value = lat + ", " + lng;
-
-            status.textContent = "GPS captured.";
-
-        },
-
-        function () {
-
-            status.textContent = "Unable to get GPS location.";
-
-        }
-
-    );
-
-};
+  document.getElementById("apGpsBtn").onclick = function(){
+    var status = document.getElementById("apGpsStatus");
+    getBestLocation(status, function(pos){
+      var lat = pos.coords.latitude.toFixed(6);
+      var lng = pos.coords.longitude.toFixed(6);
+      document.getElementById("apProfilingLocation").value = lat + ", " + lng;
+      status.textContent = "Location captured (accuracy ±" + Math.round(pos.coords.accuracy) + "m).";
+    });
+  };
   
 
   document.getElementById("apSave").onclick = async function(){
@@ -925,26 +930,11 @@ Array.prototype.forEach.call(document.querySelectorAll("#encounterList .pf-photo
     document.getElementById("encGpsBtn").onclick = function(){
       var statusEl = document.getElementById("encGpsStatus");
       var input = document.getElementById("encLocation");
-      if(!navigator.geolocation){
-        statusEl.textContent = "Location isn't available — enter it manually.";
-        return;
-      }
-      statusEl.textContent = "Getting current location…";
-      navigator.geolocation.getCurrentPosition(
-        function(position){
-          encCoords = [position.coords.latitude, position.coords.longitude];
-          input.value = "Lat " + position.coords.latitude.toFixed(5) + ", Lon " + position.coords.longitude.toFixed(5);
-          statusEl.textContent = "Location found.";
-        },
-        function(){
-          statusEl.textContent = "Could not determine location — enter it manually.";
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 15000,
-          maximumAge: 0
-        }
-      );
+      getBestLocation(statusEl, function(pos){
+        encCoords = [pos.coords.latitude, pos.coords.longitude];
+        input.value = "Lat " + pos.coords.latitude.toFixed(5) + ", Lon " + pos.coords.longitude.toFixed(5);
+        statusEl.textContent = "Location captured (accuracy ±" + Math.round(pos.coords.accuracy) + "m).";
+      });
     };
     document.getElementById("encGpsBtn").click();
 
@@ -1036,22 +1026,11 @@ Array.prototype.forEach.call(document.querySelectorAll("#encounterList .pf-photo
     document.getElementById("encGpsBtn").onclick = function(){
       var statusEl = document.getElementById("encGpsStatus");
       var input = document.getElementById("encLocation");
-      if(!navigator.geolocation){
-        statusEl.textContent = "Location isn't available — enter it manually.";
-        return;
-      }
-      statusEl.textContent = "Getting current location…";
-      navigator.geolocation.getCurrentPosition(
-        function(position){
-          encCoords = [position.coords.latitude, position.coords.longitude];
-          input.value = "Lat " + position.coords.latitude.toFixed(5) + ", Lon " + position.coords.longitude.toFixed(5);
-          statusEl.textContent = "Location found.";
-        },
-        function(){
-          statusEl.textContent = "Could not determine location — enter it manually.";
-        },
-        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
-      );
+      getBestLocation(statusEl, function(pos){
+        encCoords = [pos.coords.latitude, pos.coords.longitude];
+        input.value = "Lat " + pos.coords.latitude.toFixed(5) + ", Lon " + pos.coords.longitude.toFixed(5);
+        statusEl.textContent = "Location captured (accuracy ±" + Math.round(pos.coords.accuracy) + "m).";
+      });
     };
 
     document.getElementById("encSave").onclick = async function(){
