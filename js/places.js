@@ -42,6 +42,40 @@ function fileToCompressedDataUrl(file, maxDim){
     reader.readAsDataURL(file);
   });
 }
+
+var addressSearchTimer = null;
+async function searchAddresses(q){
+  if(!q || q.trim().length < 3) return [];
+  var url = "https://nominatim.openstreetmap.org/search?format=json&q=" + encodeURIComponent(q) + "&limit=5&addressdetails=1";
+  try{
+    var res = await fetch(url, { headers: { "Accept": "application/json" } });
+    var data = await res.json();
+    return data.map(function(r){ return { label: r.display_name, lat: parseFloat(r.lat), lng: parseFloat(r.lon) }; });
+  }catch(e){ return []; }
+}
+function wireAddressAutocomplete(inputEl, listEl, coordsSetter){
+  inputEl.oninput = function(){
+    clearTimeout(addressSearchTimer);
+    var q = this.value;
+    addressSearchTimer = setTimeout(async function(){
+      var results = await searchAddresses(q);
+      if(!results.length){ listEl.innerHTML = ""; return; }
+      listEl.innerHTML = results.map(function(r, i){
+        return '<div class="address-suggestion-row" data-i="' + i + '">' + escapeHtml(r.label) + '</div>';
+      }).join("");
+      Array.prototype.forEach.call(listEl.querySelectorAll(".address-suggestion-row"), function(row){
+        row.onclick = function(){
+          var r = results[parseInt(row.getAttribute("data-i"), 10)];
+          inputEl.value = r.label;
+          coordsSetter({ lat: r.lat, lng: r.lng });
+          listEl.innerHTML = "";
+        };
+      });
+    }, 400);
+  };
+  inputEl.onblur = function(){ setTimeout(function(){ listEl.innerHTML = ""; }, 200); };
+}
+
 function getBestLocation(statusEl, onResult, timeoutMs){
   timeoutMs = timeoutMs || 8000;
   if(!navigator.geolocation){ statusEl.textContent = "Location isn't available on this device."; return; }
@@ -174,7 +208,8 @@ function openAddPlaceModal(){
       '<input type="file" id="plImportFile" accept="image/*" multiple style="display:none;">' +
       '<label>Name</label><input id="plName" placeholder="e.g. Corner house, Voortrekker Road">' +
       '<label>Type</label><input id="plType" placeholder="e.g. Drug House">' +
-      '<label>Address</label><input id="plAddress" placeholder="e.g. 45 Voortrekker Road, Bellville">' +
+      '<label>Address</label>' +
+      '<div class="address-suggestions"><input id="plAddress" placeholder="Start typing an address…"><div class="address-suggestions-list" id="plAddressSuggestions"></div></div>' +
       '<label><i class="bi bi-geo-alt-fill"></i> GPS Location</label>' +
       '<div style="display:flex;gap:8px;">' +
         '<input id="plCoordsDisplay" style="flex:1;" readonly placeholder="Not captured yet">' +
@@ -226,6 +261,12 @@ function openAddPlaceModal(){
       }catch(e){ console.error(e); }
     }
   };
+
+  wireAddressAutocomplete(document.getElementById("plAddress"), document.getElementById("plAddressSuggestions"), function(c){
+    coords = c;
+    document.getElementById("plCoordsDisplay").value = c.lat.toFixed(6) + ", " + c.lng.toFixed(6);
+    document.getElementById("plGpsStatus").textContent = "Pin set from typed address.";
+  });
 
   document.getElementById("plGpsBtn").onclick = function(){
     var statusEl = document.getElementById("plGpsStatus");
@@ -310,7 +351,11 @@ async function renderPlaceProfile(id){
         '<div class="profile-field-group">' +
           field("Name", "plfName", p.name, editMode) +
           field("Type", "plfType", p.type, editMode, null, "e.g. Drug House") +
-          field("Address", "plfAddress", p.address, editMode) +
+          (editMode
+            ? '<div class="profile-field"><label>Address</label><div class="address-suggestions">' +
+                '<input id="plfAddress" value="' + escapeHtml(p.address || "") + '" placeholder="Start typing an address…">' +
+                '<div class="address-suggestions-list" id="plfAddressSuggestions"></div></div></div>'
+            : field("Address", "plfAddress", p.address, editMode)) +
           field("Notes", "plfNotes", p.notes, editMode, "textarea") +
         '</div>' +
         (editMode ?
@@ -391,6 +436,12 @@ async function renderPlaceProfile(id){
     document.getElementById("toggleEditBtn").onclick = function(){ editMode = !editMode; render(); };
 
     if(editMode){
+      wireAddressAutocomplete(document.getElementById("plfAddress"), document.getElementById("plfAddressSuggestions"), function(c){
+        coords = c;
+        document.getElementById("plfCoordsDisplay").value = c.lat.toFixed(6) + ", " + c.lng.toFixed(6);
+        document.getElementById("plfGpsStatus").textContent = "Pin set from typed address.";
+      });
+
       document.getElementById("plfGpsBtn").onclick = function(){
         var statusEl = document.getElementById("plfGpsStatus");
         getBestLocation(statusEl, function(pos){
