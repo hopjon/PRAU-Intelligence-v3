@@ -105,10 +105,10 @@ export async function renderDashboardHome(container, navigateTo){
 
   // ---- render ----
   container.innerHTML =
-    '<div class="stat-cards">' +
-      '<div class="stat-card" id="statPeople"><div class="stat-number">' + people.length + '</div><div class="stat-label">People</div></div>' +
-      '<div class="stat-card" id="statVehicles"><div class="stat-number">' + vehicles.length + '</div><div class="stat-label">Vehicles</div></div>' +
-      '<div class="stat-card" id="statPlaces"><div class="stat-number">' + places.length + '</div><div class="stat-label">Places</div></div>' +
+    '<div class="stat-cards" style="display:flex;justify-content:center;gap:16px;flex-wrap:wrap;">' +
+      '<div class="stat-card" id="statPeople" style="width:120px;height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:12px;cursor:pointer;"><div class="stat-number">' + people.length + '</div><div class="stat-label">People</div></div>' +
+      '<div class="stat-card" id="statVehicles" style="width:120px;height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:12px;cursor:pointer;"><div class="stat-number">' + vehicles.length + '</div><div class="stat-label">Vehicles</div></div>' +
+      '<div class="stat-card" id="statPlaces" style="width:120px;height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:12px;cursor:pointer;"><div class="stat-number">' + places.length + '</div><div class="stat-label">Places</div></div>' +
     '</div>' +
 
     '<div class="dash-section">' +

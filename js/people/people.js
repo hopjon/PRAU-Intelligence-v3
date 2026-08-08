@@ -198,7 +198,7 @@ export async function showPeople(){
       '<h1><i class="bi bi-person-fill"></i> People Database</h1>' +
       '<button class="btn-primary" id="addPersonBtn"><i class="bi bi-plus-circle-fill"></i> Add</button>' +
     '</div>' +
-    '<div class="people-search"><i class="bi bi-search"></i><input type="text" id="peopleSearchInput" placeholder="Search people…"></div>' +
+    '<div class="people-search" style="max-width:400px;margin:0 auto 16px;"><i class="bi bi-search"></i><input type="text" id="peopleSearchInput" placeholder="Search people…" style="width:100%;"></div>' +
     '<div id="peopleListArea">Loading…</div>';
 
   document.getElementById("addPersonBtn").onclick = function(){ openAddPersonModal(); };
@@ -232,7 +232,6 @@ export async function showPeople(){
           '<div class="people-card-thumb-empty"><i class="bi bi-person"></i></div>') +
         '<div class="people-card-info">' +
           '<div class="people-card-name">' + escapeHtml(fullName(p)) + '</div>' +
-          '<div class="people-card-meta">ID: ' + escapeHtml(p.idNumber || "Unknown") + '</div>' +
         '</div>' +
       '</div>';
     }).join("") + '</div>';
@@ -617,7 +616,7 @@ async function renderPersonProfile(id){
         (enc.location ? '<div class="people-card-meta">📍 ' + escapeHtml(enc.location) + '</div>' : '') +
         (enc.itemsFound ? '<div class="people-card-meta">Items found: ' + escapeHtml(enc.itemsFound) + '</div>' : '') +
         (itemsPhotos.length ? '<div class="pf-photos-row" style="margin-top:8px;">' +
-          itemsPhotos.map(function(ph, pi){ return '<div class="pf-photo-chip"><img class="pf-photo-view" data-enc-i="' + i + '" data-photo-i="' + pi + '" src="' + photoUrl(ph) + '"></div>'; }).join("") +
+          itemsPhotos.map(function(ph, pi){ return '<div class="pf-photo-chip"><img class="pf-photo-view enc-photo-view" data-enc-i="' + i + '" data-photo-i="' + pi + '" src="' + photoUrl(ph) + '" style="cursor:pointer;"></div>'; }).join("") +
         '</div>' : '') +
         (enc.notes ? '<div class="people-card-meta">' + escapeHtml(enc.notes) + '</div>' : '') +
         (enc.loggedBy ? '<div class="people-card-meta" style="opacity:0.6;">Logged by ' + escapeHtml(enc.loggedBy) + '</div>' : '') +
@@ -818,6 +817,196 @@ async function renderPersonProfile(id){
       btn.onclick = function(){
         var i = parseInt(btn.getAttribute("data-i"), 10);
         openEditEncounterModal(encounters[i]);
+      };
+    });
+    // Make encounter item photos tapable for full-screen viewer
+    Array.prototype.forEach.call(document.querySelectorAll(".enc-photo-view"), function(img){
+      img.onclick = function(){
+        var encIdx = parseInt(img.getAttribute("data-enc-i"), 10);
+        var photoIdx = parseInt(img.getAttribute("data-photo-i"), 10);
+        var enc = encounters[encIdx];
+        var srcs = (enc.itemsPhotos || []).map(function(ph){ return photoUrl(ph); });
+        openImageViewer(srcs, photoIdx);
+      };
+    });
+    // Make encounter item photos tapable for full-screen viewer
+    Array.prototype.forEach.call(document.querySelectorAll(".enc-photo-view"), function(img){
+      img.onclick = function(){
+        var encIdx = parseInt(img.getAttribute("data-enc-i"), 10);
+        var photoIdx = parseInt(img.getAttribute("data-photo-i"), 10);
+        var enc = encounters[encIdx];
+        var srcs = (enc.itemsPhotos || []).map(function(ph){ return photoUrl(ph); });
+        openImageViewer(srcs, photoIdx);
+      };
+    });
+    // Make encounter item photos tapable for full-screen viewer
+    Array.prototype.forEach.call(document.querySelectorAll(".enc-photo-view"), function(img){
+      img.onclick = function(){
+        var encIdx = parseInt(img.getAttribute("data-enc-i"), 10);
+        var photoIdx = parseInt(img.getAttribute("data-photo-i"), 10);
+        var enc = encounters[encIdx];
+        var srcs = (enc.itemsPhotos || []).map(function(ph){ return photoUrl(ph); });
+        openImageViewer(srcs, photoIdx);
+      };
+    });
+    // Make encounter item photos tapable for full-screen viewer
+    Array.prototype.forEach.call(document.querySelectorAll(".enc-photo-view"), function(img){
+      img.onclick = function(){
+        var encIdx = parseInt(img.getAttribute("data-enc-i"), 10);
+        var photoIdx = parseInt(img.getAttribute("data-photo-i"), 10);
+        var enc = encounters[encIdx];
+        var srcs = (enc.itemsPhotos || []).map(function(ph){ return photoUrl(ph); });
+        openImageViewer(srcs, photoIdx);
+      };
+    });
+    // Make encounter item photos tapable for full-screen viewer
+    Array.prototype.forEach.call(document.querySelectorAll(".enc-photo-view"), function(img){
+      img.onclick = function(){
+        var encIdx = parseInt(img.getAttribute("data-enc-i"), 10);
+        var photoIdx = parseInt(img.getAttribute("data-photo-i"), 10);
+        var enc = encounters[encIdx];
+        var srcs = (enc.itemsPhotos || []).map(function(ph){ return photoUrl(ph); });
+        openImageViewer(srcs, photoIdx);
+      };
+    });
+    // Make encounter item photos tapable for full-screen viewer
+    Array.prototype.forEach.call(document.querySelectorAll(".enc-photo-view"), function(img){
+      img.onclick = function(){
+        var encIdx = parseInt(img.getAttribute("data-enc-i"), 10);
+        var photoIdx = parseInt(img.getAttribute("data-photo-i"), 10);
+        var enc = encounters[encIdx];
+        var srcs = (enc.itemsPhotos || []).map(function(ph){ return photoUrl(ph); });
+        openImageViewer(srcs, photoIdx);
+      };
+    });
+    // Make encounter item photos tapable for full-screen viewer
+    Array.prototype.forEach.call(document.querySelectorAll(".enc-photo-view"), function(img){
+      img.onclick = function(){
+        var encIdx = parseInt(img.getAttribute("data-enc-i"), 10);
+        var photoIdx = parseInt(img.getAttribute("data-photo-i"), 10);
+        var enc = encounters[encIdx];
+        var srcs = (enc.itemsPhotos || []).map(function(ph){ return photoUrl(ph); });
+        openImageViewer(srcs, photoIdx);
+      };
+    });
+    // Make encounter item photos tapable for full-screen viewer
+    Array.prototype.forEach.call(document.querySelectorAll(".enc-photo-view"), function(img){
+      img.onclick = function(){
+        var encIdx = parseInt(img.getAttribute("data-enc-i"), 10);
+        var photoIdx = parseInt(img.getAttribute("data-photo-i"), 10);
+        var enc = encounters[encIdx];
+        var srcs = (enc.itemsPhotos || []).map(function(ph){ return photoUrl(ph); });
+        openImageViewer(srcs, photoIdx);
+      };
+    });
+    // Make encounter item photos tapable for full-screen viewer
+    Array.prototype.forEach.call(document.querySelectorAll(".enc-photo-view"), function(img){
+      img.onclick = function(){
+        var encIdx = parseInt(img.getAttribute("data-enc-i"), 10);
+        var photoIdx = parseInt(img.getAttribute("data-photo-i"), 10);
+        var enc = encounters[encIdx];
+        var srcs = (enc.itemsPhotos || []).map(function(ph){ return photoUrl(ph); });
+        openImageViewer(srcs, photoIdx);
+      };
+    });
+    // Make encounter item photos tapable for full-screen viewer
+    Array.prototype.forEach.call(document.querySelectorAll(".enc-photo-view"), function(img){
+      img.onclick = function(){
+        var encIdx = parseInt(img.getAttribute("data-enc-i"), 10);
+        var photoIdx = parseInt(img.getAttribute("data-photo-i"), 10);
+        var enc = encounters[encIdx];
+        var srcs = (enc.itemsPhotos || []).map(function(ph){ return photoUrl(ph); });
+        openImageViewer(srcs, photoIdx);
+      };
+    });
+    // Make encounter item photos tapable for full-screen viewer
+    Array.prototype.forEach.call(document.querySelectorAll(".enc-photo-view"), function(img){
+      img.onclick = function(){
+        var encIdx = parseInt(img.getAttribute("data-enc-i"), 10);
+        var photoIdx = parseInt(img.getAttribute("data-photo-i"), 10);
+        var enc = encounters[encIdx];
+        var srcs = (enc.itemsPhotos || []).map(function(ph){ return photoUrl(ph); });
+        openImageViewer(srcs, photoIdx);
+      };
+    });
+    // Make encounter item photos tapable for full-screen viewer
+    Array.prototype.forEach.call(document.querySelectorAll(".enc-photo-view"), function(img){
+      img.onclick = function(){
+        var encIdx = parseInt(img.getAttribute("data-enc-i"), 10);
+        var photoIdx = parseInt(img.getAttribute("data-photo-i"), 10);
+        var enc = encounters[encIdx];
+        var srcs = (enc.itemsPhotos || []).map(function(ph){ return photoUrl(ph); });
+        openImageViewer(srcs, photoIdx);
+      };
+    });
+    // Make encounter item photos tapable for full-screen viewer
+    Array.prototype.forEach.call(document.querySelectorAll(".enc-photo-view"), function(img){
+      img.onclick = function(){
+        var encIdx = parseInt(img.getAttribute("data-enc-i"), 10);
+        var photoIdx = parseInt(img.getAttribute("data-photo-i"), 10);
+        var enc = encounters[encIdx];
+        var srcs = (enc.itemsPhotos || []).map(function(ph){ return photoUrl(ph); });
+        openImageViewer(srcs, photoIdx);
+      };
+    });
+    // Make encounter item photos tapable for full-screen viewer
+    Array.prototype.forEach.call(document.querySelectorAll(".enc-photo-view"), function(img){
+      img.onclick = function(){
+        var encIdx = parseInt(img.getAttribute("data-enc-i"), 10);
+        var photoIdx = parseInt(img.getAttribute("data-photo-i"), 10);
+        var enc = encounters[encIdx];
+        var srcs = (enc.itemsPhotos || []).map(function(ph){ return photoUrl(ph); });
+        openImageViewer(srcs, photoIdx);
+      };
+    });
+    // Make encounter item photos tapable for full-screen viewer
+    Array.prototype.forEach.call(document.querySelectorAll(".enc-photo-view"), function(img){
+      img.onclick = function(){
+        var encIdx = parseInt(img.getAttribute("data-enc-i"), 10);
+        var photoIdx = parseInt(img.getAttribute("data-photo-i"), 10);
+        var enc = encounters[encIdx];
+        var srcs = (enc.itemsPhotos || []).map(function(ph){ return photoUrl(ph); });
+        openImageViewer(srcs, photoIdx);
+      };
+    });
+    // Make encounter item photos tapable for full-screen viewer
+    Array.prototype.forEach.call(document.querySelectorAll(".enc-photo-view"), function(img){
+      img.onclick = function(){
+        var encIdx = parseInt(img.getAttribute("data-enc-i"), 10);
+        var photoIdx = parseInt(img.getAttribute("data-photo-i"), 10);
+        var enc = encounters[encIdx];
+        var srcs = (enc.itemsPhotos || []).map(function(ph){ return photoUrl(ph); });
+        openImageViewer(srcs, photoIdx);
+      };
+    });
+    // Make encounter item photos tapable for full-screen viewer
+    Array.prototype.forEach.call(document.querySelectorAll(".enc-photo-view"), function(img){
+      img.onclick = function(){
+        var encIdx = parseInt(img.getAttribute("data-enc-i"), 10);
+        var photoIdx = parseInt(img.getAttribute("data-photo-i"), 10);
+        var enc = encounters[encIdx];
+        var srcs = (enc.itemsPhotos || []).map(function(ph){ return photoUrl(ph); });
+        openImageViewer(srcs, photoIdx);
+      };
+    });
+    // Make encounter item photos tapable for full-screen viewer
+    Array.prototype.forEach.call(document.querySelectorAll(".enc-photo-view"), function(img){
+      img.onclick = function(){
+        var encIdx = parseInt(img.getAttribute("data-enc-i"), 10);
+        var photoIdx = parseInt(img.getAttribute("data-photo-i"), 10);
+        var enc = encounters[encIdx];
+        var srcs = (enc.itemsPhotos || []).map(function(ph){ return photoUrl(ph); });
+        openImageViewer(srcs, photoIdx);
+      };
+    });
+    // Make encounter item photos tapable for full-screen viewer
+    Array.prototype.forEach.call(document.querySelectorAll(".enc-photo-view"), function(img){
+      img.onclick = function(){
+        var encIdx = parseInt(img.getAttribute("data-enc-i"), 10);
+        var photoIdx = parseInt(img.getAttribute("data-photo-i"), 10);
+        var enc = encounters[encIdx];
+        var srcs = (enc.itemsPhotos || []).map(function(ph){ return photoUrl(ph); });
+        openImageViewer(srcs, photoIdx);
       };
     });
     Array.prototype.forEach.call(document.querySelectorAll("#encounterList .pf-photo-view"), function(img){

@@ -1,19 +1,27 @@
-// face.js — Face Search module using @vladmandic/face-api
-// PATH B: Stores new face-api descriptors in descriptorV2 field
+// face.js — Face Search module using @vladmandic/face-api (most accurate free browser-native face recognition)
+// Replaces @vladmandic/human with @vladmandic/face-api for higher accuracy (99.38% LFW vs ~99.0%)
+// All functions, icons, and UI structure preserved from original.
+// PATH B: Stores new face-api descriptors in descriptorV2 field — old Human.js descriptors in "descriptor" stay untouched.
 
 var modelsReady = false;
 var loadPromise = null;
+
+// CDN base path for face-api models (hosted on jsdelivr, free and reliable)
 var MODEL_URL = "https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model";
 
 export function ensureModelsLoaded(){
   if(loadPromise) return loadPromise;
   loadPromise = (async function(){
     try{
+      // Dynamically import face-api from CDN (ESM, free, actively maintained fork)
       const faceapi = await import("https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.15/dist/face-api.esm.js");
       window.faceapi = faceapi;
+
+      // Load all required models: detection + landmarks + recognition descriptor
       await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL);
       await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
       await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
+
       modelsReady = true;
       console.log("face-api models loaded successfully");
     }catch(e){ console.error("face engine failed to load", e); }
@@ -29,8 +37,9 @@ export async function computeDescriptor(canvasOrImg){
       .detectSingleFace(canvasOrImg, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 }))
       .withFaceLandmarks()
       .withFaceDescriptor();
+
     if(detection && detection.descriptor){
-      return Array.from(detection.descriptor);
+      return Array.from(detection.descriptor); // 128-dim Float32Array -> regular Array
     }
     return null;
   }catch(e){ return null; }
@@ -47,26 +56,34 @@ export function photoUrl(p){
   return typeof p === "string" ? p : p.dataUrl;
 }
 
+// PATH B: Prefer new face-api descriptor (descriptorV2), fallback to old Human.js descriptor
 export function photoDescriptor(p){
   if(typeof p === "string") return null;
-  if(p.descriptorV2) return p.descriptorV2;
-  if(p.descriptor) return p.descriptor;
+  if(p.descriptorV2) return p.descriptorV2;      // new 128-dim face-api descriptor
+  if(p.descriptor) return p.descriptor;             // old 1024-dim Human.js descriptor
   return null;
 }
 
+// PATH B: Return the appropriate threshold based on descriptor type
 export function matchThreshold(p){
   if(!p) return 0.6;
-  if(p.descriptorV2) return 0.6;
-  if(p.descriptor) return 1.0;
+  if(p.descriptorV2) return 0.6;   // face-api threshold
+  if(p.descriptor) return 1.0;        // Human.js threshold
   return 0.6;
 }
 
+// ---------- Face Search screen ----------
 import { db } from "./firebase.js";
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 function escapeHtml(s){
   return (s||"").replace(/[&<>"']/g, function(c){
-    return {"&":"&amp;","<":"&lt;","<":"&gt;","'":"&quot;","'":"&#39;"}[c];
+    if(c === "&") return "&amp;";
+    if(c === "<") return "&lt;";
+    if(c === ">") return "&gt;";
+    if(c === '"') return "&quot;";
+    if(c === "'") return "&#39;";
+    return c;
   });
 }
 
@@ -95,7 +112,7 @@ function fileToCanvas(file, maxDim){
 export function renderFaceSearch(container){
   container.innerHTML =
     '<div class="people-header"><h1>Face Search</h1></div>' +
-    '<div class="modal-error" id="faceStatus" style="text-align:left;color:#888;margin-bottom:16px;">Loading matching engine…</div>' +
+    '<div class="modal-error" id="faceStatus" style="text-align:left;color:#888;margin-bottom:16px;">Loading matching engine...</div>' +
     '<div style="display:flex;gap:10px;">' +
       '<button id="faceTakeBtn" class="btn-primary" style="flex:1;justify-content:center;"><i class="bi bi-camera"></i> Take photo</button>' +
       '<button id="faceGalleryBtn" class="btn-ghost" style="flex:1;"><i class="bi bi-images"></i> From gallery</button>' +
@@ -123,7 +140,7 @@ export function renderFaceSearch(container){
 
   async function runFaceSearch(file){
     var resultsEl = document.getElementById("faceResults");
-    resultsEl.innerHTML = '<div class="people-empty">Analyzing…</div>';
+    resultsEl.innerHTML = '<div class="people-empty">Analyzing...</div>';
 
     var canvas = await fileToCanvas(file, 480);
     var descriptor = await computeDescriptor(canvas);
@@ -139,6 +156,7 @@ export function renderFaceSearch(container){
       (r.photos || []).forEach(function(p){
         var desc = photoDescriptor(p);
         if(desc){
+          // PATH B: Use per-photo threshold based on descriptor type
           var threshold = matchThreshold(p);
           var dist = euclidean(descriptor, desc);
           scored.push({ record: r, photoUrl: photoUrl(p), dist: dist, threshold: threshold });
@@ -154,6 +172,7 @@ export function renderFaceSearch(container){
     }
 
     resultsEl.innerHTML = top.map(function(t){
+      // PATH B: Use the photo's own threshold for accurate percentage
       var pct = Math.max(0, Math.round((1 - t.dist / t.threshold) * 100));
       return '<div class="people-row" style="cursor:default;">' +
         '<img class="people-row-thumb" src="' + t.photoUrl + '">' +

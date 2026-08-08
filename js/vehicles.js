@@ -47,7 +47,7 @@ export async function renderVehicles(){
       '<h1><i class="bi bi-car-front-fill"></i> Vehicle Database</h1>' +
       '<button class="btn-primary" id="addVehicleBtn"><i class="bi bi-plus-circle-fill"></i> Add</button>' +
     '</div>' +
-    '<div class="people-search"><i class="bi bi-search"></i><input type="text" id="vehiclesSearchInput" placeholder="Search make, model, registration, VIN…"></div>' +
+    '<div class="people-search" style="max-width:400px;margin:0 auto 16px;"><i class="bi bi-search"></i><input type="text" id="vehiclesSearchInput" placeholder="Search make, model, registration, VIN…" style="width:100%;"></div>' +
     '<div id="vehiclesListArea">Loading…</div>';
 
   document.getElementById("addVehicleBtn").onclick = function(){ openAddVehicleModal(); };
@@ -76,7 +76,7 @@ export async function renderVehicles(){
     listArea.innerHTML = '<div class="people-grid">' + filtered.map(function(v){
       var thumb = v.photos && v.photos[0] ? v.photos[0].dataUrl : null;
       return '<div class="people-card" data-id="' + v.id + '">' +
-        (thumb ? '<img class="people-card-thumb" src="' + thumb + '">' :
+        (thumb ? '<img class="people-card-thumb vehicle-card-thumb" src="' + thumb + '" style="cursor:pointer;" data-vid="' + v.id + '">' :
           '<div class="people-card-thumb-empty"><i class="bi bi-car-front"></i></div>') +
         '<div class="people-card-info">' +
           '<div class="people-card-name">' + escapeHtml(vehicleTitle(v)) + '</div>' +
@@ -87,6 +87,18 @@ export async function renderVehicles(){
 
     Array.prototype.forEach.call(listArea.querySelectorAll(".people-card"), function(el){
       el.onclick = function(){ renderVehicleProfile(el.getAttribute("data-id")); };
+    });
+    // Make vehicle card photos tapable for full-screen viewer
+    Array.prototype.forEach.call(listArea.querySelectorAll(".vehicle-card-thumb"), function(img){
+      img.onclick = function(e){
+        e.stopPropagation();
+        var vid = img.getAttribute("data-vid");
+        var vehicle = vehicles.find(function(v){ return v.id === vid; });
+        if(vehicle && vehicle.photos && vehicle.photos.length){
+          var srcs = vehicle.photos.map(function(ph){ return ph.dataUrl; });
+          if(window.__openImageViewer) window.__openImageViewer(srcs, 0);
+        }
+      };
     });
   }
 
@@ -396,7 +408,7 @@ async function renderVehicleProfile(id){
         (enc.location ? '<div class="people-card-meta">📍 ' + escapeHtml(enc.location) + '</div>' : '') +
         (enc.itemsFound ? '<div class="people-card-meta">Items found: ' + escapeHtml(enc.itemsFound) + '</div>' : '') +
         (itemsPhotos.length ? '<div class="pf-photos-row" style="margin-top:8px;">' +
-          itemsPhotos.map(function(ph){ return '<div class="pf-photo-chip"><img src="' + ph + '"></div>'; }).join("") +
+          itemsPhotos.map(function(ph, pi){ return '<div class="pf-photo-chip"><img class="vehicle-enc-photo" src="' + ph + '" style="cursor:pointer;" data-enc-i="' + i + '" data-photo-i="' + pi + '"></div>'; }).join("") +
         '</div>' : '') +
         (enc.notes ? '<div class="people-card-meta">' + escapeHtml(enc.notes) + '</div>' : '') +
         (enc.loggedBy ? '<div class="people-card-meta" style="opacity:0.6;">Logged by ' + escapeHtml(enc.loggedBy) + '</div>' : '') +
@@ -410,7 +422,7 @@ async function renderVehicleProfile(id){
     var html = "";
     pendingPhotos.forEach(function(ph, i){
       var takenBy = (typeof ph === "object" && ph.takenBy) ? ph.takenBy : "";
-      html += '<div><div class="pf-photo-chip"><img src="' + ph.dataUrl + '">' +
+      html += '<div><div class="pf-photo-chip"><img class="vehicle-profile-photo" src="' + ph.dataUrl + '" style="cursor:pointer;" data-photo-i="' + i + '">' +
         (editMode ? '<button class="pf-rm" data-i="' + i + '" type="button">✕</button>' : '') +
         '</div>' + (takenBy ? '<div class="pf-photo-caption">' + escapeHtml(takenBy) + '</div>' : '') + '</div>';
     });
@@ -564,11 +576,29 @@ async function renderVehicleProfile(id){
         openEditEncounterModal(encounters[i]);
       };
     });
+    // Make vehicle encounter item photos tapable for full-screen viewer
+    Array.prototype.forEach.call(document.querySelectorAll(".vehicle-enc-photo"), function(img){
+      img.onclick = function(){
+        var encIdx = parseInt(img.getAttribute("data-enc-i"), 10);
+        var photoIdx = parseInt(img.getAttribute("data-photo-i"), 10);
+        var enc = encounters[encIdx];
+        var srcs = (enc.itemsPhotos || []).map(function(ph){ return ph; });
+        if(window.__openImageViewer) window.__openImageViewer(srcs, photoIdx);
+      };
+    });
 
     document.getElementById("newEncounterBtn").onclick = function(){
       if(encounters.length >= MAX_ENCOUNTERS) return;
       openNewEncounterModal();
     };
+    // Make vehicle profile photos tapable for full-screen viewer
+    Array.prototype.forEach.call(document.querySelectorAll(".vehicle-profile-photo"), function(img){
+      img.onclick = function(){
+        var idx = parseInt(img.getAttribute("data-photo-i"), 10);
+        var srcs = pendingPhotos.map(function(ph){ return ph.dataUrl; });
+        if(window.__openImageViewer) window.__openImageViewer(srcs, idx);
+      };
+    });
   }
 
   function encounterFormHtml(existing){
