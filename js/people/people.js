@@ -73,6 +73,7 @@ function openImageViewer(images, startIndex){
   viewer.style.display = "flex";
   showViewerImage();
 }
+window.__openImageViewer = openImageViewer;
 function closeImageViewer(){
   var viewer = document.getElementById("imageViewer");
   if(viewer) viewer.style.display = "none";
