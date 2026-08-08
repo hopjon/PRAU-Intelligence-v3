@@ -265,6 +265,7 @@ async function findDuplicateByIdNumber(idNumber, excludeId){
 }
 
 // ---------- duplicate face check ----------
+// PATH B: Check both old descriptor (Human.js) and new descriptorV2 (face-api)
 async function findDuplicateFace(descriptor, excludeId, peopleList){
   if(!descriptor) return null;
   var best = null;
@@ -272,8 +273,15 @@ async function findDuplicateFace(descriptor, excludeId, peopleList){
   peopleList.forEach(function(data){
     if(data.id === excludeId) return;
     (data.photos || []).forEach(function(ph){
-      var desc = (typeof ph === "object") ? ph.descriptor : null;
+      var desc = null;
+      if(typeof ph === "object"){
+        // PATH B: Prefer new face-api descriptor, fallback to old Human.js descriptor
+        if(ph.descriptorV2) desc = ph.descriptorV2;
+        else if(ph.descriptor) desc = ph.descriptor;
+      }
       if(!desc) return;
+      // PATH B: Use appropriate threshold based on descriptor type
+      var threshold = (ph.descriptorV2) ? 0.6 : 1.0;
       var dist = euclidean(descriptor, desc);
       if(dist < bestDist){
         bestDist = dist;
@@ -308,14 +316,13 @@ function openAddPersonModal(){
       '<label>Originally From</label><input id="apOrigin" placeholder="e.g. Gugulethu">' +
       '<label>Current Residence</label><input id="apResidence" placeholder="e.g. 12 Main Road, Khayelitsha">' +
       '<label>Previous Arrests</label>' +
-'<textarea id="apPreviousArrests" placeholder="e.g. Shoplifting, March 2024"></textarea>' +
-
-'<label><i class="bi bi-geo-alt-fill"></i> Profiling Location</label>' +
-'<div style="display:flex;gap:8px;">' +
-    '<input id="apProfilingLocation" style="flex:1;" placeholder="e.g. Corner of Main and Voortrekker">' +
-    '<button class="btn-ghost" id="apGpsBtn" type="button">📍</button>' +
-'</div>' +
-'<div class="modal-error" id="apGpsStatus" style="text-align:left;color:#888;"></div>' +
+      '<textarea id="apPreviousArrests" placeholder="e.g. Shoplifting, March 2024"></textarea>' +
+      '<label><i class="bi bi-geo-alt-fill"></i> Profiling Location</label>' +
+      '<div style="display:flex;gap:8px;">' +
+          '<input id="apProfilingLocation" style="flex:1;" placeholder="e.g. Corner of Main and Voortrekker">' +
+          '<button class="btn-ghost" id="apGpsBtn" type="button">📍</button>' +
+      '</div>' +
+      '<div class="modal-error" id="apGpsStatus" style="text-align:left;color:#888;"></div>' +
       '<div class="modal-actions">' +
         '<button class="btn-ghost" id="apCancel">Cancel</button>' +
         '<button class="btn-primary" id="apSave">Save</button>' +
@@ -350,7 +357,8 @@ function openAddPersonModal(){
     var dataUrl = await fileToCompressedDataUrl(file, 480);
     var canvas = await dataUrlToCanvas(dataUrl);
     var descriptor = await computeDescriptor(canvas);
-    pendingPhotos.push({ dataUrl: dataUrl, descriptor: descriptor, takenBy: currentUserShortName(), addedAt: new Date().toISOString() });
+    // PATH B: Save new face-api descriptor to descriptorV2, keep old descriptor field empty
+    pendingPhotos.push({ dataUrl: dataUrl, descriptorV2: descriptor, takenBy: currentUserShortName(), addedAt: new Date().toISOString() });
     renderApPhotos();
   };
   document.getElementById("apImportFile").onchange = async function(){
@@ -360,7 +368,8 @@ function openAddPersonModal(){
         var dataUrl = await fileToCompressedDataUrl(files[i], 480);
         var canvas = await dataUrlToCanvas(dataUrl);
         var descriptor = await computeDescriptor(canvas);
-        pendingPhotos.push({ dataUrl: dataUrl, descriptor: descriptor, takenBy: currentUserShortName(), addedAt: new Date().toISOString() });
+        // PATH B: Save new face-api descriptor to descriptorV2
+        pendingPhotos.push({ dataUrl: dataUrl, descriptorV2: descriptor, takenBy: currentUserShortName(), addedAt: new Date().toISOString() });
         renderApPhotos();
       }catch(e){ console.error(e); }
     }
@@ -375,7 +384,6 @@ function openAddPersonModal(){
       status.textContent = "Location captured (accuracy ±" + Math.round(pos.coords.accuracy) + "m).";
     });
   };
-  
 
   document.getElementById("apSave").onclick = async function(){
     var errEl = document.getElementById("apError");
@@ -383,7 +391,7 @@ function openAddPersonModal(){
     var surname = "";
     var idNumber = document.getElementById("apIdNumber").value.trim();
     var previousArrests = document.getElementById("apPreviousArrests").value.trim();
-var profilingLocation = document.getElementById("apProfilingLocation").value.trim();
+    var profilingLocation = document.getElementById("apProfilingLocation").value.trim();
     if(!name){ errEl.textContent = "Full name is required."; return; }
 
     this.disabled = true;
@@ -398,32 +406,21 @@ var profilingLocation = document.getElementById("apProfilingLocation").value.tri
     }
 
     var person = {
-  name: name,
-  surname: surname,
-  idNumber: idNumber,
-
-  dob: document.getElementById("apDob").value,
-
-  aliases: document.getElementById("apAliases").value.trim(),
-
-  origin: document.getElementById("apOrigin").value.trim(),
-
-  residence: document.getElementById("apResidence").value.trim(),
-
-  previousArrests: previousArrests,
-
-  profilingLocation: profilingLocation,
-
-  deceased: false,
-
-  encounters: [],
-
-  photos: pendingPhotos,
-
-  addedAt: new Date().toISOString(),
-
-  addedBy: auth.currentUser ? auth.currentUser.email : "unknown"
-};
+      name: name,
+      surname: surname,
+      idNumber: idNumber,
+      dob: document.getElementById("apDob").value,
+      aliases: document.getElementById("apAliases").value.trim(),
+      origin: document.getElementById("apOrigin").value.trim(),
+      residence: document.getElementById("apResidence").value.trim(),
+      previousArrests: previousArrests,
+      profilingLocation: profilingLocation,
+      deceased: false,
+      encounters: [],
+      photos: pendingPhotos,
+      addedAt: new Date().toISOString(),
+      addedBy: auth.currentUser ? auth.currentUser.email : "unknown"
+    };
 
     this.textContent = "Saving…";
     try{
@@ -505,9 +502,9 @@ async function renderPersonProfile(id){
 
   console.log("Loading person:", id);
 
-var snap = await getDoc(doc(db, "people", id));
+  var snap = await getDoc(doc(db, "people", id));
 
-console.log("Document exists:", snap.exists());
+  console.log("Document exists:", snap.exists());
   if(!snap.exists()){ content.innerHTML = '<div class="people-empty">Record not found.</div>'; return; }
 
   var p = Object.assign({ id: id }, snap.data());
@@ -568,22 +565,15 @@ console.log("Document exists:", snap.exists());
         '<hr>' +
         '<hr>' +
 
-'<h3>Photos</h3>' +
-
-'<div class="pf-photos-row" id="pfPhotosRow"></div>' +
-
-(editMode ?
-
-'<button class="pf-take-photo-btn" id="pfAddPhotoBtn" type="button"><i class="bi bi-camera-fill"></i>Take Photo</button>' +
-
-'<label class="pf-import-label" for="pfImportFile"><i class="bi bi-images"></i>Import from Gallery</label>' +
-'<input type="file" id="pfPhotoFile" accept="image/*" capture="environment" style="display:none;">' +
-
-'<input type="file" id="pfImportFile" accept="image/*" multiple style="display:none;">'
-
-: '') +
-
-'<div id="faceWarningArea"></div>' +
+        '<h3>Photos</h3>' +
+        '<div class="pf-photos-row" id="pfPhotosRow"></div>' +
+        (editMode ?
+          '<button class="pf-take-photo-btn" id="pfAddPhotoBtn" type="button"><i class="bi bi-camera-fill"></i>Take Photo</button>' +
+          '<label class="pf-import-label" for="pfImportFile"><i class="bi bi-images"></i>Import from Gallery</label>' +
+          '<input type="file" id="pfPhotoFile" accept="image/*" capture="environment" style="display:none;">' +
+          '<input type="file" id="pfImportFile" accept="image/*" multiple style="display:none;">'
+        : '') +
+        '<div id="faceWarningArea"></div>' +
 
         '<hr>' +
         '<h3>Encounters</h3>' +
@@ -597,27 +587,22 @@ console.log("Document exists:", snap.exists());
   }
 
   function field(label, id, value, editable, type){
-
     if(type === "textarea"){
-
-        return '<div class="profile-field">' +
-            '<label>' + label + '</label>' +
-            '<textarea id="' + id + '"' +
-            (editable ? '' : ' readonly') +
-            '>' + escapeHtml(value || "") + '</textarea>' +
+      return '<div class="profile-field">' +
+          '<label>' + label + '</label>' +
+          '<textarea id="' + id + '"' +
+          (editable ? '' : ' readonly') +
+          '>' + escapeHtml(value || "") + '</textarea>' +
         '</div>';
-
     }
-
     return '<div class="profile-field">' +
         '<label>' + label + '</label>' +
         '<input type="' + (type || "text") + '" id="' + id + '"' +
         ' value="' + escapeHtml(value || "") + '"' +
         (editable ? '' : ' readonly') +
         '>' +
-    '</div>';
-
-}
+      '</div>';
+  }
 
   function renderEncounters(){
     if(!encounters.length) return '<div class="people-empty">No encounters recorded yet.</div>';
@@ -626,12 +611,9 @@ console.log("Document exists:", snap.exists());
       return '<div class="pf-encounter">' +
         '<div class="pf-encounter-head"><span>Encounter ' + (i + 1) + ' — ' + escapeHtml(enc.date || "") + '</span>' +
         '<div style="display:flex;gap:8px;">' +
-
-'<button class="pf-encounter-edit" data-i="' + i + '" type="button">✏ Edit</button>' +
-
-'<button class="pf-encounter-remove" data-id="' + enc.id + '" type="button">Remove</button></div>' +
-
-'</div>' +
+          '<button class="pf-encounter-edit" data-i="' + i + '" type="button">✏ Edit</button>' +
+          '<button class="pf-encounter-remove" data-id="' + enc.id + '" type="button">Remove</button></div>' +
+        '</div>' +
         (enc.location ? '<div class="people-card-meta">📍 ' + escapeHtml(enc.location) + '</div>' : '') +
         (enc.itemsFound ? '<div class="people-card-meta">Items found: ' + escapeHtml(enc.itemsFound) + '</div>' : '') +
         (itemsPhotos.length ? '<div class="pf-photos-row" style="margin-top:8px;">' +
@@ -680,7 +662,8 @@ console.log("Document exists:", snap.exists());
   }
 
   async function addPhoto(dataUrl){
-    var entry = { dataUrl: dataUrl, descriptor: null, takenBy: currentUserShortName(), addedAt: new Date().toISOString() };
+    // PATH B: Save new face-api descriptor to descriptorV2, leave old descriptor empty
+    var entry = { dataUrl: dataUrl, descriptorV2: null, takenBy: currentUserShortName(), addedAt: new Date().toISOString() };
     pendingPhotos.push(entry);
     await updateDoc(doc(db, "people", id), { photos: pendingPhotos });
     renderPhotos();
@@ -689,7 +672,7 @@ console.log("Document exists:", snap.exists());
       var canvas = await dataUrlToCanvas(dataUrl);
       var descriptor = await computeDescriptor(canvas);
       if(descriptor){
-        entry.descriptor = descriptor;
+        entry.descriptorV2 = descriptor;
         await updateDoc(doc(db, "people", id), { photos: pendingPhotos });
 
         var peopleList = await getAllPeopleCached();
@@ -796,51 +779,29 @@ console.log("Document exists:", snap.exists());
 
     renderPhotos();
 
-if (editMode) {
-
-    document.getElementById("pfAddPhotoBtn").onclick = function () {
-
+    if (editMode) {
+      document.getElementById("pfAddPhotoBtn").onclick = function () {
         document.getElementById("pfPhotoFile").value = "";
-
         document.getElementById("pfPhotoFile").click();
-
-    };
-
-    document.getElementById("pfPhotoFile").onchange = async function () {
-
+      };
+      document.getElementById("pfPhotoFile").onchange = async function () {
         var file = this.files[0];
-
         if (!file) return;
-
         var dataUrl = await fileToCompressedDataUrl(file, 480);
-
         addPhoto(dataUrl);
-
-    };
-
-    document.getElementById("pfImportFile").onchange = async function () {
-
+      };
+      document.getElementById("pfImportFile").onchange = async function () {
         var files = Array.prototype.slice.call(this.files);
-
         for (var i = 0; i < files.length; i++) {
-
-            try {
-
-                var dataUrl = await fileToCompressedDataUrl(files[i], 480);
-
-                await addPhoto(dataUrl);
-
-            } catch (e) {
-
-                console.error(e);
-
-            }
-
+          try {
+            var dataUrl = await fileToCompressedDataUrl(files[i], 480);
+            await addPhoto(dataUrl);
+          } catch (e) {
+            console.error(e);
+          }
         }
-
-    };
-
-}
+      };
+    }
 
     Array.prototype.forEach.call(document.querySelectorAll(".pf-encounter-remove"), function(btn){
       btn.onclick = async function(){
@@ -859,7 +820,7 @@ if (editMode) {
         openEditEncounterModal(encounters[i]);
       };
     });
-Array.prototype.forEach.call(document.querySelectorAll("#encounterList .pf-photo-view"), function(img){
+    Array.prototype.forEach.call(document.querySelectorAll("#encounterList .pf-photo-view"), function(img){
       img.onclick = function(){
         var enc = encounters[parseInt(img.getAttribute("data-enc-i"), 10)];
         var srcs = (enc.itemsPhotos || []).map(function(ph){ return photoUrl(ph); });
@@ -1059,6 +1020,6 @@ Array.prototype.forEach.call(document.querySelectorAll("#encounterList .pf-photo
     };
   }
 
- await loadEncounters();
+  await loadEncounters();
   render();
 }

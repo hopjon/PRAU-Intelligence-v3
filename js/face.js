@@ -1,32 +1,36 @@
-var humanInstance = null;
+// face.js — Face Search module using @vladmandic/face-api
+// PATH B: Stores new face-api descriptors in descriptorV2 field
+
 var modelsReady = false;
 var loadPromise = null;
+var MODEL_URL = "https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model";
 
 export function ensureModelsLoaded(){
   if(loadPromise) return loadPromise;
   loadPromise = (async function(){
     try{
-      if(typeof Human === "undefined") return;
-      var config = {
-        modelBasePath: "https://cdn.jsdelivr.net/npm/@vladmandic/human/models/",
-        face: { enabled: true, detector: { rotation: false }, mesh: { enabled: true },
-                description: { enabled: true }, iris: { enabled: false }, emotion: { enabled: false } },
-        body: { enabled: false }, hand: { enabled: false }, gesture: { enabled: false }
-      };
-      humanInstance = new Human.Human(config);
-      await humanInstance.load();
+      const faceapi = await import("https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.15/dist/face-api.esm.js");
+      window.faceapi = faceapi;
+      await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL);
+      await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+      await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
       modelsReady = true;
+      console.log("face-api models loaded successfully");
     }catch(e){ console.error("face engine failed to load", e); }
   })();
   return loadPromise;
 }
 
 export async function computeDescriptor(canvasOrImg){
-  if(!modelsReady || !humanInstance) return null;
+  if(!modelsReady || !window.faceapi) return null;
   try{
-    var result = await humanInstance.detect(canvasOrImg);
-    if(result && result.face && result.face.length && result.face[0].embedding){
-      return Array.from(result.face[0].embedding);
+    var faceapi = window.faceapi;
+    var detection = await faceapi
+      .detectSingleFace(canvasOrImg, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 }))
+      .withFaceLandmarks()
+      .withFaceDescriptor();
+    if(detection && detection.descriptor){
+      return Array.from(detection.descriptor);
     }
     return null;
   }catch(e){ return null; }
@@ -44,16 +48,25 @@ export function photoUrl(p){
 }
 
 export function photoDescriptor(p){
-  return typeof p === "string" ? null : p.descriptor;
+  if(typeof p === "string") return null;
+  if(p.descriptorV2) return p.descriptorV2;
+  if(p.descriptor) return p.descriptor;
+  return null;
 }
 
-// ---------- Face Search screen ----------
+export function matchThreshold(p){
+  if(!p) return 0.6;
+  if(p.descriptorV2) return 0.6;
+  if(p.descriptor) return 1.0;
+  return 0.6;
+}
+
 import { db } from "./firebase.js";
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 function escapeHtml(s){
   return (s||"").replace(/[&<>"']/g, function(c){
-    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    return {"&":"&amp;","<":"&lt;","<":"&gt;","'":"&quot;","'":"&#39;"}[c];
   });
 }
 
@@ -115,7 +128,7 @@ export function renderFaceSearch(container){
     var canvas = await fileToCanvas(file, 480);
     var descriptor = await computeDescriptor(canvas);
     if(!descriptor){
-      resultsEl.innerHTML = '<div class="people-empty">Could not analyze this photo — no clear face found, or the engine isn\'t available.</div>';
+      resultsEl.innerHTML = '<div class="people-empty">Could not analyze this photo — no clear face found, or the engine is not available.</div>';
       return;
     }
 
@@ -125,23 +138,27 @@ export function renderFaceSearch(container){
       var r = d.data(); r.id = d.id;
       (r.photos || []).forEach(function(p){
         var desc = photoDescriptor(p);
-        if(desc){ scored.push({ record: r, photoUrl: photoUrl(p), dist: euclidean(descriptor, desc) }); }
+        if(desc){
+          var threshold = matchThreshold(p);
+          var dist = euclidean(descriptor, desc);
+          scored.push({ record: r, photoUrl: photoUrl(p), dist: dist, threshold: threshold });
+        }
       });
     });
     scored.sort(function(a, b){ return a.dist - b.dist; });
     var top = scored.slice(0, 5);
 
     if(!top.length){
-      resultsEl.innerHTML = '<div class="people-empty">No stored photos have matchable face data yet — photos added before face-matching was enabled won\'t have this.</div>';
+      resultsEl.innerHTML = '<div class="people-empty">No stored photos have matchable face data yet — photos added before face-matching was enabled will not have this.</div>';
       return;
     }
 
     resultsEl.innerHTML = top.map(function(t){
-      var pct = Math.max(0, Math.round((1 - t.dist / 1.0) * 100));
+      var pct = Math.max(0, Math.round((1 - t.dist / t.threshold) * 100));
       return '<div class="people-row" style="cursor:default;">' +
         '<img class="people-row-thumb" src="' + t.photoUrl + '">' +
         '<div><div class="people-row-name">' + escapeHtml(t.record.name) + '</div>' +
-        '<div class="people-row-meta">' + (t.dist < 0.6 ? "Likely match" : "Possible match") + ' · ' + pct + '% similarity</div></div>' +
+        '<div class="people-row-meta">' + (t.dist < t.threshold ? "Likely match" : "Possible match") + ' · ' + pct + '% similarity</div></div>' +
       '</div>';
     }).join("");
   }
