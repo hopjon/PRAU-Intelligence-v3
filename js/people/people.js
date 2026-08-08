@@ -862,7 +862,6 @@ Array.prototype.forEach.call(document.querySelectorAll("#encounterList .pf-photo
     });
 
     document.getElementById("newEncounterBtn").onclick = function(){
-    document.getElementById("newEncounterBtn").onclick = function(){
       if(encounters.length >= MAX_ENCOUNTERS) return;
       openNewEncounterModal();
     };
@@ -1080,7 +1079,6 @@ Array.prototype.forEach.call(document.querySelectorAll("#encounterList .pf-photo
     };
   }
 
-  await loadEncounters();
+ await loadEncounters();
   render();
-}
 }
