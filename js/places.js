@@ -2,10 +2,15 @@ import { db, auth } from "./firebase.js";
 import {
   collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
-  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
-  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png"
+var goldPinIcon = L.divIcon({
+  className: "gold-pin-icon",
+  html: '<svg width="30" height="42" viewBox="0 0 30 42" xmlns="http://www.w3.org/2000/svg">' +
+    '<path d="M15 0C6.7 0 0 6.7 0 15c0 11.2 15 27 15 27s15-15.8 15-27C30 6.7 23.3 0 15 0z" fill="#D4AF37" stroke="#8a6c0a" stroke-width="1"/>' +
+    '<circle cx="15" cy="15" r="6" fill="#1a1400"/>' +
+    '</svg>',
+  iconSize: [30, 42],
+  iconAnchor: [15, 42],
+  popupAnchor: [0, -38]
 });
 
 function escapeHtml(s){
@@ -103,7 +108,7 @@ export async function renderPlaces(){
   if(withCoords.length){
     var bounds = [];
     withCoords.forEach(function(p){
-      var m = L.marker([p.coords.lat, p.coords.lng]).addTo(map);
+      var m = L.marker([p.coords.lat, p.coords.lng], { icon: goldPinIcon }).addTo(map);
       m.bindPopup('<strong>' + escapeHtml(p.name || "Unnamed place") + '</strong><br>' + escapeHtml(p.type || "") +
         '<br><a href="#" data-id="' + p.id + '" class="place-popup-link">View profile</a>');
       m.on("popupopen", function(){
@@ -338,7 +343,7 @@ async function renderPlaceProfile(id){
       if(mapEl){
         var map = L.map(mapEl);
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 }).addTo(map);
-        L.marker([coords.lat, coords.lng]).addTo(map);
+        L.marker([coords.lat, coords.lng], { icon: goldPinIcon }).addTo(map);
         map.setView([coords.lat, coords.lng], 16);
       }
     }
