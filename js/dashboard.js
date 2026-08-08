@@ -1,7 +1,7 @@
 import { logout } from "./auth.js";
 import { db } from "./firebase.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { renderPeople } from "./people/people.js";
+import { showPeople } from "./people/people.js";
 import { renderVehicles } from "./vehicles.js";
 import { renderFaceSearch } from "./face.js";
 import { renderPlaces } from "./places.js";
@@ -10,18 +10,6 @@ import { navigate } from "./layout/router.js";
 
 var currentView = "dashboard";
 var currentUser = null;
-
-if(currentView === "people"){
-    renderPeople(contentArea);
-  } else if(currentView === "vehicles"){
-    renderVehicles(contentArea);
-  } else if(currentView === "face"){
-    renderFaceSearch(contentArea);
-  } else if(currentView === "places"){
-    renderPlaces();
-  } else {
-    renderDashboardHome(contentArea, function(view){ currentView = view; renderShell(displayName); });
-  }
 
 function getMenu(){
   return '<aside class="sidebar">' +
@@ -73,21 +61,22 @@ function renderShell(displayName){
 
   document.getElementById("logoutBtn").onclick = logout;
   document.getElementById("navDashboard").onclick = function(){ currentView = "dashboard"; renderShell(displayName); };
- document.getElementById("navPeople").onclick = function(){ currentView = "people"; renderShell(displayName); };
+  document.getElementById("navPeople").onclick = function(){ currentView = "people"; renderShell(displayName); };
   document.getElementById("navVehicles").onclick = function(){ currentView = "vehicles"; renderShell(displayName); };
   document.getElementById("navFace").onclick = function(){ currentView = "face"; renderShell(displayName); };
   document.getElementById("navPlaces").onclick = function(){ currentView = "places"; renderShell(displayName); };
+
   var contentArea = document.getElementById("contentArea");
   if(currentView === "people"){
-    showPeople();
+    showPeople(contentArea);
   } else if(currentView === "vehicles"){
     renderVehicles(contentArea);
   } else if(currentView === "face"){
     renderFaceSearch(contentArea);
   } else if(currentView === "places"){
-    renderPlaces();
+    renderPlaces(contentArea);
   } else {
-    contentArea.innerHTML = getCards();
+    renderDashboardHome(contentArea, function(view){ currentView = view; renderShell(displayName); });
   }
 }
 
