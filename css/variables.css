@@ -5,12 +5,12 @@
 
 :root {
   /* === GOLD PALETTE === */
-  --gold:           #8B5A1A;   /* Main gold (was var(--gold)) */
-  --gold-light:     #B87A2E;   /* Lighter gold */
-  --gold-lighter:   #C4883A;   /* Highlight gold */
-  --gold-dark:      #5C3A0F;   /* Darker gold */
-  --gold-darker:    #3d2608;   /* Shadow gold */
-  --gold-hover: #B87A2E;  /* Same as --gold-light */
+  --gold:           #A27732;   /* Main gold */
+  --gold-light:     #C48D3C;   /* Lighter gold */
+  --gold-lighter:   #C48D3C;   /* Highlight gold */
+  --gold-dark:      #5B3C10;   /* Darker gold */
+  --gold-darker:    #5B3C10;   /* Shadow gold */
+  --gold-hover: #C48D3C;  /* Same as --gold-light */
   
   /* Gold with opacity */
   --gold-10: rgba(139, 90, 26, 0.1);
