@@ -450,7 +450,7 @@ button#takePhotoBtn *,
 #faceSearch button *,
 [class*="face"] button *,
 [id*="face"] button * {
-  color: rgb(255, 255, 255) !important;
+  color: rgb(0, 0, 0) !important;
   fill: #000000 !important;
   stroke: #000000 !important;
 }
@@ -469,7 +469,7 @@ button#takePhotoBtn i,
 #faceSearch button i,
 [class*="face"] button i,
 [id*="face"] button i {
-  color: #000000 !important;
+  color: rgb(0, 0, 0) !important;
   fill: #000000 !important;
 }
 
