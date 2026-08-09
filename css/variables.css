@@ -10,6 +10,7 @@
   --gold-lighter:   #C4883A;   /* Highlight gold */
   --gold-dark:      #5C3A0F;   /* Darker gold */
   --gold-darker:    #3d2608;   /* Shadow gold */
+  --gold-hover: #B87A2E;  /* Same as --gold-light */
   
   /* Gold with opacity */
   --gold-10: rgba(139, 90, 26, 0.1);
