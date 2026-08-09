@@ -1,33 +1,39 @@
-:root{
-
-    /* Primary Colours */
-
-    --background: #0F1115;
-    --sidebar: #171B22;
-    --card: #1E252F;
-
-    /* Brand */
-
-    --gold: #b97c2b;
-    --gold-hover: var(--gold-hover);
-    --gold-dark: var(--gold-dark);
-
-    /* Text */
-
-    --text: #FFFFFF;
-    --text-secondary: #B8B8B8;
-
-    /* Borders */
-
-    --border: rgba(212,175,55,.20);
-
-    /* Effects */
-
-    --shadow:
-        0 8px 30px rgba(0,0,0,.35);
-
-    --radius:14px;
-
-    --transition:.25s ease;
-
+/* css/variables.css */
+:root {
+  /* Gold palette */
+  --gold-primary:   #8B5A1A;
+  --gold-light:     #B87A2E;
+  --gold-lighter:   #C4883A;
+  --gold-dark:      #5C3A0F;
+  --gold-darker:    #3d2608;
+  
+  /* Gold with opacity */
+  --gold-10: rgba(139, 90, 26, 0.1);
+  --gold-20: rgba(139, 90, 26, 0.2);
+  --gold-30: rgba(139, 90, 26, 0.3);
+  --gold-40: rgba(139, 90, 26, 0.4);
+  --gold-50: rgba(139, 90, 26, 0.5);
+  --gold-60: rgba(139, 90, 26, 0.6);
+  --gold-70: rgba(139, 90, 26, 0.7);
+  
+  /* Text */
+  --text-white:     #ffffff;
+  --text-gray:      #888888;
+  --text-gray-dark: #666666;
+  --text-gray-light:#aaaaaa;
+  --text-black:     #000000;
+  --text-red:       #ef5350;
+  
+  /* Backgrounds */
+  --bg-page:    #0f0f0f;
+  --bg-card:    #161616;
+  --bg-input:   #161616;
+  --bg-hover:   #1a1a1a;
+  --bg-dark:    #0a0a0a;
+  --bg-encounter:#141414;
+  
+  /* Borders */
+  --border-default: #2b3038;
+  --border-gold:    var(--gold-40);
+  --border-gold-strong: var(--gold-70);
 }
