@@ -672,3 +672,26 @@ body, .dashboard {
   border-color: var(--gold) !important;
   box-shadow: 0 0 0 2px var(--gold-15), 0 0 15px var(--gold-10) !important;
 }
+/* ============================================================
+   FIX: Remove border/box around search icons
+   ============================================================ */
+
+.people-search i,
+.vehicles-search i,
+.search-box i,
+[class*="search"] i,
+.people-search svg,
+.vehicles-search svg,
+.search-box svg,
+[class*="search"] svg,
+.people-search .bi,
+.vehicles-search .bi,
+.search-box .bi,
+[class*="search"] .bi {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
