@@ -426,7 +426,7 @@ button.pf-take-photo-btn,
 [id*="face"] button,
 [id*="face"] .btn {
   background: linear-gradient(180deg, #C4883A 0%, #A6702A 25%, var(--gold-primary) 50%, #7A4A15 75%, var(--gold-dark) 100%) !important;
-  color: #000000 !important;
+  color: rgb(0, 0, 0) !important;
   font-weight: 700 !important;
   border-radius: 12px !important;
   border: 1px solid rgba(196, 136, 58, 0.5) !important;
@@ -450,7 +450,7 @@ button#takePhotoBtn *,
 #faceSearch button *,
 [class*="face"] button *,
 [id*="face"] button * {
-  color: #000000 !important;
+  color: rgb(255, 255, 255) !important;
   fill: #000000 !important;
   stroke: #000000 !important;
 }
