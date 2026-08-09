@@ -642,3 +642,33 @@ body, .dashboard {
     grid-template-columns: repeat(2, 1fr) !important;
   }
 }
+/* ============================================================
+   FIX: Search box - remove inner input border
+   ============================================================ */
+
+.people-search input,
+.vehicles-search input,
+.search-box input,
+[class*="search"] input {
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  background: transparent !important;
+}
+
+/* Only the container has border, not the input */
+.people-search,
+.vehicles-search,
+.search-box,
+[class*="search"] {
+  border: 1px solid var(--border) !important;
+  background: var(--card) !important;
+}
+
+.people-search:focus-within,
+.vehicles-search:focus-within,
+.search-box:focus-within,
+[class*="search"]:focus-within {
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 0 2px var(--gold-15), 0 0 15px var(--gold-10) !important;
+}
