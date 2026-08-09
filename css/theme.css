@@ -1,22 +1,44 @@
 /* ============================================================
-   PRAU INTELLIGENCE - GOLD THEME OVERRIDES
+   PRAU INTELLIGENCE - GOLD THEME
    ============================================================
-   This file overrides styles from all other CSS files.
-   Load it LAST in your index.html <head>.
+   🎨 COLOR PALETTE - CHANGE ONLY THESE VALUES!
    ============================================================ */
 
-/* ========== ALL GOLD COLORS IN ONE PLACE ========== */
 :root {
-  --gold-primary: #865E21;
-  --gold-light: #AD813A;
-  --gold-dark: #614015;
-  --gold-glow: rgba(170, 96, 0, 0.4);
-  --gold-glow-soft: rgba(139, 90, 26, 0.2);
+  /* === GOLD COLORS === */
+  --gold-primary:   #8B5A1A;   /* Main gold */
+  --gold-light:     #B87A2E;   /* Lighter gold (highlights) */
+  --gold-dark:      #5C3A0F;   /* Darker gold (shadows) */
+  --gold-glow:      rgba(139, 90, 26, 0.3);
+  --gold-glow-soft: rgba(139, 90, 26, 0.1);
+  
+  /* === TEXT COLORS === */
+  --text-white:     #ffffff;   /* Normal text, headings you want white */
+  --text-gray:      #888888;   /* Meta text, subtitles, descriptions */
+  --text-gray-dark: #666666;   /* Captions, placeholders */
+  --text-gray-light:#aaaaaa;   /* Labels, hints */
+  --text-black:     #000000;   /* Text on gold buttons */
+  --text-red:       #ef5350;   /* Errors, warnings, deceased */
+  --text-gold:      #8B5A1A;   /* Headings, icons, accents */
+  
+  /* === BACKGROUND COLORS === */
+  --bg-page:        #0f0f0f;   /* Page background */
+  --bg-card:        #161616;   /* Cards, inputs, rows */
+  --bg-card-hover:  #1a1a1a;   /* Card hover state */
+  --bg-dark:        #0a0a0a;   /* Darker areas */
+  
+  /* === BORDER COLORS === */
+  --border-default: #2b3038;   /* Default borders */
+  --border-gold:    rgba(139, 90, 26, 0.4);   /* Gold borders */
+  --border-gold-strong: rgba(139, 90, 26, 0.7);
 }
 
-/* ========== 1. PREMIUM GOLD BUTTON ==========
+
+/* ============================================================
+   1. PREMIUM GOLD BUTTON
    Sign In, Logout, Active sidebar tabs
-   ============================================== */
+   Text: BLACK on gold background
+   ============================================================ */
 
 .login-btn,
 .logout-btn,
@@ -27,8 +49,8 @@ button#logoutBtn,
 nav .menu-item.active,
 .sidebar .menu-item.active,
 aside .menu-item.active {
-  background: linear-gradient(180deg, #C4883A 0%, #A6702A 25%, #8B5A1A 50%, #7A4A15 75%, #5C3A0F 100%) !important;
-  color: #000000 !important;
+  background: linear-gradient(180deg, #C4883A 0%, #A6702A 25%, var(--gold-primary) 50%, #7A4A15 75%, var(--gold-dark) 100%) !important;
+  color: var(--text-black) !important;
   font-weight: 700 !important;
   border-radius: 12px !important;
   border: 1px solid rgba(196, 136, 58, 0.5) !important;
@@ -43,7 +65,6 @@ aside .menu-item.active {
   overflow: hidden !important;
 }
 
-/* Top shine line */
 .login-btn::before,
 .logout-btn::before,
 #logoutBtn::before,
@@ -60,14 +81,13 @@ nav .menu-item.active::before,
   border-radius: 1px !important;
 }
 
-/* Hover */
 .login-btn:hover,
 .logout-btn:hover,
 #logoutBtn:hover,
 .menu-item.active:hover,
 nav .menu-item.active:hover,
 .sidebar .menu-item.active:hover {
-  background: linear-gradient(180deg, #D4984A 0%, #B87A2E 25%, #9A6220 50%, #8A5A1A 75%, #6B4215 100%) !important;
+  background: linear-gradient(180deg, #D4984A 0%, var(--gold-light) 25%, #9A6220 50%, #8A5A1A 75%, #6B4215 100%) !important;
   transform: translateY(-2px) !important;
   box-shadow: 
     0 6px 20px rgba(0, 0, 0, 0.5),
@@ -76,16 +96,20 @@ nav .menu-item.active:hover,
     inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
 }
 
-/* Icons inside premium buttons */
 .login-btn i,
 .logout-btn i,
 #logoutBtn i,
 .menu-item.active i,
 .menu-item.active .bi {
-  color: #000000 !important;
+  color: var(--text-black) !important;
 }
 
-/* ========== 2. SIDEBAR MENU ITEMS (Inactive) ========== */
+
+/* ============================================================
+   2. SIDEBAR MENU ITEMS (Inactive)
+   Text: WHITE
+   Icons: GOLD
+   ============================================================ */
 
 .menu-item,
 nav .menu-item,
@@ -95,8 +119,8 @@ nav button,
 .sidebar button,
 aside button {
   background: linear-gradient(135deg, #1a1208 0%, #0f0a04 50%, #1a1208 100%) !important;
-  color: #fff !important;
-  border: 1px solid rgba(139, 90, 26, 0.4) !important;
+  color: var(--text-white) !important;
+  border: 1px solid var(--border-gold) !important;
   border-radius: 12px !important;
   padding: 12px 18px !important;
   margin: 6px 12px !important;
@@ -116,7 +140,7 @@ nav .menu-item::before,
   left: 15% !important;
   right: 15% !important;
   height: 1px !important;
-  background: linear-gradient(90deg, transparent, #B87A2E, transparent) !important;
+  background: linear-gradient(90deg, transparent, var(--gold-light), transparent) !important;
   opacity: 0.6 !important;
 }
 
@@ -124,10 +148,10 @@ nav .menu-item::before,
 nav .menu-item:hover,
 .sidebar .menu-item:hover {
   background: linear-gradient(135deg, #24180a 0%, #1a1005 50%, #24180a 100%) !important;
-  border-color: rgba(139, 90, 26, 0.8) !important;
+  border-color: var(--border-gold-strong) !important;
   box-shadow: 0 0 20px rgba(139, 90, 26, 0.3), 0 0 40px rgba(139, 90, 26, 0.15), 0 0 80px rgba(139, 90, 26, 0.08), inset 0 1px 0 rgba(255,255,255,0.05) !important;
   transform: translateX(3px) !important;
-  color: #fff !important;
+  color: var(--text-white) !important;
 }
 
 .menu-item i,
@@ -135,7 +159,7 @@ nav .menu-item:hover,
 .menu-item [class*="bi-"],
 nav button i,
 .sidebar button i {
-  color: #8B5A1A !important;
+  color: var(--gold-primary) !important;
   margin-right: 10px !important;
   font-size: 16px !important;
   transition: all 0.3s ease !important;
@@ -144,11 +168,15 @@ nav button i,
 .menu-item:hover i,
 .menu-item:hover .bi,
 .menu-item:hover [class*="bi-"] {
-  color: #B87A2E !important;
+  color: var(--gold-light) !important;
   text-shadow: 0 0 12px rgba(139, 90, 26, 0.5), 0 0 24px rgba(139, 90, 26, 0.3) !important;
 }
 
-/* ========== 3. HEADINGS & ICONS - GOLD ========== */
+
+/* ============================================================
+   3. HEADINGS - GOLD
+   h1, h2, h3 and their icons
+   ============================================================ */
 
 .welcome-text h1,
 .welcome-text h1 span,
@@ -177,29 +205,115 @@ h3 [class*="bi-"],
 .sidebar h2,
 .logo span,
 .sidebar .logo span {
-  color: #8B5A1A !important;
+  color: var(--text-gold) !important;
 }
 
-/* ========== 4. ENCOUNTER TEXT FIXES ========== */
 
+/* ============================================================
+   4. NORMAL TEXT - WHITE
+   Body text, names, descriptions
+   ============================================================ */
+
+.people-card-name,
+.people-row-name,
 .pf-encounter,
 .pf-encounter p,
 .pf-encounter span:not(.pf-encounter-head span),
 .pf-encounter div,
 .pf-encounter textarea,
-.pf-encounter input {
-  color: #fff !important;
+.pf-encounter input,
+.merge-search-row,
+.linked-person-view,
+.dash-row {
+  color: var(--text-white) !important;
 }
 
-.pf-encounter-head span {
-  color: #8B5A1A !important;
-  font-weight: 700 !important;
-  font-size: 13px !important;
+
+/* ============================================================
+   5. META TEXT - GRAY
+   Subtitles, dates, descriptions, counts
+   ============================================================ */
+
+.people-card-meta,
+.people-row-meta,
+.people-empty,
+.dash-row-sub,
+.stat-label,
+.login-version {
+  color: var(--text-gray) !important;
 }
+
+
+/* ============================================================
+   6. CAPTIONS & PLACEHOLDERS - DARK GRAY
+   Small text, placeholders
+   ============================================================ */
+
+.pf-photo-caption,
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-gray-dark) !important;
+}
+
+
+/* ============================================================
+   7. LABELS - LIGHT GRAY
+   Form labels, field labels
+   ============================================================ */
+
+.modal-card label,
+.profile-field label {
+  color: var(--text-gray-light) !important;
+}
+
+
+/* ============================================================
+   8. ERROR & WARNING TEXT - RED
+   Errors, deceased badges, remove buttons
+   ============================================================ */
+
+.modal-error,
+.pf-encounter-remove,
+.deceased-badge,
+.deceased-tag,
+.linked-person-remove:hover {
+  color: var(--text-red) !important;
+}
+
+
+/* ============================================================
+   9. GOLD ACCENT TEXT
+   Status messages, warnings, special highlights
+   ============================================================ */
+
+.face-warning,
+#faceStatus,
+#apGpsStatus,
+#encGpsStatus,
+#vfLocationGpsStatus,
+#profileError,
+#apError,
+#encError,
+#avError,
+#mergeError,
+.pf-encounter-head span,
+.dash-row-count,
+.owner-link,
+.type-tag,
+.leaflet-popup-content a,
+.address-suggestion-row:hover,
+.linked-person-chip {
+  color: var(--text-gold) !important;
+}
+
+
+/* ============================================================
+   10. ENCOUNTER BUTTONS
+   ============================================================ */
 
 .pf-encounter-edit {
   background: #2b2b2b !important;
-  color: #8B5A1A !important;
+  color: var(--text-gold) !important;
   border: none !important;
   border-radius: 8px !important;
   padding: 6px 12px !important;
@@ -210,7 +324,7 @@ h3 [class*="bi-"],
 
 .pf-encounter-edit:hover {
   background: #393939 !important;
-  color: #B87A2E !important;
+  color: var(--gold-light) !important;
 }
 
 .pf-add-encounter,
@@ -218,9 +332,9 @@ h3 [class*="bi-"],
   width: 100% !important;
   padding: 11px !important;
   border-radius: 10px !important;
-  border: 1px dashed rgba(139, 90, 26, 0.6) !important;
+  border: 1px dashed var(--border-gold) !important;
   background: #1a1a1a !important;
-  color: #8B5A1A !important;
+  color: var(--text-gold) !important;
   font-weight: 600 !important;
   cursor: pointer !important;
   transition: all 0.18s ease !important;
@@ -229,8 +343,8 @@ h3 [class*="bi-"],
 .pf-add-encounter:hover,
 .pf-add-photo:hover {
   background: rgba(139, 90, 26, 0.08) !important;
-  border-color: rgba(139, 90, 26, 0.9) !important;
-  color: #B87A2E !important;
+  border-color: var(--border-gold-strong) !important;
+  color: var(--gold-light) !important;
 }
 
 .pf-add-encounter:disabled {
@@ -239,13 +353,8 @@ h3 [class*="bi-"],
 }
 
 .pf-add-photo i {
-  color: #8B5A1A !important;
+  color: var(--text-gold) !important;
   font-size: 22px !important;
-}
-
-.pf-photo-caption {
-  font-size: 9px !important;
-  color: #666 !important;
 }
 
 .pf-import-label {
@@ -254,7 +363,7 @@ h3 [class*="bi-"],
   padding: 10px !important;
   border: 1px solid rgba(139, 90, 26, 0.3) !important;
   border-radius: 9px !important;
-  color: #8B5A1A !important;
+  color: var(--text-gold) !important;
   font-size: 13px !important;
   font-weight: 700 !important;
   cursor: pointer !important;
@@ -262,12 +371,12 @@ h3 [class*="bi-"],
 }
 
 .pf-import-label:hover {
-  border-color: rgba(139, 90, 26, 0.6) !important;
+  border-color: var(--border-gold) !important;
   background: rgba(139, 90, 26, 0.05) !important;
 }
 
 .pf-import-label i {
-  color: #8B5A1A !important;
+  color: var(--text-gold) !important;
   margin-right: 6px !important;
 }
 
@@ -278,7 +387,7 @@ h3 [class*="bi-"],
   border: 1px solid rgba(139, 90, 26, 0.3) !important;
   border-radius: 9px !important;
   background: transparent !important;
-  color: #8B5A1A !important;
+  color: var(--text-gold) !important;
   font-size: 13px !important;
   font-weight: 700 !important;
   cursor: pointer !important;
@@ -288,16 +397,19 @@ h3 [class*="bi-"],
 }
 
 .pf-take-photo-btn:hover {
-  border-color: rgba(139, 90, 26, 0.6) !important;
+  border-color: var(--border-gold) !important;
   background: rgba(139, 90, 26, 0.05) !important;
 }
 
 .pf-take-photo-btn i {
-  color: #8B5A1A !important;
+  color: var(--text-gold) !important;
   margin-right: 6px !important;
 }
 
-/* ========== 5. BORDERS & SHADOWS ========== */
+
+/* ============================================================
+   11. BORDERS & SHADOWS
+   ============================================================ */
 
 .modal-card,
 .profile-view,
@@ -311,7 +423,10 @@ h3 [class*="bi-"],
   box-shadow: 0 0 20px rgba(139, 90, 26, 0.05) !important;
 }
 
-/* ========== 6. INPUT FIELDS ========== */
+
+/* ============================================================
+   12. INPUT FIELDS
+   ============================================================ */
 
 input,
 textarea,
@@ -319,9 +434,9 @@ select,
 input[type="text"],
 input[type="date"],
 input[type="file"] {
-  background: #161616 !important;
+  background: var(--bg-card) !important;
   border: 1px solid rgba(139, 90, 26, 0.2) !important;
-  color: #fff !important;
+  color: var(--text-white) !important;
 }
 
 input:focus,
@@ -329,32 +444,33 @@ textarea:focus,
 select:focus,
 input[type="text"]:focus,
 input[type="date"]:focus {
-  border-color: #8B5A1A !important;
+  border-color: var(--gold-primary) !important;
   box-shadow: 0 0 0 2px rgba(139, 90, 26, 0.15), 0 0 15px rgba(139, 90, 26, 0.1) !important;
   outline: none !important;
 }
 
-input::placeholder,
-textarea::placeholder {
-  color: #666 !important;
-}
 
-/* ========== 7. SCROLLBAR ========== */
+/* ============================================================
+   13. SCROLLBAR
+   ============================================================ */
 
 ::-webkit-scrollbar {
   width: 8px !important;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0a0a0a !important;
+  background: var(--bg-dark) !important;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #8B5A1A, #5C3A0F) !important;
+  background: linear-gradient(180deg, var(--gold-primary), var(--gold-dark)) !important;
   border-radius: 4px !important;
 }
 
-/* ========== 8. LOGIN CARD ========== */
+
+/* ============================================================
+   14. LOGIN CARD
+   ============================================================ */
 
 .login-card {
   box-shadow: 0 0 40px rgba(139, 90, 26, 0.12), 0 0 80px rgba(139, 90, 26, 0.05) !important;
@@ -362,22 +478,21 @@ textarea::placeholder {
 }
 
 .login-card::before {
-  background: linear-gradient(90deg, transparent, #B87A2E, transparent) !important;
+  background: linear-gradient(90deg, transparent, var(--gold-light), transparent) !important;
 }
 
 .login-tagline {
-  color: #8B5A1A !important;
+  color: var(--text-gold) !important;
 }
 
 .login-field i {
-  color: #8B5A1A !important;
+  color: var(--text-gold) !important;
 }
 
-.login-version {
-  color: #5C3A0F !important;
-}
 
-/* ========== 9. SEARCH BAR ========== */
+/* ============================================================
+   15. SEARCH BAR
+   ============================================================ */
 
 .people-search {
   max-width: 400px !important;
@@ -388,14 +503,20 @@ textarea::placeholder {
   width: 100% !important;
 }
 
-/* ========== 10. PHOTO CHIPS ========== */
+
+/* ============================================================
+   16. PHOTO CHIPS
+   ============================================================ */
 
 .pf-photo-chip img {
   border-radius: 8px !important;
   border: 1px solid rgba(139, 90, 26, 0.2) !important;
 }
 
-/* ========== 11. TOPBAR & SIDEBAR ========== */
+
+/* ============================================================
+   17. TOPBAR & SIDEBAR
+   ============================================================ */
 
 .topbar {
   border-bottom: 1px solid rgba(139, 90, 26, 0.15) !important;
@@ -405,7 +526,10 @@ textarea::placeholder {
   border-right: 1px solid rgba(139, 90, 26, 0.1) !important;
 }
 
-/* ========== 12. STAT CARDS ========== */
+
+/* ============================================================
+   18. STAT CARDS
+   ============================================================ */
 
 .stat-card {
   background: linear-gradient(180deg, #1a1a1a, #0f0f0f) !important;
@@ -420,7 +544,7 @@ textarea::placeholder {
   left: 10% !important;
   right: 10% !important;
   height: 2px !important;
-  background: linear-gradient(90deg, transparent, #B87A2E, transparent) !important;
+  background: linear-gradient(90deg, transparent, var(--gold-light), transparent) !important;
 }
 
 .stat-card:hover {
@@ -430,98 +554,89 @@ textarea::placeholder {
 }
 
 .stat-number {
-  color: #8B5A1A !important;
+  color: var(--text-gold) !important;
   text-shadow: 0 0 20px rgba(139, 90, 26, 0.3) !important;
 }
 
 .stat-label {
-  color: #8B5A1A !important;
+  color: var(--text-gold) !important;
 }
 
-/* ========== 13. DASHBOARD ROWS ========== */
+
+/* ============================================================
+   19. DASHBOARD ROWS
+   ============================================================ */
 
 .dash-row:hover {
-  border-color: #8B5A1A !important;
+  border-color: var(--gold-primary) !important;
 }
 
 .dash-row .dash-row-count {
-  color: #8B5A1A !important;
+  color: var(--text-gold) !important;
 }
 
-/* ========== 14. PEOPLE CARD ========== */
+
+/* ============================================================
+   20. PEOPLE CARD
+   ============================================================ */
 
 .people-card:hover {
-  border-color: #8B5A1A !important;
+  border-color: var(--gold-primary) !important;
 }
 
-/* ========== 15. LINKED PERSON CHIP ========== */
 
-.linked-person-chip {
-  color: #8B5A1A !important;
-}
-
-/* ========== 16. TYPE TAG ========== */
+/* ============================================================
+   21. TYPE TAG
+   ============================================================ */
 
 .type-tag {
-  color: #8B5A1A !important;
-  border-color: #8B5A1A !important;
+  color: var(--text-gold) !important;
+  border-color: var(--gold-primary) !important;
 }
 
-/* ========== 17. LEAFLET POPUP ========== */
+
+/* ============================================================
+   22. LEAFLET POPUP
+   ============================================================ */
 
 .leaflet-popup-content a {
-  color: #8B5A1A !important;
+  color: var(--text-gold) !important;
 }
 
-/* ========== 18. ADDRESS SUGGESTION ========== */
+
+/* ============================================================
+   23. ADDRESS SUGGESTION
+   ============================================================ */
 
 .address-suggestion-row:hover {
-  color: #8B5A1A !important;
+  color: var(--text-gold) !important;
 }
 
-/* ========== 19. OWNER LINK ========== */
 
-.owner-link {
-  color: #8B5A1A !important;
+/* ============================================================
+   24. MERGE SEARCH
+   ============================================================ */
+
+.merge-search-row:hover {
+  border-color: var(--gold-primary) !important;
 }
 
-/* ========== 20. FACE WARNING ========== */
 
-.face-warning,
-#faceStatus,
-#apGpsStatus,
-#encGpsStatus,
-#vfLocationGpsStatus,
-#profileError,
-#apError,
-#encError,
-#avError,
-#mergeError {
-  color: #8B5A1A !important;
-}
-
-/* ========== 21. DECEASED BADGE ========== */
+/* ============================================================
+   25. DECEASED BADGE
+   ============================================================ */
 
 .deceased-badge,
 .deceased-tag {
   background: rgba(139, 90, 26, 0.12) !important;
-  color: #8B5A1A !important;
+  color: var(--text-gold) !important;
   border: 1px solid rgba(139, 90, 26, 0.4) !important;
 }
 
-/* ========== 22. MERGE SEARCH ========== */
 
-.merge-search-row:hover {
-  border-color: #8B5A1A !important;
-}
-
-/* ========== 23. PEOPLE HEADER ========== */
-
-.people-header h1 {
-  color: #fff !important;
-}
-
-/* ========== 24. RESPONSIVE ========== */
+/* ============================================================
+   26. RESPONSIVE
+   ============================================================ */
 
 @media(max-width: 768px) {
   .stat-cards {
