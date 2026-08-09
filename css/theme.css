@@ -5,9 +5,9 @@
 
 /* ========== COLOR PALETTE ========== */
 :root {
-  --gold-primary:   #856c4c;
-  --gold-light:     #a78255;
-  --gold-dark:      #795f3d;
+  --gold-primary:   #865E21;
+  --gold-light:     #AD813A;
+  --gold-dark:      #614015;
   --text-white:     #ffffff;
   --text-gray:      #888888;
   --text-gray-dark: #666666;
@@ -139,7 +139,7 @@ button.logout-btn:hover,
 .topbar button:hover,
 header button:hover,
 #app header button:hover {
-  background: linear-gradient(180deg, #D4984A 0%, var(--gold-light) 25%, #9A6220 50%, #8A5A1A 75%, #6B4215 100%) !important;
+  background: linear-gradient(180deg, #865E21 0%, var(--gold-light) 25%, #A37229 50%, #7B561F 75%, #513915 100%) !important;
   transform: translateY(-2px) !important;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), 0 0 40px rgba(139, 90, 26, 0.3), 0 0 80px rgba(139, 90, 26, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
 }
