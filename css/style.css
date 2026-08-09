@@ -1,5 +1,5 @@
 /* ========== GOLD THEME - AGGRESSIVE OVERRIDES ========== */
-/* Targeting the exact colors from the screenshot: #f3c037 → #D4A843 */
+/* Gold accent: #99611a | Lighter gold: #B87A2E | Darker gold: #6B3D0F */
 
 /* ========== DASHBOARD STAT CARDS ========== */
 .stat-cards {
@@ -20,8 +20,8 @@
   border-radius: 16px !important;
   cursor: pointer !important;
   background: linear-gradient(180deg, #1a1a1a, #0f0f0f) !important;
-  border: 1px solid rgba(212, 168, 67, 0.35) !important;
-  box-shadow: 0 0 30px rgba(212, 168, 67, 0.1), 0 0 60px rgba(212, 168, 67, 0.05), inset 0 1px 0 rgba(255,255,255,0.05) !important;
+  border: 1px solid rgba(153, 97, 26, 0.35) !important;
+  box-shadow: 0 0 30px rgba(153, 97, 26, 0.1), 0 0 60px rgba(153, 97, 26, 0.05), inset 0 1px 0 rgba(255,255,255,0.05) !important;
   transition: all 0.3s ease !important;
   position: relative !important;
   overflow: hidden !important;
@@ -34,27 +34,27 @@
   left: 10% !important;
   right: 10% !important;
   height: 2px !important;
-  background: linear-gradient(90deg, transparent, #FAD06D, transparent) !important;
+  background: linear-gradient(90deg, transparent, #B87A2E, transparent) !important;
 }
 
 .stat-card:hover {
-  box-shadow: 0 0 40px rgba(212, 168, 67, 0.25), 0 0 80px rgba(212, 168, 67, 0.1), inset 0 1px 0 rgba(255,255,255,0.1) !important;
+  box-shadow: 0 0 40px rgba(153, 97, 26, 0.25), 0 0 80px rgba(153, 97, 26, 0.1), inset 0 1px 0 rgba(255,255,255,0.1) !important;
   transform: translateY(-3px) !important;
-  border-color: rgba(212, 168, 67, 0.6) !important;
+  border-color: rgba(153, 97, 26, 0.6) !important;
 }
 
 .stat-number {
   font-size: 32px !important;
   font-weight: 800 !important;
-  color: #D4A843 !important;
+  color: #99611a !important;
   line-height: 1 !important;
   margin-bottom: 8px !important;
-  text-shadow: 0 0 20px rgba(212, 168, 67, 0.3) !important;
+  text-shadow: 0 0 20px rgba(153, 97, 26, 0.3) !important;
 }
 
 .stat-label {
   font-size: 12px !important;
-  color: #D4A843 !important;
+  color: #99611a !important;
   text-transform: uppercase !important;
   letter-spacing: 1.5px !important;
   opacity: 0.85 !important;
@@ -64,18 +64,18 @@
 .btn-primary,
 button.btn-primary,
 [type="button"].btn-primary {
-  background: linear-gradient(180deg, #FAD06D, #D4A843, #B37420) !important;
+  background: linear-gradient(180deg, #B87A2E, #99611a, #6B3D0F) !important;
   color: #000000 !important;
   font-weight: 700 !important;
   border: none !important;
-  box-shadow: 0 4px 15px rgba(212, 168, 67, 0.25), 0 0 30px rgba(212, 168, 67, 0.1) !important;
+  box-shadow: 0 4px 15px rgba(153, 97, 26, 0.25), 0 0 30px rgba(153, 97, 26, 0.1) !important;
   transition: all 0.3s ease !important;
 }
 
 .btn-primary:hover,
 button.btn-primary:hover {
-  background: linear-gradient(180deg, #FAD06D, #E0B84D, #C48430) !important;
-  box-shadow: 0 6px 25px rgba(212, 168, 67, 0.35), 0 0 50px rgba(212, 168, 67, 0.15) !important;
+  background: linear-gradient(180deg, #B87A2E, #A86E20, #7A4A15) !important;
+  box-shadow: 0 6px 25px rgba(153, 97, 26, 0.35), 0 0 50px rgba(153, 97, 26, 0.15) !important;
   transform: translateY(-1px) !important;
 }
 
@@ -90,11 +90,11 @@ button.logout-btn,
 #logoutBtn,
 button#logoutBtn {
   background: transparent !important;
-  color: #D4A843 !important;
-  border: 1px solid rgba(212, 168, 67, 0.4) !important;
+  color: #99611a !important;
+  border: 1px solid rgba(153, 97, 26, 0.4) !important;
   border-radius: 10px !important;
   padding: 10px 20px !important;
-  box-shadow: 0 0 15px rgba(212, 168, 67, 0.1), 0 0 30px rgba(212, 168, 67, 0.05) !important;
+  box-shadow: 0 0 15px rgba(153, 97, 26, 0.1), 0 0 30px rgba(153, 97, 26, 0.05) !important;
   transition: all 0.3s ease !important;
   font-weight: 600 !important;
 }
@@ -102,45 +102,124 @@ button#logoutBtn {
 .logout-btn:hover,
 button.logout-btn:hover,
 #logoutBtn:hover {
-  background: rgba(212, 168, 67, 0.1) !important;
-  border-color: rgba(212, 168, 67, 0.7) !important;
-  box-shadow: 0 0 25px rgba(212, 168, 67, 0.2), 0 0 50px rgba(212, 168, 67, 0.1) !important;
-  color: #FAD06D !important;
+  background: rgba(153, 97, 26, 0.1) !important;
+  border-color: rgba(153, 97, 26, 0.7) !important;
+  box-shadow: 0 0 25px rgba(153, 97, 26, 0.2), 0 0 50px rgba(153, 97, 26, 0.1) !important;
+  color: #B87A2E !important;
 }
 
 .logout-btn i,
 #logoutBtn i {
-  color: #D4A843 !important;
+  color: #99611a !important;
 }
 
 .logout-btn:hover i,
 #logoutBtn:hover i {
-  color: #FAD06D !important;
+  color: #B87A2E !important;
 }
 
 /* ========== GHOST BUTTONS ========== */
 .btn-ghost,
 button.btn-ghost {
   background: transparent !important;
-  color: #D4A843 !important;
-  border: 1px solid rgba(212, 168, 67, 0.4) !important;
-  box-shadow: 0 0 15px rgba(212, 168, 67, 0.05) !important;
+  color: #99611a !important;
+  border: 1px solid rgba(153, 97, 26, 0.4) !important;
+  box-shadow: 0 0 15px rgba(153, 97, 26, 0.05) !important;
   transition: all 0.3s ease !important;
 }
 
 .btn-ghost:hover,
 button.btn-ghost:hover {
-  background: rgba(212, 168, 67, 0.1) !important;
-  border-color: rgba(212, 168, 67, 0.7) !important;
-  box-shadow: 0 0 25px rgba(212, 168, 67, 0.15) !important;
+  background: rgba(153, 97, 26, 0.1) !important;
+  border-color: rgba(153, 97, 26, 0.7) !important;
+  box-shadow: 0 0 25px rgba(153, 97, 26, 0.15) !important;
 }
 
 .btn-ghost i,
 button.btn-ghost i {
-  color: #D4A843 !important;
+  color: #99611a !important;
 }
 
-/* ========== ALL GOLD TEXT - MAXIMUM SPECIFICITY ========== */
+/* ========== SIDEBAR MENU ITEMS - MODERN BLACK-GOLD GRADIENT ========== */
+.menu-item,
+nav .menu-item,
+.sidebar .menu-item,
+aside .menu-item,
+nav button,
+.sidebar button,
+aside button {
+  background: linear-gradient(135deg, #1a1208 0%, #0f0a04 50%, #1a1208 100%) !important;
+  color: #fff !important;
+  border: 1px solid rgba(153, 97, 26, 0.4) !important;
+  border-radius: 12px !important;
+  padding: 12px 18px !important;
+  margin: 6px 12px !important;
+  box-shadow: 0 0 15px rgba(153, 97, 26, 0.1), 0 0 30px rgba(153, 97, 26, 0.05), inset 0 1px 0 rgba(255,255,255,0.03) !important;
+  transition: all 0.3s ease !important;
+  font-weight: 500 !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.menu-item::before,
+nav .menu-item::before,
+.sidebar .menu-item::before {
+  content: "" !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 15% !important;
+  right: 15% !important;
+  height: 1px !important;
+  background: linear-gradient(90deg, transparent, #B87A2E, transparent) !important;
+  opacity: 0.6 !important;
+}
+
+.menu-item:hover,
+nav .menu-item:hover,
+.sidebar .menu-item:hover {
+  background: linear-gradient(135deg, #1f150a 0%, #140d05 50%, #1f150a 100%) !important;
+  border-color: rgba(153, 97, 26, 0.7) !important;
+  box-shadow: 0 0 25px rgba(153, 97, 26, 0.2), 0 0 50px rgba(153, 97, 26, 0.1), inset 0 1px 0 rgba(255,255,255,0.05) !important;
+  transform: translateX(3px) !important;
+  color: #fff !important;
+}
+
+.menu-item i,
+.menu-item .bi,
+.menu-item [class*="bi-"],
+nav button i,
+.sidebar button i {
+  color: #99611a !important;
+  margin-right: 10px !important;
+  font-size: 16px !important;
+  transition: all 0.3s ease !important;
+}
+
+.menu-item:hover i,
+.menu-item:hover .bi,
+.menu-item:hover [class*="bi-"] {
+  color: #B87A2E !important;
+  text-shadow: 0 0 10px rgba(153, 97, 26, 0.4) !important;
+}
+
+/* Active menu item */
+.menu-item.active,
+nav .menu-item.active,
+.sidebar .menu-item.active {
+  background: linear-gradient(135deg, #2a1c0a 0%, #1a1005 50%, #2a1c0a 100%) !important;
+  border-color: rgba(153, 97, 26, 0.8) !important;
+  box-shadow: 0 0 30px rgba(153, 97, 26, 0.25), 0 0 60px rgba(153, 97, 26, 0.1), inset 0 1px 0 rgba(255,255,255,0.05) !important;
+  color: #fff !important;
+}
+
+.menu-item.active i,
+.menu-item.active .bi,
+.menu-item.active [class*="bi-"] {
+  color: #B87A2E !important;
+  text-shadow: 0 0 15px rgba(153, 97, 26, 0.5) !important;
+}
+
+/* ========== HEADINGS & ICONS ONLY - GOLD ========== */
 /* Dashboard headings */
 .welcome-text h1,
 .welcome-text h1 span,
@@ -149,17 +228,7 @@ button.btn-ghost i {
 #app h1,
 .content h1,
 main h1 {
-  color: #D4A843 !important;
-}
-
-/* Date and role */
-.date-time,
-.user-role,
-.topbar .date-time,
-.topbar .user-role,
-.welcome-text .date-time,
-.welcome-text .user-role {
-  color: #D4A843 !important;
+  color: #99611a !important;
 }
 
 /* Section headings */
@@ -170,7 +239,7 @@ main h1 {
 h3 i,
 h3 .bi,
 h3 [class*="bi-"] {
-  color: #D4A843 !important;
+  color: #99611a !important;
 }
 
 /* People header */
@@ -180,65 +249,13 @@ h3 [class*="bi-"] {
 .people-header h1 [class*="bi-"],
 .people-header h2,
 .people-header h2 i {
-  color: #D4A843 !important;
+  color: #99611a !important;
 }
 
-/* Card names and meta */
-.people-card-name,
-.people-row-name,
-.people-card-meta,
-.people-row-meta,
-.people-empty,
-.pf-photo-caption,
-.pf-encounter-head span,
-.dash-row-count,
-.dash-row-sub {
-  color: #D4A843 !important;
-}
-
-/* Modal and form labels */
+/* Modal and form headings only (NOT labels) */
 .modal-card h2,
-.modal-card label,
-.profile-field label,
-.modal-card h2 i,
-.modal-card label i {
-  color: #D4A843 !important;
-}
-
-/* Menu items */
-.menu-item,
-nav .menu-item,
-.sidebar .menu-item,
-aside .menu-item,
-nav button,
-.sidebar button,
-aside button {
-  color: #D4A843 !important;
-}
-
-.menu-item i,
-.menu-item .bi,
-.menu-item [class*="bi-"],
-nav button i,
-.sidebar button i {
-  color: #D4A843 !important;
-}
-
-.menu-item.active,
-nav .menu-item.active,
-.sidebar .menu-item.active,
-.menu-item.active i,
-.menu-item.active .bi {
-  background: rgba(212, 168, 67, 0.12) !important;
-  color: #D4A843 !important;
-  border-left: none !important;
-}
-
-.menu-item:hover,
-nav .menu-item:hover,
-.sidebar .menu-item:hover {
-  background: rgba(212, 168, 67, 0.08) !important;
-  color: #FAD06D !important;
+.modal-card h2 i {
+  color: #99611a !important;
 }
 
 /* Logo and sidebar title */
@@ -247,21 +264,10 @@ nav .menu-item:hover,
 .sidebar h2,
 .logo span,
 .sidebar .logo span {
-  color: #D4A843 !important;
+  color: #99611a !important;
 }
 
-/* Links and interactive elements */
-.linked-person-view,
-.merge-search-row,
-.merge-search-row:hover,
-.dash-row,
-.dash-row span,
-.dash-row [data-i],
-.dash-row [data-mep] {
-  color: #D4A843 !important;
-}
-
-/* Face search */
+/* Face search status messages */
 .face-warning,
 .modal-error,
 #faceStatus,
@@ -273,15 +279,15 @@ nav .menu-item:hover,
 #encError,
 #avError,
 #mergeError {
-  color: #D4A843 !important;
+  color: #99611a !important;
 }
 
 /* Deceased badge */
 .deceased-badge,
 .deceased-tag {
-  background: rgba(212, 168, 67, 0.12) !important;
-  color: #D4A843 !important;
-  border: 1px solid rgba(212, 168, 67, 0.4) !important;
+  background: rgba(153, 97, 26, 0.12) !important;
+  color: #99611a !important;
+  border: 1px solid rgba(153, 97, 26, 0.4) !important;
 }
 
 /* ========== ALL GOLD BORDERS ========== */
@@ -293,8 +299,8 @@ nav .menu-item:hover,
 .login-card,
 .dash-row,
 .dash-section {
-  border-color: rgba(212, 168, 67, 0.25) !important;
-  box-shadow: 0 0 20px rgba(212, 168, 67, 0.05) !important;
+  border-color: rgba(153, 97, 26, 0.25) !important;
+  box-shadow: 0 0 20px rgba(153, 97, 26, 0.05) !important;
 }
 
 /* ========== INPUT FIELDS ========== */
@@ -305,7 +311,7 @@ input[type="text"],
 input[type="date"],
 input[type="file"] {
   background: #161616 !important;
-  border: 1px solid rgba(212, 168, 67, 0.2) !important;
+  border: 1px solid rgba(153, 97, 26, 0.2) !important;
   color: #fff !important;
 }
 
@@ -314,8 +320,8 @@ textarea:focus,
 select:focus,
 input[type="text"]:focus,
 input[type="date"]:focus {
-  border-color: #D4A843 !important;
-  box-shadow: 0 0 0 2px rgba(212, 168, 67, 0.15), 0 0 15px rgba(212, 168, 67, 0.1) !important;
+  border-color: #99611a !important;
+  box-shadow: 0 0 0 2px rgba(153, 97, 26, 0.15), 0 0 15px rgba(153, 97, 26, 0.1) !important;
   outline: none !important;
 }
 
@@ -334,32 +340,32 @@ textarea::placeholder {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #D4A843, #B37420) !important;
+  background: linear-gradient(180deg, #99611a, #6B3D0F) !important;
   border-radius: 4px !important;
 }
 
 /* ========== LOGIN CARD ========== */
 .login-card {
-  box-shadow: 0 0 40px rgba(212, 168, 67, 0.12), 0 0 80px rgba(212, 168, 67, 0.05) !important;
-  border: 1px solid rgba(212, 168, 67, 0.35) !important;
+  box-shadow: 0 0 40px rgba(153, 97, 26, 0.12), 0 0 80px rgba(153, 97, 26, 0.05) !important;
+  border: 1px solid rgba(153, 97, 26, 0.35) !important;
 }
 
 .login-card::before {
-  background: linear-gradient(90deg, transparent, #FAD06D, transparent) !important;
+  background: linear-gradient(90deg, transparent, #B87A2E, transparent) !important;
 }
 
 .login-tagline {
-  color: #D4A843 !important;
+  color: #99611a !important;
 }
 
 .login-field i {
-  color: #D4A843 !important;
+  color: #99611a !important;
 }
 
 .login-btn {
-  background: linear-gradient(180deg, #FAD06D, #D4A843, #B37420) !important;
+  background: linear-gradient(180deg, #B87A2E, #99611a, #6B3D0F) !important;
   color: #000000 !important;
-  box-shadow: 0 4px 20px rgba(212, 168, 67, 0.3), 0 0 40px rgba(212, 168, 67, 0.15) !important;
+  box-shadow: 0 4px 20px rgba(153, 97, 26, 0.3), 0 0 40px rgba(153, 97, 26, 0.15) !important;
 }
 
 .login-btn i {
@@ -367,7 +373,7 @@ textarea::placeholder {
 }
 
 .login-version {
-  color: #8B6914 !important;
+  color: #6B3D0F !important;
 }
 
 /* ========== SEARCH BAR ========== */
@@ -383,34 +389,31 @@ textarea::placeholder {
 /* ========== PHOTO CHIPS ========== */
 .pf-photo-chip img {
   border-radius: 8px !important;
-  border: 1px solid rgba(212, 168, 67, 0.2) !important;
+  border: 1px solid rgba(153, 97, 26, 0.2) !important;
 }
 
 /* ========== TOPBAR & SIDEBAR ========== */
 .topbar {
-  border-bottom: 1px solid rgba(212, 168, 67, 0.15) !important;
+  border-bottom: 1px solid rgba(153, 97, 26, 0.15) !important;
 }
 
 .sidebar {
-  border-right: 1px solid rgba(212, 168, 67, 0.1) !important;
+  border-right: 1px solid rgba(153, 97, 26, 0.1) !important;
 }
 
 /* ========== EXISTING STYLES ========== */
-.people-profile-grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:20px;
+.people-profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
 }
 
-.people-profile-grid textarea{
-min-height:120px;
+.people-profile-grid textarea {
+  min-height: 120px;
 }
 
-@media(max-width:768px){
-
-.people-profile-grid{
-
-grid-template-columns:1fr;
-
-}
+@media(max-width:768px) {
+  .people-profile-grid {
+    grid-template-columns: 1fr;
+  }
 }
