@@ -74,7 +74,7 @@ button.btn-primary,
 
 .btn-primary:hover,
 button.btn-primary:hover {
-  background: linear-gradient(180deg, #A6702A, #9A6220, #6B4215) !important;
+  background: linear-gradient(180deg, #A6702A, var(--gold-hover), var(--gold-dark)) !important;
   box-shadow: 0 6px 25px rgba(139, 90, 26, 0.35), 0 0 50px rgba(139, 90, 26, 0.15) !important;
   transform: translateY(-1px) !important;
 }

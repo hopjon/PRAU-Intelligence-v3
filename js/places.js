@@ -5,7 +5,7 @@ import {
 var goldPinIcon = L.divIcon({
   className: "gold-pin-icon",
   html: '<svg width="30" height="42" viewBox="0 0 30 42" xmlns="http://www.w3.org/2000/svg">' +
-    '<path d="M15 0C6.7 0 0 6.7 0 15c0 11.2 15 27 15 27s15-15.8 15-27C30 6.7 23.3 0 15 0z" fill="#D4AF37" stroke="#8a6c0a" stroke-width="1"/>' +
+    '<path d="M15 0C6.7 0 0 6.7 0 15c0 11.2 15 27 15 27s15-15.8 15-27C30 6.7 23.3 0 15 0z" fill="var(--gold)" stroke="var(--gold-dark)" stroke-width="1"/>' +
     '<circle cx="15" cy="15" r="6" fill="#1a1400"/>' +
     '</svg>',
   iconSize: [30, 42],

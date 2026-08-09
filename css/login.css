@@ -1,25 +1,25 @@
 body{background:#0a0a0a;margin:0;font-family:Arial,Helvetica,sans-serif;}
 .login-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;}
 .login-logo{width:320px;max-width:70vw;margin-bottom:6px;}
-.login-tagline{color:#D4A843;font-size:14px;letter-spacing:2px;text-transform:uppercase;margin-bottom:24px;}
+.login-tagline{color:var(--gold);font-size:14px;letter-spacing:2px;text-transform:uppercase;margin-bottom:24px;}
 .login-card{width:100%;max-width:380px;border:1px solid rgba(212,168,67,0.4);border-radius:20px;padding:28px 24px;
   background:#0f0f0f;box-shadow:0 0 40px rgba(212,168,67,0.12), 0 0 80px rgba(212,168,67,0.05);position:relative;text-align:center;}
 .login-card::before{content:"";position:absolute;top:-1px;left:10%;right:10%;height:2px;
-  background:linear-gradient(90deg,transparent,#FAD06D,transparent);}
+  background:linear-gradient(90deg,transparent,var(--gold-hover),transparent);}
 .login-field{display:flex;align-items:center;gap:10px;background:#161616;border:1px solid rgba(212,168,67,0.25);
   border-radius:10px;padding:13px 16px;margin-bottom:16px;}
-.login-field i{color:#D4A843;font-size:18px;}
+.login-field i{color:var(--gold);font-size:18px;}
 .login-field input{flex:1;background:transparent;border:none;outline:none;color:#fff;font-size:15px;}
 .login-field input::placeholder{color:#888;}
-.login-eye{cursor:pointer;color:#D4A843;}
+.login-eye{cursor:pointer;color:var(--gold);}
 .login-btn{width:100%;padding:14px;border:none;border-radius:10px;
-  background:linear-gradient(180deg,#FAD06D,#D4A843,#B37420);color:#000000;font-weight:800;
+  background:linear-gradient(180deg,var(--gold-hover),var(--gold),var(--gold-hover));color:#000000;font-weight:800;
   font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
   box-shadow:0 4px 20px rgba(212,168,67,0.3), 0 0 40px rgba(212,168,67,0.15);}
 .login-btn i{color:#000000;font-size:18px;}
 .login-btn:hover{
-  background:linear-gradient(180deg,#FAD06D,#E0B84D,#C48430);
+  background:linear-gradient(180deg,var(--gold-hover),var(--gold-hover),var(--gold));
   box-shadow:0 6px 30px rgba(212,168,67,0.4), 0 0 60px rgba(212,168,67,0.2);
 }
 .login-error{color:#ef5350;font-size:13px;text-align:center;min-height:16px;margin-top:10px;}
-.login-version{color:#8B6914;font-size:12px;margin-top:24px;letter-spacing:1px;}
+.login-version{color:var(--gold-dark);font-size:12px;margin-top:24px;letter-spacing:1px;}
