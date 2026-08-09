@@ -42,6 +42,7 @@ function getGreeting(){
 }
 
 function renderShell(displayName){
+  Array.prototype.forEach.call(document.querySelectorAll(".modal-backdrop-custom"), function(el){ el.remove(); });
   var app = document.getElementById("app");
   app.innerHTML =
     '<div class="dashboard">' +
