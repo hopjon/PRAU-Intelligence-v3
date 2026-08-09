@@ -1,18 +1,13 @@
 /* ============================================================
-   PRAU INTELLIGENCE - GOLD THEME
-   ============================================================
-   🎨 COLOR PALETTE - CHANGE ONLY THESE VALUES!
+   PRAU INTELLIGENCE - GOLD THEME OVERRIDES
+   Load this LAST in your <head> after ALL other CSS files
    ============================================================ */
 
+/* ========== COLOR PALETTE ========== */
 :root {
-  /* === GOLD COLORS === */
   --gold-primary:   #8B5A1A;
   --gold-light:     #B87A2E;
   --gold-dark:      #5C3A0F;
-  --gold-glow:      rgba(139, 90, 26, 0.3);
-  --gold-glow-soft: rgba(139, 90, 26, 0.1);
-  
-  /* === TEXT COLORS === */
   --text-white:     #ffffff;
   --text-gray:      #888888;
   --text-gray-dark: #666666;
@@ -20,204 +15,280 @@
   --text-black:     #000000;
   --text-red:       #ef5350;
   --text-gold:      #8B5A1A;
-  
-  /* === BACKGROUND COLORS === */
-  --bg-page:        #0f0f0f;
   --bg-card:        #161616;
-  --bg-card-hover:  #1a1a1a;
   --bg-dark:        #0a0a0a;
-  
-  /* === BORDER COLORS === */
-  --border-default: #2b3038;
   --border-gold:    rgba(139, 90, 26, 0.4);
   --border-gold-strong: rgba(139, 90, 26, 0.7);
 }
 
 
 /* ============================================================
-   1. PREMIUM GOLD BUTTON (Logout, Sign In, Active Tabs)
-   Text & Icons: BLACK
+   1. LOGOUT BUTTON - FORCE BLACK TEXT & ICON
    ============================================================ */
 
-.login-btn,
-.login-btn *,
-button.login-btn,
-button.login-btn *,
-[type="button"].login-btn,
-[type="button"].login-btn *,
-
-.logout-btn,
-.logout-btn *,
-button.logout-btn,
-button.logout-btn *,
-#logoutBtn,
-#logoutBtn *,
-button#logoutBtn,
-button#logoutBtn *,
-
-.menu-item.active,
-.menu-item.active *,
-nav .menu-item.active,
-nav .menu-item.active *,
-.sidebar .menu-item.active,
-.sidebar .menu-item.active *,
-aside .menu-item.active,
-aside .menu-item.active * {
-  color: #000000 !important;
-}
-
-.login-btn,
-.logout-btn,
-button.logout-btn,
 #logoutBtn,
 button#logoutBtn,
-.menu-item.active,
-nav .menu-item.active,
-.sidebar .menu-item.active,
-aside .menu-item.active {
+.logout-btn,
+button.logout-btn,
+[type="button"].logout-btn,
+.topbar button,
+.topbar .logout-btn,
+header button,
+header .logout-btn,
+nav .logout-btn,
+.sidebar .logout-btn,
+#app .logout-btn,
+.app .logout-btn,
+.container .logout-btn,
+.wrapper .logout-btn,
+div .logout-btn,
+span .logout-btn,
+section .logout-btn,
+article .logout-btn,
+aside .logout-btn,
+main .logout-btn,
+body .logout-btn,
+html body .logout-btn,
+html body div .logout-btn,
+html body div div .logout-btn,
+#app > div .logout-btn,
+#app > div > div .logout-btn,
+#app > div > div > div .logout-btn,
+#app > div > div > div > header .logout-btn,
+#app > div > div > div > header > div .logout-btn,
+#app > div > div > div > header > div > button.logout-btn,
+#app header button,
+#app header .logout-btn,
+#app .topbar button,
+#app .topbar .logout-btn {
   background: linear-gradient(180deg, #C4883A 0%, #A6702A 25%, var(--gold-primary) 50%, #7A4A15 75%, var(--gold-dark) 100%) !important;
+  color: #000000 !important;
   font-weight: 700 !important;
   border-radius: 12px !important;
   border: 1px solid rgba(196, 136, 58, 0.5) !important;
-  box-shadow: 
-    0 4px 15px rgba(0, 0, 0, 0.4),
-    0 0 30px rgba(139, 90, 26, 0.2),
-    0 0 60px rgba(139, 90, 26, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), 0 0 30px rgba(139, 90, 26, 0.2), 0 0 60px rgba(139, 90, 26, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
   transition: all 0.3s ease !important;
-  padding: 12px 24px !important;
+  padding: 10px 20px !important;
   position: relative !important;
   overflow: hidden !important;
 }
 
-/* Top shine line */
-.login-btn::before,
-.logout-btn::before,
-#logoutBtn::before,
-.menu-item.active::before,
-nav .menu-item.active::before,
-.sidebar .menu-item.active::before {
-  content: "" !important;
-  position: absolute !important;
-  top: 1px !important;
-  left: 10% !important;
-  right: 10% !important;
-  height: 1px !important;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent) !important;
-  border-radius: 1px !important;
+/* Force ALL children of logout button to black */
+#logoutBtn *,
+#logoutBtn *::before,
+#logoutBtn *::after,
+button#logoutBtn *,
+button#logoutBtn *::before,
+button#logoutBtn *::after,
+.logout-btn *,
+.logout-btn *::before,
+.logout-btn *::after,
+button.logout-btn *,
+button.logout-btn *::before,
+button.logout-btn *::after,
+.topbar button *,
+.topbar button *::before,
+.topbar button *::after,
+header button *,
+header button *::before,
+header button *::after,
+#app header button *,
+#app header button *::before,
+#app header button *::after {
+  color: #000000 !important;
+  fill: #000000 !important;
+  stroke: #000000 !important;
 }
 
-/* Hover */
-.login-btn:hover,
-.logout-btn:hover,
-#logoutBtn:hover,
-.menu-item.active:hover,
-nav .menu-item.active:hover,
-.sidebar .menu-item.active:hover {
-  background: linear-gradient(180deg, #D4984A 0%, var(--gold-light) 25%, #9A6220 50%, #8A5A1A 75%, #6B4215 100%) !important;
-  transform: translateY(-2px) !important;
-  box-shadow: 
-    0 6px 20px rgba(0, 0, 0, 0.5),
-    0 0 40px rgba(139, 90, 26, 0.3),
-    0 0 80px rgba(139, 90, 26, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
-}
-
-/* Force icons black inside premium buttons */
-.login-btn i,
-.login-btn svg,
-.login-btn .bi,
-.logout-btn i,
-.logout-btn svg,
-.logout-btn .bi,
+/* Logout icon specifically */
 #logoutBtn i,
 #logoutBtn svg,
 #logoutBtn .bi,
-.menu-item.active i,
-.menu-item.active svg,
-.menu-item.active .bi {
+#logoutBtn [class*="bi-"],
+#logoutBtn .icon,
+#logoutBtn .fa,
+#logoutBtn .fas,
+#logoutBtn .far,
+button#logoutBtn i,
+button#logoutBtn svg,
+button#logoutBtn .bi,
+button#logoutBtn [class*="bi-"],
+.logout-btn i,
+.logout-btn svg,
+.logout-btn .bi,
+.logout-btn [class*="bi-"],
+button.logout-btn i,
+button.logout-btn svg,
+button.logout-btn .bi,
+button.logout-btn [class*="bi-"],
+.topbar button i,
+.topbar button svg,
+.topbar button .bi,
+header button i,
+header button svg,
+header button .bi {
   color: #000000 !important;
   fill: #000000 !important;
 }
 
+/* Hover */
+#logoutBtn:hover,
+button#logoutBtn:hover,
+.logout-btn:hover,
+button.logout-btn:hover,
+.topbar button:hover,
+header button:hover,
+#app header button:hover {
+  background: linear-gradient(180deg, #D4984A 0%, var(--gold-light) 25%, #9A6220 50%, #8A5A1A 75%, #6B4215 100%) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), 0 0 40px rgba(139, 90, 26, 0.3), 0 0 80px rgba(139, 90, 26, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+}
+
 
 /* ============================================================
-   2. SIDEBAR MENU ITEMS (Inactive)
-   Text: WHITE | Icons: GOLD
+   2. ACTIVE SIDEBAR TAB - FORCE BLACK TEXT & ICON
+   ============================================================ */
+
+.menu-item.active,
+.sidebar .menu-item.active,
+nav .menu-item.active,
+aside .menu-item.active,
+#sidebar .menu-item.active,
+#nav .menu-item.active,
+.sidebar nav .menu-item.active,
+.sidebar > nav .menu-item.active,
+.sidebar > div .menu-item.active,
+.sidebar > div > nav .menu-item.active,
+body .sidebar .menu-item.active,
+html body .sidebar .menu-item.active,
+html body .sidebar nav .menu-item.active,
+#app .sidebar .menu-item.active,
+#app .sidebar nav .menu-item.active,
+#app > div .sidebar .menu-item.active,
+#app > div > div .sidebar .menu-item.active,
+#app > div > div > aside .menu-item.active,
+#app > div > div > aside > nav .menu-item.active,
+#app > div > div > div > aside .menu-item.active,
+#app > div > div > div > aside > nav .menu-item.active,
+[class*="sidebar"] .menu-item.active,
+[class*="nav"] .menu-item.active,
+[id*="sidebar"] .menu-item.active,
+[id*="nav"] .menu-item.active {
+  background: linear-gradient(180deg, #C4883A 0%, #A6702A 25%, var(--gold-primary) 50%, #7A4A15 75%, var(--gold-dark) 100%) !important;
+  color: #000000 !important;
+  font-weight: 700 !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(196, 136, 58, 0.5) !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), 0 0 30px rgba(139, 90, 26, 0.2), 0 0 60px rgba(139, 90, 26, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+  transition: all 0.3s ease !important;
+  padding: 12px 18px !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* Force ALL children of active tab to black */
+.menu-item.active *,
+.menu-item.active *::before,
+.menu-item.active *::after,
+.sidebar .menu-item.active *,
+.sidebar .menu-item.active *::before,
+.sidebar .menu-item.active *::after,
+nav .menu-item.active *,
+nav .menu-item.active *::before,
+nav .menu-item.active *::after,
+#sidebar .menu-item.active *,
+#nav .menu-item.active *,
+[class*="sidebar"] .menu-item.active *,
+[id*="sidebar"] .menu-item.active * {
+  color: #000000 !important;
+  fill: #000000 !important;
+  stroke: #000000 !important;
+}
+
+/* Active tab icon */
+.menu-item.active i,
+.menu-item.active svg,
+.menu-item.active .bi,
+.menu-item.active [class*="bi-"],
+.menu-item.active .icon,
+.menu-item.active .fa,
+.menu-item.active .fas,
+.sidebar .menu-item.active i,
+.sidebar .menu-item.active svg,
+.sidebar .menu-item.active .bi,
+nav .menu-item.active i,
+nav .menu-item.active svg,
+nav .menu-item.active .bi {
+  color: #000000 !important;
+  fill: #000000 !important;
+}
+
+/* Active tab hover */
+.menu-item.active:hover,
+.sidebar .menu-item.active:hover,
+nav .menu-item.active:hover {
+  background: linear-gradient(180deg, #D4984A 0%, var(--gold-light) 25%, #9A6220 50%, #8A5A1A 75%, #6B4215 100%) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), 0 0 40px rgba(139, 90, 26, 0.3), 0 0 80px rgba(139, 90, 26, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+}
+
+
+/* ============================================================
+   3. INACTIVE SIDEBAR TABS
    ============================================================ */
 
 .menu-item,
-nav .menu-item,
 .sidebar .menu-item,
-aside .menu-item,
-nav button,
-.sidebar button,
-aside button {
+nav .menu-item,
+aside .menu-item {
   background: linear-gradient(135deg, #1a1208 0%, #0f0a04 50%, #1a1208 100%) !important;
-  color: var(--text-black) !important;
+  color: var(--text-white) !important;
   border: 1px solid var(--border-gold) !important;
   border-radius: 12px !important;
   padding: 12px 18px !important;
   margin: 6px 12px !important;
-  box-shadow: 0 0 15px rgba(155, 19, 148, 0.1), 0 0 30px rgba(139, 90, 26, 0.05), inset 0 1px 0 rgba(255,255,255,0.03) !important;
+  box-shadow: 0 0 15px rgba(139, 90, 26, 0.1), 0 0 30px rgba(139, 90, 26, 0.05), inset 0 1px 0 rgba(255,255,255,0.03) !important;
   transition: all 0.3s ease !important;
   font-weight: 500 !important;
   position: relative !important;
   overflow: hidden !important;
 }
 
-.menu-item::before,
-nav .menu-item::before,
-.sidebar .menu-item::before {
-  content: "" !important;
-  position: absolute !important;
-  top: 0 !important;
-  left: 15% !important;
-  right: 15% !important;
-  height: 1px !important;
-  background: linear-gradient(90deg, transparent, var(--gold-light), transparent) !important;
-  opacity: 0.6 !important;
+.menu-item i,
+.menu-item .bi,
+.menu-item [class*="bi-"] {
+  color: var(--gold-primary) !important;
+  margin-right: 10px !important;
+  font-size: 16px !important;
 }
 
-.menu-item:hover,
-nav .menu-item:hover,
-.sidebar .menu-item:hover {
+.menu-item:hover {
   background: linear-gradient(135deg, #24180a 0%, #1a1005 50%, #24180a 100%) !important;
   border-color: var(--border-gold-strong) !important;
   box-shadow: 0 0 20px rgba(139, 90, 26, 0.3), 0 0 40px rgba(139, 90, 26, 0.15), 0 0 80px rgba(139, 90, 26, 0.08), inset 0 1px 0 rgba(255,255,255,0.05) !important;
   transform: translateX(3px) !important;
-  color: var(--text-black) !important;
+  color: var(--text-white) !important;
 }
 
-.menu-item i,
-.menu-item .bi,
-.menu-item [class*="bi-"],
-nav button i,
-.sidebar button i {
-  color: var(--gold-primary) !important;
-  margin-right: 10px !important;
-  font-size: 16px !important;
-  transition: all 0.3s ease !important;
-}
-
-.menu-item:hover i,
-.menu-item:hover .bi,
-.menu-item:hover [class*="bi-"] {
+.menu-item:hover i {
   color: var(--gold-light) !important;
   text-shadow: 0 0 12px rgba(139, 90, 26, 0.5), 0 0 24px rgba(139, 90, 26, 0.3) !important;
 }
 
 
 /* ============================================================
-   3. ADD BUTTONS (Add Person, Add Vehicle, Add Place)
-   Gold background with BLACK text/icon - DIFFERENT from logout
-   These have a dashed border to distinguish them
+   4. ADD BUTTONS (Add Person, Add Vehicle, Add Place)
+   Gold background, BLACK text/icon, DASHED border
    ============================================================ */
 
 #addPersonBtn,
 button#addPersonBtn,
 .add-person-btn,
 button.add-person-btn,
+.add-btn,
+button.add-btn,
+.btn-add,
+button.btn-add,
 
 #addVehicleBtn,
 button#addVehicleBtn,
@@ -229,70 +300,115 @@ button#addPlaceBtn,
 .add-place-btn,
 button.add-place-btn,
 
-.pf-add-encounter,
-button.pf-add-encounter {
+#addBtn,
+button#addBtn,
+.add-button,
+button.add-button,
+
+.people-header button,
+.people-header .btn,
+.people-header [class*="btn"],
+.people-header [class*="add"],
+.vehicles-header button,
+.vehicles-header .btn,
+.vehicles-header [class*="btn"],
+.vehicles-header [class*="add"],
+.places-header button,
+.places-header .btn,
+.places-header [class*="btn"],
+.places-header [class*="add"],
+header button[class*="add"],
+header .btn[class*="add"],
+.topbar button[class*="add"],
+.topbar .btn[class*="add"],
+[class*="header"] button[class*="add"],
+[class*="header"] .btn[class*="add"] {
   background: linear-gradient(180deg, #C4883A 0%, #A6702A 25%, var(--gold-primary) 50%, #7A4A15 75%, var(--gold-dark) 100%) !important;
   color: #000000 !important;
   font-weight: 700 !important;
   border-radius: 12px !important;
   border: 2px dashed rgba(196, 136, 58, 0.6) !important;
-  box-shadow: 
-    0 4px 15px rgba(0, 0, 0, 0.4),
-    0 0 20px rgba(139, 90, 26, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), 0 0 20px rgba(139, 90, 26, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
   transition: all 0.3s ease !important;
-  padding: 12px 24px !important;
+  padding: 10px 20px !important;
   cursor: pointer !important;
 }
 
-/* Force all child elements black */
+/* Force ALL children black */
 #addPersonBtn *,
+#addPersonBtn *::before,
+#addPersonBtn *::after,
+button#addPersonBtn *,
+.add-person-btn *,
+.add-btn *,
+.btn-add *,
 #addVehicleBtn *,
 #addPlaceBtn *,
-.pf-add-encounter *,
-.add-person-btn *,
-.add-vehicle-btn *,
-.add-place-btn * {
+#addBtn *,
+.add-button *,
+.people-header button *,
+.people-header .btn *,
+.vehicles-header button *,
+.places-header button *,
+header button[class*="add"] *,
+.topbar button[class*="add"] * {
   color: #000000 !important;
+  fill: #000000 !important;
+  stroke: #000000 !important;
 }
 
+/* Add button icons */
 #addPersonBtn i,
 #addPersonBtn svg,
 #addPersonBtn .bi,
+#addPersonBtn [class*="bi-"],
+#addPersonBtn .icon,
+#addPersonBtn .fa,
+button#addPersonBtn i,
+.add-person-btn i,
+.add-btn i,
+.btn-add i,
 #addVehicleBtn i,
-#addVehicleBtn svg,
-#addVehicleBtn .bi,
 #addPlaceBtn i,
-#addPlaceBtn svg,
-#addPlaceBtn .bi,
-.pf-add-encounter i,
-.pf-add-encounter svg,
-.pf-add-encounter .bi {
+#addBtn i,
+.add-button i,
+.people-header button i,
+.people-header button svg,
+.people-header button .bi,
+.vehicles-header button i,
+.places-header button i,
+header button[class*="add"] i,
+header button[class*="add"] svg,
+.topbar button[class*="add"] i {
   color: #000000 !important;
   fill: #000000 !important;
 }
 
 /* Hover */
 #addPersonBtn:hover,
+button#addPersonBtn:hover,
+.add-person-btn:hover,
+.add-btn:hover,
+.btn-add:hover,
 #addVehicleBtn:hover,
 #addPlaceBtn:hover,
-.pf-add-encounter:hover,
-.add-person-btn:hover,
-.add-vehicle-btn:hover,
-.add-place-btn:hover {
+#addBtn:hover,
+.add-button:hover,
+.people-header button:hover,
+.vehicles-header button:hover,
+.places-header button:hover,
+header button[class*="add"]:hover,
+.topbar button[class*="add"]:hover {
   background: linear-gradient(180deg, #D4984A 0%, var(--gold-light) 25%, #9A6220 50%, #8A5A1A 75%, #6B4215 100%) !important;
   transform: translateY(-2px) !important;
-  box-shadow: 
-    0 6px 20px rgba(0, 0, 0, 0.5),
-    0 0 30px rgba(139, 90, 26, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), 0 0 30px rgba(139, 90, 26, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
   border-color: rgba(196, 136, 58, 0.9) !important;
 }
 
 
 /* ============================================================
-   4. TAKE PHOTO BUTTON (Face Search)
-   Gold background with BLACK text/icon
+   5. TAKE PHOTO BUTTON (Face Search)
+   Gold background, BLACK text/icon
    ============================================================ */
 
 #takePhotoBtn,
@@ -300,16 +416,21 @@ button#takePhotoBtn,
 .take-photo-btn,
 button.take-photo-btn,
 .pf-take-photo-btn,
-button.pf-take-photo-btn {
+button.pf-take-photo-btn,
+.face-search button,
+.face-search .btn,
+#faceSearch button,
+#faceSearch .btn,
+[class*="face"] button,
+[class*="face"] .btn,
+[id*="face"] button,
+[id*="face"] .btn {
   background: linear-gradient(180deg, #C4883A 0%, #A6702A 25%, var(--gold-primary) 50%, #7A4A15 75%, var(--gold-dark) 100%) !important;
   color: #000000 !important;
   font-weight: 700 !important;
   border-radius: 12px !important;
   border: 1px solid rgba(196, 136, 58, 0.5) !important;
-  box-shadow: 
-    0 4px 15px rgba(0, 0, 0, 0.4),
-    0 0 30px rgba(139, 90, 26, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), 0 0 30px rgba(139, 90, 26, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
   transition: all 0.3s ease !important;
   padding: 12px 24px !important;
   cursor: pointer !important;
@@ -318,41 +439,102 @@ button.pf-take-photo-btn {
   width: 100% !important;
 }
 
-/* Force all child elements black */
+/* Force ALL children black */
 #takePhotoBtn *,
+#takePhotoBtn *::before,
+#takePhotoBtn *::after,
+button#takePhotoBtn *,
 .take-photo-btn *,
-.pf-take-photo-btn * {
+.pf-take-photo-btn *,
+.face-search button *,
+#faceSearch button *,
+[class*="face"] button *,
+[id*="face"] button * {
   color: #000000 !important;
+  fill: #000000 !important;
+  stroke: #000000 !important;
 }
 
+/* Take photo icons */
 #takePhotoBtn i,
 #takePhotoBtn svg,
 #takePhotoBtn .bi,
+#takePhotoBtn [class*="bi-"],
+#takePhotoBtn .icon,
+#takePhotoBtn .fa,
+button#takePhotoBtn i,
 .take-photo-btn i,
-.take-photo-btn svg,
-.take-photo-btn .bi,
 .pf-take-photo-btn i,
-.pf-take-photo-btn svg,
-.pf-take-photo-btn .bi {
+.face-search button i,
+#faceSearch button i,
+[class*="face"] button i,
+[id*="face"] button i {
   color: #000000 !important;
   fill: #000000 !important;
 }
 
 /* Hover */
 #takePhotoBtn:hover,
+button#takePhotoBtn:hover,
 .take-photo-btn:hover,
-.pf-take-photo-btn:hover {
+.pf-take-photo-btn:hover,
+.face-search button:hover,
+#faceSearch button:hover,
+[class*="face"] button:hover,
+[id*="face"] button:hover {
   background: linear-gradient(180deg, #D4984A 0%, var(--gold-light) 25%, #9A6220 50%, #8A5A1A 75%, #6B4215 100%) !important;
   transform: translateY(-2px) !important;
-  box-shadow: 
-    0 6px 20px rgba(0, 0, 0, 0.5),
-    0 0 40px rgba(139, 90, 26, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), 0 0 40px rgba(139, 90, 26, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
 }
 
 
 /* ============================================================
-   5. HEADINGS - GOLD
+   6. SEARCH BOX - REMOVE GOLD BORDER
+   ============================================================ */
+
+.people-search,
+#peopleSearch,
+.search-box,
+.search-container,
+[class*="search"],
+[id*="search"] {
+  border: 1px solid var(--border-default) !important;
+  box-shadow: none !important;
+}
+
+.people-search input,
+#peopleSearch input,
+.search-box input,
+.search-container input,
+[class*="search"] input,
+[id*="search"] input {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  color: var(--text-white) !important;
+}
+
+.people-search:focus-within,
+#peopleSearch:focus-within,
+.search-box:focus-within,
+.search-container:focus-within,
+[class*="search"]:focus-within,
+[id*="search"]:focus-within {
+  border-color: var(--border-gold) !important;
+  box-shadow: 0 0 0 2px rgba(139, 90, 26, 0.15), 0 0 15px rgba(139, 90, 26, 0.1) !important;
+}
+
+.people-search i,
+.people-search svg,
+.people-search .bi,
+[class*="search"] i,
+[id*="search"] i {
+  color: var(--gold-primary) !important;
+}
+
+
+/* ============================================================
+   7. HEADINGS - GOLD
    ============================================================ */
 
 .welcome-text h1,
@@ -365,14 +547,11 @@ main h1,
 .dash-section h3,
 .dash-section h3 i,
 .dash-section h3 .bi,
-.dash-section h3 [class*="bi-"],
 h3 i,
 h3 .bi,
-h3 [class*="bi-"],
 .people-header h1,
 .people-header h1 i,
 .people-header h1 .bi,
-.people-header h1 [class*="bi-"],
 .people-header h2,
 .people-header h2 i,
 .modal-card h2,
@@ -387,7 +566,7 @@ h3 [class*="bi-"],
 
 
 /* ============================================================
-   6. NORMAL TEXT - WHITE
+   8. NORMAL TEXT - WHITE
    ============================================================ */
 
 .people-card-name,
@@ -406,7 +585,7 @@ h3 [class*="bi-"],
 
 
 /* ============================================================
-   7. META TEXT - GRAY
+   9. META TEXT - GRAY
    ============================================================ */
 
 .people-card-meta,
@@ -420,7 +599,7 @@ h3 [class*="bi-"],
 
 
 /* ============================================================
-   8. CAPTIONS & PLACEHOLDERS - DARK GRAY
+   10. CAPTIONS & PLACEHOLDERS - DARK GRAY
    ============================================================ */
 
 .pf-photo-caption,
@@ -431,7 +610,7 @@ textarea::placeholder {
 
 
 /* ============================================================
-   9. LABELS - LIGHT GRAY
+   11. LABELS - LIGHT GRAY
    ============================================================ */
 
 .modal-card label,
@@ -441,7 +620,7 @@ textarea::placeholder {
 
 
 /* ============================================================
-   10. ERROR & WARNING TEXT - RED
+   12. ERROR & WARNING TEXT - RED
    ============================================================ */
 
 .modal-error,
@@ -454,7 +633,7 @@ textarea::placeholder {
 
 
 /* ============================================================
-   11. GOLD ACCENT TEXT
+   13. GOLD ACCENT TEXT
    ============================================================ */
 
 .face-warning,
@@ -479,7 +658,7 @@ textarea::placeholder {
 
 
 /* ============================================================
-   12. ENCOUNTER EDIT BUTTON
+   14. ENCOUNTER EDIT BUTTON
    ============================================================ */
 
 .pf-encounter-edit {
@@ -500,10 +679,11 @@ textarea::placeholder {
 
 
 /* ============================================================
-   13. ADD PHOTO BUTTON
+   15. ADD PHOTO / ADD ENCOUNTER BUTTONS
    ============================================================ */
 
-.pf-add-photo {
+.pf-add-photo,
+.pf-add-encounter {
   width: 100% !important;
   padding: 11px !important;
   border-radius: 10px !important;
@@ -515,7 +695,8 @@ textarea::placeholder {
   transition: all 0.18s ease !important;
 }
 
-.pf-add-photo:hover {
+.pf-add-photo:hover,
+.pf-add-encounter:hover {
   background: rgba(139, 90, 26, 0.08) !important;
   border-color: var(--border-gold-strong) !important;
   color: var(--gold-light) !important;
@@ -528,7 +709,7 @@ textarea::placeholder {
 
 
 /* ============================================================
-   14. IMPORT LABEL
+   16. IMPORT LABEL
    ============================================================ */
 
 .pf-import-label {
@@ -556,7 +737,7 @@ textarea::placeholder {
 
 
 /* ============================================================
-   15. BORDERS & SHADOWS
+   17. BORDERS & SHADOWS
    ============================================================ */
 
 .modal-card,
@@ -573,7 +754,7 @@ textarea::placeholder {
 
 
 /* ============================================================
-   16. INPUT FIELDS
+   18. INPUT FIELDS
    ============================================================ */
 
 input,
@@ -599,7 +780,7 @@ input[type="date"]:focus {
 
 
 /* ============================================================
-   17. SCROLLBAR
+   19. SCROLLBAR
    ============================================================ */
 
 ::-webkit-scrollbar {
@@ -617,7 +798,7 @@ input[type="date"]:focus {
 
 
 /* ============================================================
-   18. LOGIN CARD
+   20. LOGIN CARD
    ============================================================ */
 
 .login-card {
@@ -635,30 +816,6 @@ input[type="date"]:focus {
 
 .login-field i {
   color: var(--text-gold) !important;
-}
-
-
-/* ============================================================
-   19. SEARCH BAR
-   ============================================================ */
-
-.people-search {
-  max-width: 400px !important;
-  margin: 0 auto 16px !important;
-}
-
-.people-search input {
-  width: 100% !important;
-}
-
-
-/* ============================================================
-   20. PHOTO CHIPS
-   ============================================================ */
-
-.pf-photo-chip img {
-  border-radius: 8px !important;
-  border: 1px solid rgba(139, 90, 26, 0.2) !important;
 }
 
 
