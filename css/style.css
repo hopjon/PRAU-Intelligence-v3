@@ -64,12 +64,23 @@
 .btn-primary,
 button.btn-primary,
 [type="button"].btn-primary {
-  background: linear-gradient(180deg, var(--gold-hover), var(--gold), var(--gold-dark)) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  background: linear-gradient(180deg, var(--gold-hover), var(--gold) 55%, var(--gold-dark)) !important;
   color: #000000 !important;
-  font-weight: 700 !important;
-  border: none !important;
-  box-shadow: 0 4px 15px rgba(139, 90, 26, 0.25), 0 0 30px rgba(139, 90, 26, 0.1) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.5px !important;
+  border: 1px solid var(--gold-dark) !important;
+  box-shadow: 0 4px 15px rgba(139, 90, 26, 0.3), 0 0 30px rgba(139, 90, 26, 0.12), inset 0 1px 0 rgba(255,255,255,0.3) !important;
   transition: all 0.3s ease !important;
+}
+.btn-primary::after,
+button.btn-primary::after {
+  content: "" !important;
+  position: absolute !important;
+  top: 0 !important; left: -20% !important; right: -20% !important; height: 45% !important;
+  background: linear-gradient(180deg, rgba(255,255,255,0.35), transparent) !important;
+  pointer-events: none !important;
 }
 
 .btn-primary:hover,
@@ -148,7 +159,10 @@ aside .menu-item,
 nav button,
 .sidebar button,
 aside button {
-  background: linear-gradient(135deg, #1a1208 0%, #0f0a04 50%, #1a1208 100%) !important;
+  background: linear-gradient(135deg, var(--gold-dark) 0%, #0f0a04 45%, var(--gold-dark) 100%) !important;
+  opacity: 0.55 !important;
+  color: #fff !important;
+  border: 1px solid rgba(139, 90, 26, 0.4) !important;
   color: #fff !important;
   border: 1px solid rgba(139, 90, 26, 0.4) !important;
   border-radius: 12px !important;
@@ -206,10 +220,18 @@ nav button i,
 .menu-item.active,
 nav .menu-item.active,
 .sidebar .menu-item.active {
-  background: linear-gradient(135deg, #2a1c0a 0%, #1a1005 50%, #2a1c0a 100%) !important;
-  border-color: rgba(139, 90, 26, 0.8) !important;
-  box-shadow: 0 0 30px rgba(139, 90, 26, 0.25), 0 0 60px rgba(139, 90, 26, 0.1), inset 0 1px 0 rgba(255,255,255,0.05) !important;
-  color: #fff !important;
+  background: linear-gradient(180deg, var(--gold-hover), var(--gold) 55%, var(--gold-dark)) !important;
+  opacity: 1 !important;
+  border-color: var(--gold-dark) !important;
+  box-shadow: 0 0 30px rgba(139, 90, 26, 0.3), 0 0 60px rgba(139, 90, 26, 0.12), inset 0 1px 0 rgba(255,255,255,0.25) !important;
+  color: #000000 !important;
+  font-weight: 800 !important;
+}
+.menu-item.active i,
+.menu-item.active .bi,
+.menu-item.active [class*="bi-"]{
+  color: #000000 !important;
+  text-shadow: none !important;
 }
 
 .menu-item.active i,
