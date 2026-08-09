@@ -7,11 +7,11 @@
 
 /* ========== ALL GOLD COLORS IN ONE PLACE ========== */
 :root {
-  --gold-primary: #8B5A1A;
-  --gold-light: #B87A2E;
-  --gold-dark: #5C3A0F;
-  --gold-glow: rgba(139, 90, 26, 0.3);
-  --gold-glow-soft: rgba(139, 90, 26, 0.1);
+  --gold-primary: #865E21;
+  --gold-light: #AD813A;
+  --gold-dark: #614015;
+  --gold-glow: rgba(170, 96, 0, 0.4);
+  --gold-glow-soft: rgba(139, 90, 26, 0.2);
 }
 
 /* ========== 1. PREMIUM GOLD BUTTON ==========
