@@ -1,0 +1,530 @@
+/* ============================================================
+   PRAU INTELLIGENCE - GOLD THEME OVERRIDES
+   ============================================================
+   This file overrides styles from all other CSS files.
+   Load it LAST in your index.html <head>.
+   ============================================================ */
+
+/* ========== ALL GOLD COLORS IN ONE PLACE ========== */
+:root {
+  --gold-primary: #8B5A1A;
+  --gold-light: #B87A2E;
+  --gold-dark: #5C3A0F;
+  --gold-glow: rgba(139, 90, 26, 0.3);
+  --gold-glow-soft: rgba(139, 90, 26, 0.1);
+}
+
+/* ========== 1. PREMIUM GOLD BUTTON ==========
+   Sign In, Logout, Active sidebar tabs
+   ============================================== */
+
+.login-btn,
+.logout-btn,
+button.logout-btn,
+#logoutBtn,
+button#logoutBtn,
+.menu-item.active,
+nav .menu-item.active,
+.sidebar .menu-item.active,
+aside .menu-item.active {
+  background: linear-gradient(180deg, #C4883A 0%, #A6702A 25%, #8B5A1A 50%, #7A4A15 75%, #5C3A0F 100%) !important;
+  color: #000000 !important;
+  font-weight: 700 !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(196, 136, 58, 0.5) !important;
+  box-shadow: 
+    0 4px 15px rgba(0, 0, 0, 0.4),
+    0 0 30px rgba(139, 90, 26, 0.2),
+    0 0 60px rgba(139, 90, 26, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+  transition: all 0.3s ease !important;
+  padding: 12px 24px !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* Top shine line */
+.login-btn::before,
+.logout-btn::before,
+#logoutBtn::before,
+.menu-item.active::before,
+nav .menu-item.active::before,
+.sidebar .menu-item.active::before {
+  content: "" !important;
+  position: absolute !important;
+  top: 1px !important;
+  left: 10% !important;
+  right: 10% !important;
+  height: 1px !important;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent) !important;
+  border-radius: 1px !important;
+}
+
+/* Hover */
+.login-btn:hover,
+.logout-btn:hover,
+#logoutBtn:hover,
+.menu-item.active:hover,
+nav .menu-item.active:hover,
+.sidebar .menu-item.active:hover {
+  background: linear-gradient(180deg, #D4984A 0%, #B87A2E 25%, #9A6220 50%, #8A5A1A 75%, #6B4215 100%) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 
+    0 6px 20px rgba(0, 0, 0, 0.5),
+    0 0 40px rgba(139, 90, 26, 0.3),
+    0 0 80px rgba(139, 90, 26, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Icons inside premium buttons */
+.login-btn i,
+.logout-btn i,
+#logoutBtn i,
+.menu-item.active i,
+.menu-item.active .bi {
+  color: #000000 !important;
+}
+
+/* ========== 2. SIDEBAR MENU ITEMS (Inactive) ========== */
+
+.menu-item,
+nav .menu-item,
+.sidebar .menu-item,
+aside .menu-item,
+nav button,
+.sidebar button,
+aside button {
+  background: linear-gradient(135deg, #1a1208 0%, #0f0a04 50%, #1a1208 100%) !important;
+  color: #fff !important;
+  border: 1px solid rgba(139, 90, 26, 0.4) !important;
+  border-radius: 12px !important;
+  padding: 12px 18px !important;
+  margin: 6px 12px !important;
+  box-shadow: 0 0 15px rgba(139, 90, 26, 0.1), 0 0 30px rgba(139, 90, 26, 0.05), inset 0 1px 0 rgba(255,255,255,0.03) !important;
+  transition: all 0.3s ease !important;
+  font-weight: 500 !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.menu-item::before,
+nav .menu-item::before,
+.sidebar .menu-item::before {
+  content: "" !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 15% !important;
+  right: 15% !important;
+  height: 1px !important;
+  background: linear-gradient(90deg, transparent, #B87A2E, transparent) !important;
+  opacity: 0.6 !important;
+}
+
+.menu-item:hover,
+nav .menu-item:hover,
+.sidebar .menu-item:hover {
+  background: linear-gradient(135deg, #24180a 0%, #1a1005 50%, #24180a 100%) !important;
+  border-color: rgba(139, 90, 26, 0.8) !important;
+  box-shadow: 0 0 20px rgba(139, 90, 26, 0.3), 0 0 40px rgba(139, 90, 26, 0.15), 0 0 80px rgba(139, 90, 26, 0.08), inset 0 1px 0 rgba(255,255,255,0.05) !important;
+  transform: translateX(3px) !important;
+  color: #fff !important;
+}
+
+.menu-item i,
+.menu-item .bi,
+.menu-item [class*="bi-"],
+nav button i,
+.sidebar button i {
+  color: #8B5A1A !important;
+  margin-right: 10px !important;
+  font-size: 16px !important;
+  transition: all 0.3s ease !important;
+}
+
+.menu-item:hover i,
+.menu-item:hover .bi,
+.menu-item:hover [class*="bi-"] {
+  color: #B87A2E !important;
+  text-shadow: 0 0 12px rgba(139, 90, 26, 0.5), 0 0 24px rgba(139, 90, 26, 0.3) !important;
+}
+
+/* ========== 3. HEADINGS & ICONS - GOLD ========== */
+
+.welcome-text h1,
+.welcome-text h1 span,
+.topbar h1,
+.topbar .welcome-text h1,
+#app h1,
+.content h1,
+main h1,
+.dash-section h3,
+.dash-section h3 i,
+.dash-section h3 .bi,
+.dash-section h3 [class*="bi-"],
+h3 i,
+h3 .bi,
+h3 [class*="bi-"],
+.people-header h1,
+.people-header h1 i,
+.people-header h1 .bi,
+.people-header h1 [class*="bi-"],
+.people-header h2,
+.people-header h2 i,
+.modal-card h2,
+.modal-card h2 i,
+.logo h2,
+.sidebar .logo h2,
+.sidebar h2,
+.logo span,
+.sidebar .logo span {
+  color: #8B5A1A !important;
+}
+
+/* ========== 4. ENCOUNTER TEXT FIXES ========== */
+
+.pf-encounter,
+.pf-encounter p,
+.pf-encounter span:not(.pf-encounter-head span),
+.pf-encounter div,
+.pf-encounter textarea,
+.pf-encounter input {
+  color: #fff !important;
+}
+
+.pf-encounter-head span {
+  color: #8B5A1A !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+}
+
+.pf-encounter-edit {
+  background: #2b2b2b !important;
+  color: #8B5A1A !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 6px 12px !important;
+  cursor: pointer !important;
+  font-weight: 600 !important;
+  transition: all 0.18s ease !important;
+}
+
+.pf-encounter-edit:hover {
+  background: #393939 !important;
+  color: #B87A2E !important;
+}
+
+.pf-add-encounter,
+.pf-add-photo {
+  width: 100% !important;
+  padding: 11px !important;
+  border-radius: 10px !important;
+  border: 1px dashed rgba(139, 90, 26, 0.6) !important;
+  background: #1a1a1a !important;
+  color: #8B5A1A !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.18s ease !important;
+}
+
+.pf-add-encounter:hover,
+.pf-add-photo:hover {
+  background: rgba(139, 90, 26, 0.08) !important;
+  border-color: rgba(139, 90, 26, 0.9) !important;
+  color: #B87A2E !important;
+}
+
+.pf-add-encounter:disabled {
+  opacity: 0.45 !important;
+  cursor: not-allowed !important;
+}
+
+.pf-add-photo i {
+  color: #8B5A1A !important;
+  font-size: 22px !important;
+}
+
+.pf-photo-caption {
+  font-size: 9px !important;
+  color: #666 !important;
+}
+
+.pf-import-label {
+  display: block !important;
+  text-align: center !important;
+  padding: 10px !important;
+  border: 1px solid rgba(139, 90, 26, 0.3) !important;
+  border-radius: 9px !important;
+  color: #8B5A1A !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  margin-top: 8px !important;
+}
+
+.pf-import-label:hover {
+  border-color: rgba(139, 90, 26, 0.6) !important;
+  background: rgba(139, 90, 26, 0.05) !important;
+}
+
+.pf-import-label i {
+  color: #8B5A1A !important;
+  margin-right: 6px !important;
+}
+
+.pf-take-photo-btn {
+  display: block !important;
+  text-align: center !important;
+  padding: 10px !important;
+  border: 1px solid rgba(139, 90, 26, 0.3) !important;
+  border-radius: 9px !important;
+  background: transparent !important;
+  color: #8B5A1A !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  margin-top: 8px !important;
+  width: 100% !important;
+  transition: all 0.18s ease !important;
+}
+
+.pf-take-photo-btn:hover {
+  border-color: rgba(139, 90, 26, 0.6) !important;
+  background: rgba(139, 90, 26, 0.05) !important;
+}
+
+.pf-take-photo-btn i {
+  color: #8B5A1A !important;
+  margin-right: 6px !important;
+}
+
+/* ========== 5. BORDERS & SHADOWS ========== */
+
+.modal-card,
+.profile-view,
+.people-card,
+.pf-photo-chip,
+.pf-encounter,
+.login-card,
+.dash-row,
+.dash-section {
+  border-color: rgba(139, 90, 26, 0.25) !important;
+  box-shadow: 0 0 20px rgba(139, 90, 26, 0.05) !important;
+}
+
+/* ========== 6. INPUT FIELDS ========== */
+
+input,
+textarea,
+select,
+input[type="text"],
+input[type="date"],
+input[type="file"] {
+  background: #161616 !important;
+  border: 1px solid rgba(139, 90, 26, 0.2) !important;
+  color: #fff !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus,
+input[type="text"]:focus,
+input[type="date"]:focus {
+  border-color: #8B5A1A !important;
+  box-shadow: 0 0 0 2px rgba(139, 90, 26, 0.15), 0 0 15px rgba(139, 90, 26, 0.1) !important;
+  outline: none !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #666 !important;
+}
+
+/* ========== 7. SCROLLBAR ========== */
+
+::-webkit-scrollbar {
+  width: 8px !important;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0a0a !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #8B5A1A, #5C3A0F) !important;
+  border-radius: 4px !important;
+}
+
+/* ========== 8. LOGIN CARD ========== */
+
+.login-card {
+  box-shadow: 0 0 40px rgba(139, 90, 26, 0.12), 0 0 80px rgba(139, 90, 26, 0.05) !important;
+  border: 1px solid rgba(139, 90, 26, 0.35) !important;
+}
+
+.login-card::before {
+  background: linear-gradient(90deg, transparent, #B87A2E, transparent) !important;
+}
+
+.login-tagline {
+  color: #8B5A1A !important;
+}
+
+.login-field i {
+  color: #8B5A1A !important;
+}
+
+.login-version {
+  color: #5C3A0F !important;
+}
+
+/* ========== 9. SEARCH BAR ========== */
+
+.people-search {
+  max-width: 400px !important;
+  margin: 0 auto 16px !important;
+}
+
+.people-search input {
+  width: 100% !important;
+}
+
+/* ========== 10. PHOTO CHIPS ========== */
+
+.pf-photo-chip img {
+  border-radius: 8px !important;
+  border: 1px solid rgba(139, 90, 26, 0.2) !important;
+}
+
+/* ========== 11. TOPBAR & SIDEBAR ========== */
+
+.topbar {
+  border-bottom: 1px solid rgba(139, 90, 26, 0.15) !important;
+}
+
+.sidebar {
+  border-right: 1px solid rgba(139, 90, 26, 0.1) !important;
+}
+
+/* ========== 12. STAT CARDS ========== */
+
+.stat-card {
+  background: linear-gradient(180deg, #1a1a1a, #0f0f0f) !important;
+  border: 1px solid rgba(139, 90, 26, 0.35) !important;
+  box-shadow: 0 0 30px rgba(139, 90, 26, 0.1), 0 0 60px rgba(139, 90, 26, 0.05), inset 0 1px 0 rgba(255,255,255,0.05) !important;
+}
+
+.stat-card::before {
+  content: "" !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 10% !important;
+  right: 10% !important;
+  height: 2px !important;
+  background: linear-gradient(90deg, transparent, #B87A2E, transparent) !important;
+}
+
+.stat-card:hover {
+  box-shadow: 0 0 40px rgba(139, 90, 26, 0.25), 0 0 80px rgba(139, 90, 26, 0.1), inset 0 1px 0 rgba(255,255,255,0.1) !important;
+  transform: translateY(-3px) !important;
+  border-color: rgba(139, 90, 26, 0.6) !important;
+}
+
+.stat-number {
+  color: #8B5A1A !important;
+  text-shadow: 0 0 20px rgba(139, 90, 26, 0.3) !important;
+}
+
+.stat-label {
+  color: #8B5A1A !important;
+}
+
+/* ========== 13. DASHBOARD ROWS ========== */
+
+.dash-row:hover {
+  border-color: #8B5A1A !important;
+}
+
+.dash-row .dash-row-count {
+  color: #8B5A1A !important;
+}
+
+/* ========== 14. PEOPLE CARD ========== */
+
+.people-card:hover {
+  border-color: #8B5A1A !important;
+}
+
+/* ========== 15. LINKED PERSON CHIP ========== */
+
+.linked-person-chip {
+  color: #8B5A1A !important;
+}
+
+/* ========== 16. TYPE TAG ========== */
+
+.type-tag {
+  color: #8B5A1A !important;
+  border-color: #8B5A1A !important;
+}
+
+/* ========== 17. LEAFLET POPUP ========== */
+
+.leaflet-popup-content a {
+  color: #8B5A1A !important;
+}
+
+/* ========== 18. ADDRESS SUGGESTION ========== */
+
+.address-suggestion-row:hover {
+  color: #8B5A1A !important;
+}
+
+/* ========== 19. OWNER LINK ========== */
+
+.owner-link {
+  color: #8B5A1A !important;
+}
+
+/* ========== 20. FACE WARNING ========== */
+
+.face-warning,
+#faceStatus,
+#apGpsStatus,
+#encGpsStatus,
+#vfLocationGpsStatus,
+#profileError,
+#apError,
+#encError,
+#avError,
+#mergeError {
+  color: #8B5A1A !important;
+}
+
+/* ========== 21. DECEASED BADGE ========== */
+
+.deceased-badge,
+.deceased-tag {
+  background: rgba(139, 90, 26, 0.12) !important;
+  color: #8B5A1A !important;
+  border: 1px solid rgba(139, 90, 26, 0.4) !important;
+}
+
+/* ========== 22. MERGE SEARCH ========== */
+
+.merge-search-row:hover {
+  border-color: #8B5A1A !important;
+}
+
+/* ========== 23. PEOPLE HEADER ========== */
+
+.people-header h1 {
+  color: #fff !important;
+}
+
+/* ========== 24. RESPONSIVE ========== */
+
+@media(max-width: 768px) {
+  .stat-cards {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
