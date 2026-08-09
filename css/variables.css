@@ -1,39 +1,56 @@
-/* css/variables.css */
+/* ============================================================
+   variables.css - ALL COLORS IN ONE PLACE
+   Change values here, everything else updates automatically
+   ============================================================ */
+
 :root {
-  /* Gold palette */
-  --gold-primary:   #8B5A1A;
-  --gold-light:     #B87A2E;
-  --gold-lighter:   #C4883A;
-  --gold-dark:      #5C3A0F;
-  --gold-darker:    #3d2608;
+  /* === GOLD PALETTE === */
+  --gold:           #8B5A1A;   /* Main gold (was var(--gold)) */
+  --gold-light:     #B87A2E;   /* Lighter gold */
+  --gold-lighter:   #C4883A;   /* Highlight gold */
+  --gold-dark:      #5C3A0F;   /* Darker gold */
+  --gold-darker:    #3d2608;   /* Shadow gold */
   
   /* Gold with opacity */
   --gold-10: rgba(139, 90, 26, 0.1);
+  --gold-15: rgba(139, 90, 26, 0.15);
   --gold-20: rgba(139, 90, 26, 0.2);
+  --gold-25: rgba(139, 90, 26, 0.25);
   --gold-30: rgba(139, 90, 26, 0.3);
+  --gold-35: rgba(139, 90, 26, 0.35);
   --gold-40: rgba(139, 90, 26, 0.4);
   --gold-50: rgba(139, 90, 26, 0.5);
   --gold-60: rgba(139, 90, 26, 0.6);
   --gold-70: rgba(139, 90, 26, 0.7);
+  --gold-80: rgba(139, 90, 26, 0.8);
+  --gold-90: rgba(139, 90, 26, 0.9);
   
-  /* Text */
-  --text-white:     #ffffff;
-  --text-gray:      #888888;
-  --text-gray-dark: #666666;
-  --text-gray-light:#aaaaaa;
-  --text-black:     #000000;
-  --text-red:       #ef5350;
+  /* === TEXT COLORS === */
+  --text:           #ffffff;   /* Main text (was var(--text)) */
+  --text-secondary: #888888;   /* Subtitles, meta (was var(--text-secondary)) */
+  --text-gray-dark: #666666;   /* Captions, placeholders */
+  --text-gray-light:#aaaaaa;   /* Labels, hints */
+  --text-black:     #000000;   /* Text on gold buttons */
+  --text-red:       #ef5350;   /* Errors, warnings, deceased */
   
-  /* Backgrounds */
-  --bg-page:    #0f0f0f;
-  --bg-card:    #161616;
-  --bg-input:   #161616;
-  --bg-hover:   #1a1a1a;
-  --bg-dark:    #0a0a0a;
-  --bg-encounter:#141414;
+  /* === BACKGROUNDS === */
+  --background:     #0f0f0f;   /* Page background (was var(--background)) */
+  --sidebar:        #0f0f0f;   /* Sidebar background (was var(--sidebar)) */
+  --card:           #161616;   /* Cards, inputs, rows (was var(--card)) */
+  --input:          #161616;   /* Input fields */
+  --hover:          #1a1a1a;   /* Hover states */
+  --dark:           #0a0a0a;   /* Darker areas */
+  --encounter:      #141414;   /* Encounter cards */
   
-  /* Borders */
-  --border-default: #2b3038;
+  /* === BORDERS === */
+  --border:         #2b3038;   /* Default borders (was var(--border)) */
   --border-gold:    var(--gold-40);
   --border-gold-strong: var(--gold-70);
+  
+  /* === SHADOWS === */
+  --shadow:         0 4px 20px rgba(0, 0, 0, 0.4);
+  
+  /* === LAYOUT === */
+  --radius:         12px;
+  --transition:     all 0.3s ease;
 }
