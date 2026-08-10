@@ -34,7 +34,7 @@
   left: 10% !important;
   right: 10% !important;
   height: 2px !important;
-  background: linear-gradient(90deg, transparent, #FAD06D, transparent) !important;
+  background: linear-gradient(90deg, transparent, var(--gold-light), transparent) !important;
 }
 
 .stat-card:hover {
@@ -46,7 +46,7 @@
 .stat-number {
   font-size: 32px !important;
   font-weight: 800 !important;
-  color: #D4A843 !important;
+  color: var(--gold) !important;
   line-height: 1 !important;
   margin-bottom: 8px !important;
   text-shadow: 0 0 20px rgba(212, 168, 67, 0.3) !important;
@@ -54,7 +54,7 @@
 
 .stat-label {
   font-size: 12px !important;
-  color: #D4A843 !important;
+  color: var(--gold) !important;
   text-transform: uppercase !important;
   letter-spacing: 1.5px !important;
   opacity: 0.85 !important;
@@ -64,7 +64,7 @@
 .btn-primary,
 button.btn-primary,
 [type="button"].btn-primary {
-  background: linear-gradient(180deg, #FAD06D, #D4A843, #B37420) !important;
+  background: linear-gradient(180deg, var(--gold-light), var(--gold), var(--gold-dark)) !important;
   color: #000000 !important;
   font-weight: 700 !important;
   border: none !important;
@@ -90,7 +90,7 @@ button.logout-btn,
 #logoutBtn,
 button#logoutBtn {
   background: transparent !important;
-  color: #D4A843 !important;
+  color: var(--gold) !important;
   border: 1px solid rgba(212, 168, 67, 0.4) !important;
   border-radius: 10px !important;
   padding: 10px 20px !important;
@@ -105,24 +105,24 @@ button.logout-btn:hover,
   background: rgba(212, 168, 67, 0.1) !important;
   border-color: rgba(212, 168, 67, 0.7) !important;
   box-shadow: 0 0 25px rgba(212, 168, 67, 0.2), 0 0 50px rgba(212, 168, 67, 0.1) !important;
-  color: #FAD06D !important;
+  color: var(--gold-light) !important;
 }
 
 .logout-btn i,
 #logoutBtn i {
-  color: #D4A843 !important;
+  color: var(--gold) !important;
 }
 
 .logout-btn:hover i,
 #logoutBtn:hover i {
-  color: #FAD06D !important;
+  color: var(--gold-light) !important;
 }
 
 /* ========== GHOST BUTTONS ========== */
 .btn-ghost,
 button.btn-ghost {
   background: transparent !important;
-  color: #D4A843 !important;
+  color: var(--gold) !important;
   border: 1px solid rgba(212, 168, 67, 0.4) !important;
   box-shadow: 0 0 15px rgba(212, 168, 67, 0.05) !important;
   transition: all 0.3s ease !important;
@@ -137,7 +137,7 @@ button.btn-ghost:hover {
 
 .btn-ghost i,
 button.btn-ghost i {
-  color: #D4A843 !important;
+  color: var(--gold) !important;
 }
 
 /* ========== ALL GOLD TEXT - MAXIMUM SPECIFICITY ========== */
@@ -149,7 +149,7 @@ button.btn-ghost i {
 #app h1,
 .content h1,
 main h1 {
-  color: #D4A843 !important;
+  color: var(--gold) !important;
 }
 
 /* Date and role */
@@ -159,7 +159,7 @@ main h1 {
 .topbar .user-role,
 .welcome-text .date-time,
 .welcome-text .user-role {
-  color: #D4A843 !important;
+  color: var(--gold) !important;
 }
 
 /* Section headings */
@@ -170,7 +170,7 @@ main h1 {
 h3 i,
 h3 .bi,
 h3 [class*="bi-"] {
-  color: #D4A843 !important;
+  color: var(--gold) !important;
 }
 
 /* People header */
@@ -180,7 +180,7 @@ h3 [class*="bi-"] {
 .people-header h1 [class*="bi-"],
 .people-header h2,
 .people-header h2 i {
-  color: #D4A843 !important;
+  color: var(--gold) !important;
 }
 
 /* Card names and meta */
@@ -193,7 +193,7 @@ h3 [class*="bi-"] {
 .pf-encounter-head span,
 .dash-row-count,
 .dash-row-sub {
-  color: #D4A843 !important;
+  color: var(--gold) !important;
 }
 
 /* Modal and form labels */
@@ -202,7 +202,7 @@ h3 [class*="bi-"] {
 .profile-field label,
 .modal-card h2 i,
 .modal-card label i {
-  color: #D4A843 !important;
+  color: var(--gold) !important;
 }
 
 /* Menu items */
@@ -213,7 +213,7 @@ aside .menu-item,
 nav button,
 .sidebar button,
 aside button {
-  color: #D4A843 !important;
+  color: var(--gold) !important;
 }
 
 .menu-item i,
@@ -221,7 +221,7 @@ aside button {
 .menu-item [class*="bi-"],
 nav button i,
 .sidebar button i {
-  color: #D4A843 !important;
+  color: var(--gold) !important;
 }
 
 .menu-item.active,
@@ -230,7 +230,7 @@ nav .menu-item.active,
 .menu-item.active i,
 .menu-item.active .bi {
   background: rgba(212, 168, 67, 0.12) !important;
-  color: #D4A843 !important;
+  color: var(--gold) !important;
   border-left: none !important;
 }
 
@@ -238,7 +238,7 @@ nav .menu-item.active,
 nav .menu-item:hover,
 .sidebar .menu-item:hover {
   background: rgba(212, 168, 67, 0.08) !important;
-  color: #FAD06D !important;
+  color: var(--gold-light) !important;
 }
 
 /* Logo and sidebar title */
@@ -247,7 +247,7 @@ nav .menu-item:hover,
 .sidebar h2,
 .logo span,
 .sidebar .logo span {
-  color: #D4A843 !important;
+  color: var(--gold) !important;
 }
 
 /* Links and interactive elements */
@@ -258,7 +258,7 @@ nav .menu-item:hover,
 .dash-row span,
 .dash-row [data-i],
 .dash-row [data-mep] {
-  color: #D4A843 !important;
+  color: var(--gold) !important;
 }
 
 /* Face search */
@@ -273,14 +273,14 @@ nav .menu-item:hover,
 #encError,
 #avError,
 #mergeError {
-  color: #D4A843 !important;
+  color: var(--gold) !important;
 }
 
 /* Deceased badge */
 .deceased-badge,
 .deceased-tag {
   background: rgba(212, 168, 67, 0.12) !important;
-  color: #D4A843 !important;
+  color: var(--gold) !important;
   border: 1px solid rgba(212, 168, 67, 0.4) !important;
 }
 
@@ -314,7 +314,7 @@ textarea:focus,
 select:focus,
 input[type="text"]:focus,
 input[type="date"]:focus {
-  border-color: #D4A843 !important;
+  border-color: var(--gold) !important;
   box-shadow: 0 0 0 2px rgba(212, 168, 67, 0.15), 0 0 15px rgba(212, 168, 67, 0.1) !important;
   outline: none !important;
 }
@@ -334,7 +334,7 @@ textarea::placeholder {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #D4A843, #B37420) !important;
+  background: linear-gradient(180deg, var(--gold), var(--gold-dark)) !important;
   border-radius: 4px !important;
 }
 
@@ -345,19 +345,19 @@ textarea::placeholder {
 }
 
 .login-card::before {
-  background: linear-gradient(90deg, transparent, #FAD06D, transparent) !important;
+  background: linear-gradient(90deg, transparent, var(--gold-light), transparent) !important;
 }
 
 .login-tagline {
-  color: #D4A843 !important;
+  color: var(--gold) !important;
 }
 
 .login-field i {
-  color: #D4A843 !important;
+  color: var(--gold) !important;
 }
 
 .login-btn {
-  background: linear-gradient(180deg, #FAD06D, #D4A843, #B37420) !important;
+  background: linear-gradient(180deg, var(--gold-light), var(--gold), var(--gold-dark)) !important;
   color: #000000 !important;
   box-shadow: 0 4px 20px rgba(212, 168, 67, 0.3), 0 0 40px rgba(212, 168, 67, 0.15) !important;
 }
@@ -367,7 +367,7 @@ textarea::placeholder {
 }
 
 .login-version {
-  color: #8B6914 !important;
+  color: var(--gold-dark) !important;
 }
 
 /* ========== SEARCH BAR ========== */
