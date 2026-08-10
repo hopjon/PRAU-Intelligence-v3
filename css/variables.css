@@ -11,21 +11,7 @@
   --gold-dark:      #5B3C10;   /* Darker gold */
   --gold-darker:    #5B3C10;   /* Shadow gold */
   --gold-hover: #C48D3C;  /* Same as --gold-light */
-  
-  /* Gold with opacity */
-  --gold-10: rgba(139, 90, 26, 0.1);
-  --gold-15: rgba(139, 90, 26, 0.15);
-  --gold-20: rgba(139, 90, 26, 0.2);
-  --gold-25: rgba(139, 90, 26, 0.25);
-  --gold-30: rgba(139, 90, 26, 0.3);
-  --gold-35: rgba(139, 90, 26, 0.35);
-  --gold-40: rgba(139, 90, 26, 0.4);
-  --gold-50: rgba(139, 90, 26, 0.5);
-  --gold-60: rgba(139, 90, 26, 0.6);
-  --gold-70: rgba(139, 90, 26, 0.7);
-  --gold-80: rgba(139, 90, 26, 0.8);
-  --gold-90: rgba(139, 90, 26, 0.9);
-  
+
   /* === TEXT COLORS === */
   --text:           #ffffff;   /* Main text (was var(--text)) */
   --text-secondary: #888888;   /* Subtitles, meta (was var(--text-secondary)) */
@@ -45,9 +31,7 @@
   
   /* === BORDERS === */
   --border:         #2b3038;   /* Default borders (was var(--border)) */
-  --border-gold:    var(--gold-40);
-  --border-gold-strong: var(--gold-70);
-  
+
   /* === SHADOWS === */
   --shadow:         0 4px 20px rgba(0, 0, 0, 0.4);
   

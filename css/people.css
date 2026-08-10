@@ -116,24 +116,6 @@
     opacity:.45;
     cursor:not-allowed;
 }
-.pf-add-encounter{
-    width:100%;
-    padding:11px;
-    border-radius:10px;
-    border:1px dashed var(--gold);
-    background:#222;
-    color:var(--gold);
-    font-weight:600;
-    cursor:pointer;
-    transition:.18s;
-}
-.pf-add-encounter:hover{
-    background:#2c2c2c;
-}
-.pf-add-encounter:disabled{
-    opacity:.45;
-    cursor:not-allowed;
-}
 .pf-photo-caption{font-size:9px;color:#666;text-align:center;margin-top:2px;max-width:70px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .profile-view{max-width:900px;}

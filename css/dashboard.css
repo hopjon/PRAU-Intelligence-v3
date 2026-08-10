@@ -173,12 +173,6 @@
     margin:10px 0;
     font-weight:700;
 }
-.date-time{
-    margin-top:6px;
-    font-size:12px;
-    color:#9c9c9c;
-    letter-spacing:.5px;
-}
 /* ===== Welcome Header ===== */
 
 
@@ -192,6 +186,7 @@
     color:#9c9c9c;
     font-size:.85rem;
     margin-top:4px;
+    letter-spacing:.5px;
 }
 
 .user-role{
