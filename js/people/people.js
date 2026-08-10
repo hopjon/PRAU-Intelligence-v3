@@ -195,6 +195,7 @@ function dataUrlToCanvas(dataUrl){
 
 // ---------- list ----------
 window.__openPersonProfile = function(id){ renderPersonProfile(id); };
+window.__openAddPersonModal = function(prefill, onCreated){ openAddPersonModal(prefill, onCreated); };
 
 export async function showPeople(){
   var content = document.getElementById("contentArea");
@@ -301,7 +302,7 @@ async function findDuplicateFace(descriptor, excludeId, peopleList){
 }
 
 // ---------- add person (modal) ----------
-function openAddPersonModal(){
+function openAddPersonModal(prefill, onCreated){
   var pendingPhotos = [];
 
   var backdrop = document.createElement("div");
@@ -314,7 +315,8 @@ function openAddPersonModal(){
       '<label class="pf-import-label" for="apImportFile"><i class="bi bi-images"></i>Import from gallery</label>' +
       '<input type="file" id="apPhotoFile" accept="image/*" capture="environment" style="display:none;">' +
       '<input type="file" id="apImportFile" accept="image/*" multiple style="display:none;">' +
-      '<label>Name and Surname</label><input id="apName" placeholder="e.g. John Doe">' +
+      '<label>Name and Surname</label><input id="apName" placeholder="e.g. John Doe" value="' + escapeHtml(prefill && prefill.name ? prefill.name : "") + '">' +
+      '<label>Phone Number</label><input id="apPhone" placeholder="e.g. 082 123 4567" value="' + escapeHtml(prefill && prefill.phone ? prefill.phone : "") + '">' +
       '<label>ID Number</label><input id="apIdNumber" placeholder="e.g. 9001015800086">' +
       '<label>Date of Birth</label><input type="text" id="apDob" placeholder="DD/MM/YYYY">' +
       '<label>Known Alias</label><input id="apAliases" placeholder="e.g. Skhokho">' +
@@ -415,6 +417,7 @@ function openAddPersonModal(){
     var person = {
       name: name,
       surname: surname,
+      phone: document.getElementById("apPhone").value.trim(),
       idNumber: idNumber,
       dob: document.getElementById("apDob").value,
       aliases: document.getElementById("apAliases").value.trim(),
@@ -438,7 +441,11 @@ function openAddPersonModal(){
       }));
       clearPending("people");
       backdrop.remove();
-      renderPersonProfile(ref.id);
+      if(onCreated){
+        onCreated({ id: ref.id, name: fullName(person), phone: person.phone });
+      }else{
+        renderPersonProfile(ref.id);
+      }
     }catch(e){
       clearPending("people");
       errEl.textContent = isDocTooLargeError(e)
@@ -564,6 +571,7 @@ async function renderPersonProfile(id){
           '<div class="profile-field" style="grid-column:1 / -1;">' +
             '<label>Name and Surname</label><input type="text" id="pfName" value="' + escapeHtml(fullName(p)) + '"' + (editMode ? '' : ' readonly') + ' placeholder="e.g. John Doe">' +
           '</div>' +
+          field("Phone Number", "pfPhone", p.phone, editMode, null, "e.g. 082 123 4567") +
           field("ID Number", "pfIdNumber", p.idNumber, editMode, null, "e.g. 9001015800086") +
           field("Date of Birth", "pfDob", p.dob, editMode, "text", "DD/MM/YYYY") +
           field("Known Alias", "pfAliases", p.aliases, editMode, null, "e.g. Skhokho") +
@@ -762,6 +770,7 @@ async function renderPersonProfile(id){
 
         var updates = {
           name: name, surname: "", idNumber: idNumber,
+          phone: document.getElementById("pfPhone").value.trim(),
           dob: document.getElementById("pfDob").value,
           aliases: document.getElementById("pfAliases").value.trim(),
           origin: document.getElementById("pfOrigin").value.trim(),

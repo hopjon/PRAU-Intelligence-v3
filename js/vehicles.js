@@ -322,6 +322,7 @@ function openAddVehicleModal(){
       year: document.getElementById("avYear").value.trim(),
       colour: document.getElementById("avColour").value.trim(),
       linkedPeople: linkedPeople,
+      unprofiledPeople: [],
       deceased: false,
       photos: pendingPhotos,
       addedAt: new Date().toISOString(),
@@ -361,6 +362,7 @@ async function renderVehicleProfile(id){
   var pendingPhotos = v.photos ? v.photos.slice() : [];
   var encounters = [];
   var editLinkedPeople = (v.linkedPeople !== undefined) ? v.linkedPeople.slice() : (v.ownerId ? [{ id: v.ownerId, name: v.ownerName }] : []);
+  var editUnprofiledPeople = (v.unprofiledPeople || []).slice();
 
   async function loadEncounters(){
     var q = query(collection(db, "vehicleEncounters"), where("vehicleId", "==", id));
@@ -370,8 +372,49 @@ async function renderVehicleProfile(id){
     encounters.sort(function(a, b){ return (a.date || "").localeCompare(b.date || ""); });
   }
 
-  function render(){
+  function linkedPeopleDisplayHtml(){
     var displayLinked = (v.linkedPeople !== undefined) ? v.linkedPeople : (v.ownerId ? [{ id: v.ownerId, name: v.ownerName }] : []);
+    return '<label>Linked People</label>' +
+      (displayLinked.length ? '<div class="linked-people-chips">' + displayLinked.map(function(p){
+        return '<span class="linked-person-view" data-id="' + p.id + '">' + escapeHtml(p.name) + '</span>';
+      }).join("") + '</div>' : '<div style="color:#888;">No one linked</div>');
+  }
+
+  function unprofiledPeopleDisplayHtml(){
+    return '<label>Known / Unprofiled People</label>' +
+      ((v.unprofiledPeople && v.unprofiledPeople.length) ? '<div class="linked-people-chips">' + v.unprofiledPeople.map(function(u){
+        return '<span class="linked-person-view" style="cursor:default;">' + escapeHtml(u.name) + (u.phone ? ' — ' + escapeHtml(u.phone) : '') + '</span>';
+      }).join("") + '</div>' : '<div style="color:#888;">None recorded</div>');
+  }
+
+  function wireLinkedPersonViews(){
+    Array.prototype.forEach.call(document.querySelectorAll(".linked-person-view"), function(el){
+      el.onclick = async function(){
+        var pid = el.getAttribute("data-id");
+        if(!pid || !window.__openPersonProfile) return;
+        try{
+          var snap = await getDoc(doc(db, "people", pid));
+          if(snap.exists() && !snap.data().deleted) window.__openPersonProfile(pid);
+        }catch(e){}
+      };
+    });
+  }
+
+  function refreshLinkedSections(){
+    var displayEl = document.getElementById("linkedPeopleDisplay");
+    if(displayEl) displayEl.innerHTML = linkedPeopleDisplayHtml();
+    var unprofiledDisplayEl = document.getElementById("unprofiledPeopleDisplay");
+    if(unprofiledDisplayEl) unprofiledDisplayEl.innerHTML = unprofiledPeopleDisplayHtml();
+    wireLinkedPersonViews();
+    if(document.getElementById("vfLinkedWidget")){
+      linkedPeopleWidget(document.getElementById("vfLinkedWidget"), editLinkedPeople, function(list){
+        editLinkedPeople = list;
+      });
+    }
+    renderUnprofiledEditor();
+  }
+
+  function render(){
     content.innerHTML =
       '<div class="people-header">' +
         '<button class="btn-ghost" id="backToVehicles">← Back</button>' +
@@ -394,14 +437,11 @@ async function renderVehicleProfile(id){
           (editMode ? '<button class="btn-ghost" id="vfLocationGpsBtn" type="button" style="flex-shrink:0;padding:11px 14px;">📍</button>' : '') +
         '</div>' +
         (editMode ? '<div class="modal-error" id="vfLocationGpsStatus" style="text-align:left;color:#888;"></div>' : '') +
-        '<div id="linkedPeopleDisplay">' +
-          '<label>Linked People</label>' +
-          (displayLinked.length ? '<div class="linked-people-chips">' + displayLinked.map(function(p){
-            return '<span class="linked-person-view" data-id="' + p.id + '">' + escapeHtml(p.name) + '</span>';
-          }).join("") + '</div>' : '<div style="color:#888;">No one linked</div>') +
-        '</div>' +
+        '<div id="linkedPeopleDisplay">' + linkedPeopleDisplayHtml() + '</div>' +
+        '<div id="unprofiledPeopleDisplay" style="margin-top:14px;">' + unprofiledPeopleDisplayHtml() + '</div>' +
         (editMode ?
           '<div id="vfLinkedWidget" style="margin-top:14px;"></div>' +
+          '<div id="vfUnprofiledWidget" style="margin-top:14px;"></div>' +
           '<div class="profile-actions">' +
             '<button class="btn-primary" id="saveProfileBtn">Save Changes</button>' +
             '<button class="btn-ghost" id="deleteVehicleBtn" style="color:#ef5350;border-color:#ef5350;">Delete Vehicle</button>' +
@@ -487,6 +527,90 @@ async function renderVehicleProfile(id){
     renderPhotos();
   }
 
+  function renderUnprofiledEditor(){
+    var wrap = document.getElementById("vfUnprofiledWidget");
+    if(!wrap) return;
+    wrap.innerHTML =
+      '<label>Known / Unprofiled People</label>' +
+      '<div class="linked-people-chips" id="unprofiledChips">' +
+        (editUnprofiledPeople.length ? editUnprofiledPeople.map(function(u, i){
+          return '<span class="linked-person-chip" data-i="' + i + '">' +
+            escapeHtml(u.name) + (u.phone ? ' — ' + escapeHtml(u.phone) : '') +
+            ' <button class="btn-ghost unprofiled-promote" data-i="' + i + '" type="button" style="padding:2px 8px;font-size:11px;margin-left:6px;">Create Profile</button>' +
+            ' <button class="linked-person-remove unprofiled-remove" data-i="' + i + '" type="button">✕</button>' +
+          '</span>';
+        }).join("") : '<span style="color:#888;">None recorded</span>') +
+      '</div>' +
+      '<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">' +
+        '<input id="upName" placeholder="Name" style="flex:1;min-width:120px;">' +
+        '<input id="upPhone" placeholder="Phone" style="flex:1;min-width:120px;">' +
+      '</div>' +
+      '<textarea id="upNotes" placeholder="Notes" style="margin-top:8px;"></textarea>' +
+      '<button class="btn-ghost" id="upAddBtn" type="button" style="margin-top:8px;">+ Add Known Person</button>' +
+      '<div class="modal-error" id="unprofiledError"></div>';
+
+    document.getElementById("upAddBtn").onclick = function(){
+      var name = document.getElementById("upName").value.trim();
+      if(!name) return;
+      editUnprofiledPeople.push({
+        name: name,
+        phone: document.getElementById("upPhone").value.trim(),
+        notes: document.getElementById("upNotes").value.trim(),
+        addedAt: new Date().toISOString(),
+        addedBy: currentUserShortName()
+      });
+      renderUnprofiledEditor();
+    };
+
+    Array.prototype.forEach.call(wrap.querySelectorAll(".unprofiled-remove"), function(btn){
+      btn.onclick = function(){
+        editUnprofiledPeople.splice(parseInt(btn.getAttribute("data-i"), 10), 1);
+        renderUnprofiledEditor();
+      };
+    });
+
+    Array.prototype.forEach.call(wrap.querySelectorAll(".unprofiled-promote"), function(btn){
+      btn.onclick = async function(){
+        var i = parseInt(btn.getAttribute("data-i"), 10);
+        var entry = editUnprofiledPeople[i];
+        if(!entry || !window.__openAddPersonModal){
+          document.getElementById("unprofiledError").textContent = "Person creation isn't available right now.";
+          return;
+        }
+
+        var normalizedName = (entry.name || "").trim().toLowerCase().replace(/\s+/g, " ");
+        if(normalizedName){
+          try{
+            var allPeople = await loadAllPeopleForLinking();
+            var likelyMatch = allPeople.some(function(pp){
+              return pp.name.trim().toLowerCase().replace(/\s+/g, " ") === normalizedName;
+            });
+            if(likelyMatch && !confirm('A person named "' + entry.name + '" already exists. Continue creating a new profile anyway?')) return;
+          }catch(e){ /* if the lookup itself fails, don't block promotion */ }
+        }
+
+        if(!confirm('Create a full Person profile for "' + entry.name + '" and link it to this vehicle?')) return;
+        window.__openAddPersonModal({ name: entry.name, phone: entry.phone }, async function(newPerson){
+          var newLinked = editLinkedPeople.concat([{ id: newPerson.id, name: newPerson.name }]);
+          var newUnprofiled = editUnprofiledPeople.slice();
+          newUnprofiled.splice(i, 1);
+          try{
+            await updateDoc(doc(db, "vehicles", id), { linkedPeople: newLinked, unprofiledPeople: newUnprofiled });
+            editLinkedPeople = newLinked;
+            editUnprofiledPeople = newUnprofiled;
+            v.linkedPeople = newLinked;
+            v.unprofiledPeople = newUnprofiled;
+            refreshLinkedSections();
+          }catch(e){
+            renderUnprofiledEditor();
+            document.getElementById("unprofiledError").textContent =
+              "The person profile was created, but couldn't be linked to this vehicle — check your connection and link them manually via Linked People.";
+          }
+        });
+      };
+    });
+  }
+
   function wireUp(){
     document.getElementById("backToVehicles").onclick = function(){ renderVehicles(); };
 
@@ -495,21 +619,13 @@ async function renderVehicleProfile(id){
       render();
     };
 
-    Array.prototype.forEach.call(document.querySelectorAll(".linked-person-view"), function(el){
-      el.onclick = async function(){
-        var pid = el.getAttribute("data-id");
-        if(!pid || !window.__openPersonProfile) return;
-        try{
-          var snap = await getDoc(doc(db, "people", pid));
-          if(snap.exists() && !snap.data().deleted) window.__openPersonProfile(pid);
-        }catch(e){}
-      };
-    });
+    wireLinkedPersonViews();
 
     if(editMode){
       linkedPeopleWidget(document.getElementById("vfLinkedWidget"), editLinkedPeople, function(list){
         editLinkedPeople = list;
       });
+      renderUnprofiledEditor();
       if(document.getElementById("vfLocationGpsBtn")){
         document.getElementById("vfLocationGpsBtn").onclick = function(){
           var statusEl = document.getElementById("vfLocationGpsStatus");
@@ -547,7 +663,8 @@ async function renderVehicleProfile(id){
           colour: document.getElementById("vfColour").value.trim(),
           markings: document.getElementById("vfMarkings").value.trim(),
           locationSpotted: document.getElementById("vfLocationSpotted").value.trim(),
-          linkedPeople: editLinkedPeople
+          linkedPeople: editLinkedPeople,
+          unprofiledPeople: editUnprofiledPeople
         };
         try{
           await updateDoc(doc(db, "vehicles", id), updates);
