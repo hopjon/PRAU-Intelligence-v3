@@ -180,10 +180,6 @@ function openAddUnidentifiedModal(container, backToPeople){
 
   document.getElementById("auSave").onclick = async function(){
     var errEl = document.getElementById("auError");
-    if(!pendingPhotos.length){
-      errEl.textContent = "Add at least one photo.";
-      return;
-    }
 
     var record = {
       label: document.getElementById("auLabel").value.trim(),
