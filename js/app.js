@@ -9,6 +9,14 @@ const appEl = document.getElementById("app");
 var appVersionEl = document.getElementById("appVersion");
 if(appVersionEl) appVersionEl.textContent = APP_VERSION;
 
+var offlineBannerEl = document.getElementById("offlineBanner");
+function updateOfflineBanner(){
+  if(offlineBannerEl) offlineBannerEl.style.display = navigator.onLine ? "none" : "block";
+}
+updateOfflineBanner();
+window.addEventListener("offline", updateOfflineBanner);
+window.addEventListener("online", updateOfflineBanner);
+
 function renderLogin(){
   appEl.innerHTML = `
     <div class="login-screen">
