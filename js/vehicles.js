@@ -121,24 +121,23 @@ async function findDuplicateByRegistration(registration, excludeId){
 }
 
 // ---------- owner search (link to a Person) ----------
-async function searchPeople(q){
-  q = (q || "").trim().toLowerCase();
-  if(!q) return [];
-  var snapshot = await getDocs(collection(db, "people"));
-  var results = [];
-  snapshot.forEach(function(d){
-    var data = d.data();
-    if(data.deleted) return;
-    var name = ((data.name||"") + " " + (data.surname||"")).trim();
-    if(name.toLowerCase().indexOf(q) !== -1){
-      results.push({ id: d.id, name: name });
-    }
+// Fetched once per widget instance instead of on every keystroke.
+function loadAllPeopleForLinking(){
+  return getDocs(collection(db, "people")).then(function(snapshot){
+    var list = [];
+    snapshot.forEach(function(d){
+      var data = d.data();
+      if(data.deleted) return;
+      var name = ((data.name||"") + " " + (data.surname||"")).trim();
+      list.push({ id: d.id, name: name });
+    });
+    return list;
   });
-  return results;
 }
 
 function linkedPeopleWidget(containerEl, currentList, onChange){
   var people = currentList.slice();
+  var allPeoplePromise = loadAllPeopleForLinking();
 
   function renderChips(){
     containerEl.innerHTML =
@@ -169,7 +168,9 @@ function linkedPeopleWidget(containerEl, currentList, onChange){
     });
 
     document.getElementById("linkedPeopleSearch").oninput = async function(){
-      var results = await searchPeople(this.value);
+      var q = this.value.trim().toLowerCase();
+      var allPeople = await allPeoplePromise;
+      var results = !q ? [] : allPeople.filter(function(r){ return r.name.toLowerCase().indexOf(q) !== -1; });
       results = results.filter(function(r){ return !people.some(function(p){ return p.id === r.id; }); });
       document.getElementById("linkedPeopleResults").innerHTML = results.map(function(r){
         return '<div class="merge-search-row" data-id="' + r.id + '" data-name="' + escapeHtml(r.name) + '">' + escapeHtml(r.name) + '</div>';
