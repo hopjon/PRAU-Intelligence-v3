@@ -2,47 +2,6 @@
 /* Targeting the exact colors from the screenshot: #f3c037 → #D4A843 */
 
 /* ========== DASHBOARD STAT CARDS ========== */
-.stat-cards {
-  display: flex !important;
-  justify-content: center !important;
-  gap: 16px !important;
-  flex-wrap: wrap !important;
-  padding: 20px 0 !important;
-}
-
-.stat-card {
-  width: 120px !important;
-  height: 120px !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: center !important;
-  border-radius: 16px !important;
-  cursor: pointer !important;
-  background: linear-gradient(180deg, #1a1a1a, #0f0f0f) !important;
-  border: 1px solid rgba(212, 168, 67, 0.35) !important;
-  box-shadow: 0 0 30px rgba(212, 168, 67, 0.1), 0 0 60px rgba(212, 168, 67, 0.05), inset 0 1px 0 rgba(255,255,255,0.05) !important;
-  transition: all 0.3s ease !important;
-  position: relative !important;
-  overflow: hidden !important;
-}
-
-.stat-card::before {
-  content: "" !important;
-  position: absolute !important;
-  top: 0 !important;
-  left: 10% !important;
-  right: 10% !important;
-  height: 2px !important;
-  background: linear-gradient(90deg, transparent, var(--gold-light), transparent) !important;
-}
-
-.stat-card:hover {
-  box-shadow: 0 0 40px rgba(212, 168, 67, 0.25), 0 0 80px rgba(212, 168, 67, 0.1), inset 0 1px 0 rgba(255,255,255,0.1) !important;
-  transform: translateY(-3px) !important;
-  border-color: rgba(212, 168, 67, 0.6) !important;
-}
-
 .stat-number {
   font-size: 32px !important;
   font-weight: 800 !important;
