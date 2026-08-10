@@ -30,6 +30,7 @@ export async function renderDashboardHome(container, navigateTo){
   var peopleSnap = await getDocs(collection(db, "people"));
   var vehiclesSnap = await getDocs(collection(db, "vehicles"));
   var placesSnap = await getDocs(collection(db, "places"));
+  var unidentifiedSnap = await getDocs(collection(db, "unidentifiedPeople"));
   var encSnap = await getDocs(collection(db, "encounters"));
   var vEncSnap = await getDocs(collection(db, "vehicleEncounters"));
 
@@ -49,6 +50,12 @@ export async function renderDashboardHome(container, navigateTo){
   placesSnap.forEach(function(d){
     var data = d.data();
     if(!data.deleted) places.push(Object.assign({ id: d.id }, data));
+  });
+
+  var unidentifiedPeople = [];
+  unidentifiedSnap.forEach(function(d){
+    var data = d.data();
+    if(!data.deleted) unidentifiedPeople.push(Object.assign({ id: d.id }, data));
   });
 
   var encounters = [];
@@ -113,6 +120,7 @@ export async function renderDashboardHome(container, navigateTo){
       '<div class="stat-card" id="statPeople"><div class="stat-number">' + people.length + '</div><div class="stat-label">People</div></div>' +
       '<div class="stat-card" id="statVehicles"><div class="stat-number">' + vehicles.length + '</div><div class="stat-label">Vehicles</div></div>' +
       '<div class="stat-card" id="statPlaces"><div class="stat-number">' + places.length + '</div><div class="stat-label">Places</div></div>' +
+      '<div class="stat-card" id="statUnidentified"><div class="stat-number">' + unidentifiedPeople.length + '</div><div class="stat-label">Unidentified</div></div>' +
     '</div>' +
 
     '<div class="dash-section">' +
@@ -152,6 +160,7 @@ export async function renderDashboardHome(container, navigateTo){
   document.getElementById("statPeople").onclick = function(){ navigateTo("people"); };
   document.getElementById("statVehicles").onclick = function(){ navigateTo("vehicles"); };
   document.getElementById("statPlaces").onclick = function(){ navigateTo("places"); };
+  document.getElementById("statUnidentified").onclick = function(){ navigateTo("people"); };
 
   Array.prototype.forEach.call(container.querySelectorAll("[data-i]"), function(row){
     row.onclick = function(){ activity[parseInt(row.getAttribute("data-i"), 10)].action(); };
