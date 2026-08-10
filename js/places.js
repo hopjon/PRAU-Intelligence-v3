@@ -22,6 +22,9 @@ function escapeHtml(s){
 function currentUserShortName(){
   return (auth.currentUser && auth.currentUser.email) ? auth.currentUser.email.split("@")[0] : "unknown";
 }
+function isDocTooLargeError(e){
+  return e && e.code === "invalid-argument" && /longer than \d+ bytes/i.test(e.message || "");
+}
 function fileToCompressedDataUrl(file, maxDim){
   return new Promise(function(resolve, reject){
     var img = new Image();
@@ -316,7 +319,9 @@ function openAddPlaceModal(){
       renderPlaceProfile(ref.id);
     }catch(e){
       clearPending("places");
-      errEl.textContent = "Could not save — check your connection.";
+      errEl.textContent = isDocTooLargeError(e)
+        ? "This record's photos are too large to save. Remove a photo and try again."
+        : "Could not save — check your connection.";
       this.disabled = false;
       this.textContent = "Save";
     }
@@ -487,7 +492,9 @@ async function renderPlaceProfile(id){
           editMode = false;
           render();
         }catch(e){
-          errEl.textContent = "Could not save — check your connection.";
+          errEl.textContent = isDocTooLargeError(e)
+            ? "This record's photos are too large to save. Remove a photo and try again."
+            : "Could not save — check your connection.";
           this.disabled = false;
           this.textContent = "Save Changes";
         }
