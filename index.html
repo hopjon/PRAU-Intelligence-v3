@@ -57,49 +57,5 @@
   <div id="imageViewerCounter" style="position:absolute;bottom:16px;left:0;right:0;text-align:center;color:#fff;font-size:13px;"></div>
 
 </div>
-<script>
-// Force black text on gold buttons after page loads
-document.addEventListener('DOMContentLoaded', function() {
-  
-  // Function to force black text/icons
-  function forceBlack(elements) {
-    elements.forEach(function(el) {
-      el.style.setProperty('color', '#000000', 'important');
-      // Force all child elements too
-      el.querySelectorAll('*').forEach(function(child) {
-        child.style.setProperty('color', '#000000', 'important');
-      });
-      // Force icons
-      el.querySelectorAll('i, svg, .bi, [class*="bi-"]').forEach(function(icon) {
-        icon.style.setProperty('color', '#000000', 'important');
-        icon.style.setProperty('fill', '#000000', 'important');
-      });
-    });
-  }
-  
-  // Logout button
-  forceBlack(document.querySelectorAll('#logoutBtn, .logout-btn, button.logout-btn'));
-  
-  // Active sidebar tabs
-  forceBlack(document.querySelectorAll('.menu-item.active, .sidebar .menu-item.active, nav .menu-item.active'));
-  
-  // Add buttons
-  forceBlack(document.querySelectorAll('#addPersonBtn, #addVehicleBtn, #addPlaceBtn, .add-btn, .btn-add, button[class*="add"]'));
-  
-  // Take photo button
-  forceBlack(document.querySelectorAll('#takePhotoBtn, .take-photo-btn, .pf-take-photo-btn'));
-  
-  // Also watch for dynamically added elements
-  const observer = new MutationObserver(function(mutations) {
-    forceBlack(document.querySelectorAll('#logoutBtn, .logout-btn, button.logout-btn'));
-    forceBlack(document.querySelectorAll('.menu-item.active, .sidebar .menu-item.active, nav .menu-item.active'));
-    forceBlack(document.querySelectorAll('#addPersonBtn, #addVehicleBtn, #addPlaceBtn, .add-btn, .btn-add, button[class*="add"]'));
-    forceBlack(document.querySelectorAll('#takePhotoBtn, .take-photo-btn, .pf-take-photo-btn'));
-  });
-  
-  observer.observe(document.body, { childList: true, subtree: true });
-  
-});
-</script>
 </body>
 </html>
