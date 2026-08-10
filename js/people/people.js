@@ -4,6 +4,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { ensureModelsLoaded, computeDescriptor, euclidean, photoUrl } from "../face.js";
 import { reassignVehicleLinks } from "../vehicles.js";
+import { renderUnidentifiedPeople } from "./unidentified.js";
 import { markPending, clearPending, isPending } from "../pendingWrites.js";
 
 ensureModelsLoaded();
@@ -202,12 +203,18 @@ export async function showPeople(){
   content.innerHTML =
     '<div class="people-header">' +
       '<h1><i class="bi bi-person-fill"></i> People Database</h1>' +
-      '<button class="btn-primary" id="addPersonBtn"><i class="bi bi-plus-circle-fill"></i> Add</button>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+        '<button class="btn-ghost" id="unidentifiedPeopleBtn"><i class="bi bi-question-circle-fill"></i> Unidentified People</button>' +
+        '<button class="btn-primary" id="addPersonBtn"><i class="bi bi-plus-circle-fill"></i> Add</button>' +
+      '</div>' +
     '</div>' +
     '<div class="people-search" style="max-width:400px;margin:0 auto 16px;"><i class="bi bi-search"></i><input type="text" id="peopleSearchInput" placeholder="Search people…" style="width:100%;"></div>' +
     '<div id="peopleListArea">Loading…</div>';
 
   document.getElementById("addPersonBtn").onclick = function(){ openAddPersonModal(); };
+  document.getElementById("unidentifiedPeopleBtn").onclick = function(){
+    renderUnidentifiedPeople(content, function(){ showPeople(); });
+  };
 
   var snapshot = await getDocs(collection(db, "people"));
   var people = [];
