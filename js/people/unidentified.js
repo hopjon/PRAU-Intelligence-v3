@@ -202,9 +202,10 @@ function openAddUnidentifiedModal(container, backToPeople){
       backdrop.remove();
       renderUnidentifiedProfile(container, ref.id, backToPeople);
     }catch(e){
+      console.error("Unidentified Person save failed:", e && e.code, e && e.message, e);
       errEl.textContent = isDocTooLargeError(e)
         ? "This record's photos are too large to save. Remove a photo and try again."
-        : "Could not save — check your connection.";
+        : "Could not save — check your connection. (" + ((e && e.code) || (e && e.message) || "unknown error") + ")";
       this.disabled = false;
       this.textContent = "Save";
     }
