@@ -121,6 +121,34 @@ async function findDuplicateByRegistration(registration, excludeId){
   return match;
 }
 
+// ---------- reassign vehicle linkedPeople after a People merge ----------
+export async function reassignVehicleLinks(oldPersonId, newPersonId, newPersonName){
+  var snapshot = await getDocs(collection(db, "vehicles"));
+  var jobs = [];
+  snapshot.forEach(function(d){
+    var data = d.data();
+    var linked = data.linkedPeople;
+    if(!linked || !linked.length) return;
+    var found = false;
+    var mapped = linked.map(function(p){
+      if(p.id === oldPersonId){
+        found = true;
+        return { id: newPersonId, name: newPersonName };
+      }
+      return p;
+    });
+    if(!found) return;
+    var seen = {};
+    var updated = mapped.filter(function(p){
+      if(seen[p.id]) return false;
+      seen[p.id] = true;
+      return true;
+    });
+    jobs.push(updateDoc(doc(db, "vehicles", d.id), { linkedPeople: updated }));
+  });
+  await Promise.all(jobs);
+}
+
 // ---------- owner search (link to a Person) ----------
 // Fetched once per widget instance instead of on every keystroke.
 function loadAllPeopleForLinking(){

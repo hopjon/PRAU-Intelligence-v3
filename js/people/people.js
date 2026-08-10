@@ -3,6 +3,7 @@ import {
   collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc, query, where
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { ensureModelsLoaded, computeDescriptor, euclidean, photoUrl } from "../face.js";
+import { reassignVehicleLinks } from "../vehicles.js";
 
 ensureModelsLoaded();
 
@@ -489,6 +490,8 @@ async function openMergeModal(currentPerson, currentId, onMerged){
           });
           await Promise.all(reassignJobs);
 
+          await reassignVehicleLinks(otherId, currentId, fullName(currentPerson));
+
           await deleteDoc(doc(db, "people", otherId));
           backdrop.remove();
           onMerged();
@@ -697,18 +700,24 @@ async function renderPersonProfile(id){
           document.getElementById("viewDupBtn").onclick = function(){ renderPersonProfile(dupFace.record.id); };
           document.getElementById("mergeDupBtn").onclick = async function(){
             if(!confirm("Merge " + fullName(dupFace.record) + " into " + fullName(p) + "? The other record will be permanently deleted.")) return;
-            var mergedPhotos = pendingPhotos.concat(dupFace.record.photos || []);
-            await updateDoc(doc(db, "people", id), { photos: mergedPhotos });
+            try{
+              var mergedPhotos = pendingPhotos.concat(dupFace.record.photos || []);
+              await updateDoc(doc(db, "people", id), { photos: mergedPhotos });
 
-            var otherEncSnap2 = await getDocs(query(collection(db, "encounters"), where("personId", "==", dupFace.record.id)));
-            var reassignJobs2 = [];
-            otherEncSnap2.forEach(function(d){
-              reassignJobs2.push(updateDoc(doc(db, "encounters", d.id), { personId: id }));
-            });
-            await Promise.all(reassignJobs2);
+              var otherEncSnap2 = await getDocs(query(collection(db, "encounters"), where("personId", "==", dupFace.record.id)));
+              var reassignJobs2 = [];
+              otherEncSnap2.forEach(function(d){
+                reassignJobs2.push(updateDoc(doc(db, "encounters", d.id), { personId: id }));
+              });
+              await Promise.all(reassignJobs2);
 
-            await deleteDoc(doc(db, "people", dupFace.record.id));
-            renderPersonProfile(id);
+              await reassignVehicleLinks(dupFace.record.id, id, fullName(p));
+
+              await deleteDoc(doc(db, "people", dupFace.record.id));
+              renderPersonProfile(id);
+            }catch(e){
+              document.getElementById("faceWarningArea").innerHTML += '<div class="modal-error">Merge failed — check your connection.</div>';
+            }
           };
         }
       }
