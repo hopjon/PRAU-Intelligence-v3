@@ -457,9 +457,13 @@ async function renderVehicleProfile(id){
     };
 
     Array.prototype.forEach.call(document.querySelectorAll(".linked-person-view"), function(el){
-      el.onclick = function(){
+      el.onclick = async function(){
         var pid = el.getAttribute("data-id");
-        if(pid && window.__openPersonProfile) window.__openPersonProfile(pid);
+        if(!pid || !window.__openPersonProfile) return;
+        try{
+          var snap = await getDoc(doc(db, "people", pid));
+          if(snap.exists() && !snap.data().deleted) window.__openPersonProfile(pid);
+        }catch(e){}
       };
     });
 

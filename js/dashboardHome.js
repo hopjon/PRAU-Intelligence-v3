@@ -68,8 +68,9 @@ export async function renderDashboardHome(container, navigateTo){
   places.forEach(function(pl){ activity.push({ ts: pl.addedAt, label: "Place added: " + (pl.name || "Unnamed place"), action: function(){ window.__openPlaceProfile && window.__openPlaceProfile(pl.id); } }); });
   encounters.forEach(function(e){
     var person = peopleMap[e.personId];
-    activity.push({ ts: e.createdAt, label: "Encounter logged: " + (person ? fullName(person) : "Unknown person"),
-      action: function(){ if(person) window.__openPersonProfile && window.__openPersonProfile(person.id); } });
+    if(!person) return;
+    activity.push({ ts: e.createdAt, label: "Encounter logged: " + fullName(person),
+      action: function(){ window.__openPersonProfile && window.__openPersonProfile(person.id); } });
   });
   vehicleEncounters.forEach(function(e){
     var vehicle = vehiclesMap[e.vehicleId];

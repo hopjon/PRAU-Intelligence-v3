@@ -458,7 +458,12 @@ async function openMergeModal(currentPerson, currentId, onMerged){
 
   var snapshot = await getDocs(collection(db, "people"));
   var all = [];
-  snapshot.forEach(function(d){ if(d.id !== currentId) all.push(Object.assign({ id: d.id }, d.data())); });
+  snapshot.forEach(function(d){
+    if(d.id === currentId) return;
+    var data = d.data();
+    if(data.deleted) return;
+    all.push(Object.assign({ id: d.id }, data));
+  });
 
   document.getElementById("mergeSearch").oninput = function(){
     var q = this.value.trim().toLowerCase();
