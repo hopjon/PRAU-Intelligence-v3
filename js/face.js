@@ -149,10 +149,11 @@ export function renderFaceSearch(container){
       return;
     }
 
-    var snap = await getDocs(collection(db, "suspects"));
+    var snap = await getDocs(collection(db, "people"));
     var scored = [];
     snap.docs.forEach(function(d){
       var r = d.data(); r.id = d.id;
+      if(r.deleted) return;
       (r.photos || []).forEach(function(p){
         var desc = photoDescriptor(p);
         if(desc){
