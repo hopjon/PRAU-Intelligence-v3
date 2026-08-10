@@ -231,7 +231,6 @@ nav .menu-item.active,
 .menu-item.active .bi {
   background: rgba(212, 168, 67, 0.12) !important;
   color: var(--gold) !important;
-  border-left: none !important;
 }
 
 .menu-item:hover,
