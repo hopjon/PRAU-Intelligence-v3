@@ -256,6 +256,7 @@ async function findDuplicateByIdNumber(idNumber, excludeId){
   snapshot.forEach(function(d){
     if(d.id === excludeId) return;
     var data = d.data();
+    if(data.deleted) return;
     if(data.idNumber && data.idNumber.trim().toLowerCase() === idNumber.trim().toLowerCase()){
       match = Object.assign({ id: d.id }, data);
     }
@@ -515,7 +516,11 @@ async function renderPersonProfile(id){
     if(!allPeopleCache){
       var snap0 = await getDocs(collection(db, "people"));
       allPeopleCache = [];
-      snap0.forEach(function(d){ allPeopleCache.push(Object.assign({ id: d.id }, d.data())); });
+      snap0.forEach(function(d){
+        var data = d.data();
+        if(data.deleted) return;
+        allPeopleCache.push(Object.assign({ id: d.id }, data));
+      });
     }
     return allPeopleCache;
   }

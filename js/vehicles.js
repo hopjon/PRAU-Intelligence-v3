@@ -113,6 +113,7 @@ async function findDuplicateByRegistration(registration, excludeId){
   snapshot.forEach(function(d){
     if(d.id === excludeId) return;
     var data = d.data();
+    if(data.deleted) return;
     if(data.registration && data.registration.trim().toLowerCase() === registration.trim().toLowerCase()){
       match = Object.assign({ id: d.id }, data);
     }
