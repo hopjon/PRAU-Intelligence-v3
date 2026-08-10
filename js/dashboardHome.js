@@ -57,9 +57,12 @@ export async function renderDashboardHome(container, navigateTo){
   var vehicleEncounters = [];
   vEncSnap.forEach(function(d){ vehicleEncounters.push(Object.assign({ id: d.id }, d.data())); });
 
+  var activeEncounters = encounters.filter(function(e){ return peopleMap[e.personId]; });
+  var activeVehicleEncounters = vehicleEncounters.filter(function(e){ return vehiclesMap[e.vehicleId]; });
+
   var today = new Date().toISOString().slice(0, 10);
-  var todaysCount = encounters.filter(function(e){ return e.date === today; }).length +
-                     vehicleEncounters.filter(function(e){ return e.date === today; }).length;
+  var todaysCount = activeEncounters.filter(function(e){ return e.date === today; }).length +
+                     activeVehicleEncounters.filter(function(e){ return e.date === today; }).length;
 
   // ---- recent activity ----
   var activity = [];
@@ -83,7 +86,7 @@ export async function renderDashboardHome(container, navigateTo){
 
   // ---- hotspots (by location text across both encounter types) ----
   var locationCounts = {};
-  encounters.concat(vehicleEncounters).forEach(function(e){
+  activeEncounters.concat(activeVehicleEncounters).forEach(function(e){
     var loc = (e.location || "").trim();
     if(!loc) return;
     locationCounts[loc] = (locationCounts[loc] || 0) + 1;
