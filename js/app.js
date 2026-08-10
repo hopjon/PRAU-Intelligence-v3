@@ -2,8 +2,12 @@ import { watchAuth, login, logout } from "./auth.js";
 import { showDashboard } from "./dashboard.js";
 import { registerRoute } from "./layout/router.js";
 import { showPeople } from "./people/people.js";
+import { APP_VERSION } from "./version.js";
 
 const appEl = document.getElementById("app");
+
+var appVersionEl = document.getElementById("appVersion");
+if(appVersionEl) appVersionEl.textContent = APP_VERSION;
 
 function renderLogin(){
   appEl.innerHTML = `
@@ -23,7 +27,7 @@ function renderLogin(){
         <button class="login-btn" id="loginBtn"><i class="bi bi-lock-fill"></i> Sign In</button>
         <div class="login-error" id="loginError"></div>
       </div>
-      <div class="login-version">v3.0</div>
+      <div class="login-version">v${APP_VERSION}</div>
     </div>
   `;
 
