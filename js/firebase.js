@@ -14,8 +14,19 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
-export const db = initializeFirestore(app, {
-  experimentalAutoDetectLongPolling: true,
-  useFetchStreams: false,
-  localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
-});
+
+var db;
+try{
+  db = initializeFirestore(app, {
+    experimentalAutoDetectLongPolling: true,
+    useFetchStreams: false,
+    localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
+  });
+}catch(e){
+  console.error("Persistent Firestore cache unavailable, falling back to memory-only cache", e);
+  db = initializeFirestore(app, {
+    experimentalAutoDetectLongPolling: true,
+    useFetchStreams: false
+  });
+}
+export { db };

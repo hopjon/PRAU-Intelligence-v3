@@ -2,6 +2,7 @@ import { db, auth } from "./firebase.js";
 import {
   collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { markPending, clearPending, isPending } from "./pendingWrites.js";
 var goldPinIcon = L.divIcon({
   className: "gold-pin-icon",
   html: '<svg width="30" height="42" viewBox="0 0 30 42" xmlns="http://www.w3.org/2000/svg">' +
@@ -282,6 +283,8 @@ function openAddPlaceModal(){
     var name = document.getElementById("plName").value.trim();
     if(!name){ errEl.textContent = "Enter a name for this place."; return; }
 
+    if(isPending("places") && !confirm("A previous Add may still be syncing from before a reload. Add another anyway?")) return;
+
     this.disabled = true;
     this.textContent = "Checking…";
 
@@ -305,11 +308,14 @@ function openAddPlaceModal(){
     };
 
     this.textContent = "Saving…";
+    markPending("places");
     try{
       var ref = await addDoc(collection(db, "places"), place);
+      clearPending("places");
       backdrop.remove();
       renderPlaceProfile(ref.id);
     }catch(e){
+      clearPending("places");
       errEl.textContent = "Could not save — check your connection.";
       this.disabled = false;
       this.textContent = "Save";

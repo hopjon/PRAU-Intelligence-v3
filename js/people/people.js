@@ -4,6 +4,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { ensureModelsLoaded, computeDescriptor, euclidean, photoUrl } from "../face.js";
 import { reassignVehicleLinks } from "../vehicles.js";
+import { markPending, clearPending, isPending } from "../pendingWrites.js";
 
 ensureModelsLoaded();
 
@@ -395,6 +396,8 @@ function openAddPersonModal(){
     var profilingLocation = document.getElementById("apProfilingLocation").value.trim();
     if(!name){ errEl.textContent = "Full name is required."; return; }
 
+    if(isPending("people") && !confirm("A previous Add may still be syncing from before a reload. Add another anyway?")) return;
+
     this.disabled = true;
     this.textContent = "Checking…";
 
@@ -424,14 +427,17 @@ function openAddPersonModal(){
     };
 
     this.textContent = "Saving…";
+    markPending("people");
     try{
       var ref = await addDoc(collection(db, "people"), Object.assign({}, person, {
         previousArrests: previousArrests,
         profilingLocation: profilingLocation
       }));
+      clearPending("people");
       backdrop.remove();
       renderPersonProfile(ref.id);
     }catch(e){
+      clearPending("people");
       errEl.textContent = "Could not save — check your connection.";
       this.disabled = false;
       this.textContent = "Save";

@@ -2,6 +2,7 @@ import { db, auth } from "./firebase.js";
 import {
   collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc, query, where
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { markPending, clearPending, isPending } from "./pendingWrites.js";
 
 var MAX_ENCOUNTERS = 6;
 
@@ -298,6 +299,8 @@ function openAddVehicleModal(){
       return;
     }
 
+    if(isPending("vehicles") && !confirm("A previous Add may still be syncing from before a reload. Add another anyway?")) return;
+
     this.disabled = true;
     this.textContent = "Checking…";
 
@@ -323,11 +326,14 @@ function openAddVehicleModal(){
     };
 
     this.textContent = "Saving…";
+    markPending("vehicles");
     try{
       var ref = await addDoc(collection(db, "vehicles"), vehicle);
+      clearPending("vehicles");
       backdrop.remove();
       renderVehicleProfile(ref.id);
     }catch(e){
+      clearPending("vehicles");
       errEl.textContent = "Could not save — check your connection.";
       this.disabled = false;
       this.textContent = "Save";
