@@ -189,6 +189,9 @@ export function renderGlobalSearch(container){
   var resultsEl = document.getElementById("globalSearchResults");
   resultsEl.innerHTML = '<div class="people-empty">Loading…</div>';
 
+  cache = null;
+  loadPromise = null;
+
   var loadedData = null;
   loadSearchData().then(function(data){
     loadedData = data;
