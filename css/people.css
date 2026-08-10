@@ -173,6 +173,33 @@
 .pf-add-photo i{font-size:22px;}
 .pf-take-photo-btn{display:block;text-align:center;padding:10px;border:1px solid #3a3120;border-radius:9px;
   background:transparent;color:var(--gold);font-size:13px;font-weight:700;cursor:pointer;margin-top:8px;width:100%;}
+
+/* ===========================
+   Mobile touch-target fixes (Stage 15A)
+=========================== */
+@media(max-width:768px){
+  .people-header{
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .people-header h1{
+    min-width:0;
+    flex:1 1 auto;
+    overflow-wrap:break-word;
+  }
+  .pf-photo-chip .pf-rm{
+    width:32px;
+    height:32px;
+    font-size:12px;
+  }
+  .pf-encounter-edit,
+  .pf-encounter-remove{
+    padding:10px 14px;
+  }
+  .pf-encounter-head > div{
+    gap:14px !important;
+  }
+}
 .pf-take-photo-btn i{margin-right:6px;}
 .pf-import-label i{margin-right:6px;}
 .image-viewer{

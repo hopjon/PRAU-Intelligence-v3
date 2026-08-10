@@ -292,3 +292,14 @@ grid-template-columns:1fr;
 
 }
 }
+
+/* ===========================
+   Mobile input zoom fix (Stage 15A)
+=========================== */
+@media(max-width:768px){
+  input,
+  textarea,
+  select{
+    font-size:16px !important;
+  }
+}

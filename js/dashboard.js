@@ -50,8 +50,10 @@ function renderShell(displayName){
   app.innerHTML =
     '<div class="dashboard">' +
       getMenu() +
+      '<div class="sidebar-backdrop" id="sidebarBackdrop"></div>' +
       '<main class="content">' +
         '<div class="topbar">' +
+          '<button id="sidebarToggle" class="sidebar-toggle" type="button" aria-label="Toggle menu"><i class="bi bi-list"></i></button>' +
           '<div class="welcome-text">' +
             '<h1>' + getGreeting() + ', ' + displayName + '</h1>' +
             '<div class="date-time">' + getDateTime() + '</div>' +
@@ -64,6 +66,9 @@ function renderShell(displayName){
     '</div>';
 
   document.getElementById("logoutBtn").onclick = logout;
+  var sidebarEl = document.querySelector(".sidebar");
+  document.getElementById("sidebarToggle").onclick = function(){ sidebarEl.classList.toggle("open"); };
+  document.getElementById("sidebarBackdrop").onclick = function(){ sidebarEl.classList.remove("open"); };
   document.getElementById("navDashboard").onclick = function(){ currentView = "dashboard"; renderShell(displayName); };
   document.getElementById("navPeople").onclick = function(){ currentView = "people"; renderShell(displayName); };
   document.getElementById("navVehicles").onclick = function(){ currentView = "vehicles"; renderShell(displayName); };
