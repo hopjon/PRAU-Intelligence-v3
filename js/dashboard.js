@@ -5,6 +5,7 @@ import { showPeople } from "./people/people.js";
 import { renderVehicles } from "./vehicles.js";
 import { renderFaceSearch } from "./face.js";
 import { renderPlaces } from "./places.js";
+import { renderGlobalSearch } from "./search.js";
 import { renderDashboardHome } from "./dashboardHome.js";
 import { navigate } from "./layout/router.js";
 
@@ -25,6 +26,8 @@ function getMenu(){
           '<i class="bi bi-camera-fill"></i> Face Search</button>' +
         '<button class="menu-item' + (currentView === "places" ? " active" : "") + '" id="navPlaces">' +
           '<i class="bi bi-geo-alt-fill"></i> Places</button>' +
+        '<button class="menu-item' + (currentView === "search" ? " active" : "") + '" id="navSearch">' +
+          '<i class="bi bi-search"></i> Search</button>' +
       '</nav>' +
     '</aside>';
 }
@@ -66,6 +69,7 @@ function renderShell(displayName){
   document.getElementById("navVehicles").onclick = function(){ currentView = "vehicles"; renderShell(displayName); };
   document.getElementById("navFace").onclick = function(){ currentView = "face"; renderShell(displayName); };
   document.getElementById("navPlaces").onclick = function(){ currentView = "places"; renderShell(displayName); };
+  document.getElementById("navSearch").onclick = function(){ currentView = "search"; renderShell(displayName); };
 
   var contentArea = document.getElementById("contentArea");
   if(currentView === "people"){
@@ -76,6 +80,8 @@ function renderShell(displayName){
     renderFaceSearch(contentArea);
   } else if(currentView === "places"){
     renderPlaces(contentArea);
+  } else if(currentView === "search"){
+    renderGlobalSearch(contentArea);
   } else {
     renderDashboardHome(contentArea, function(view){ currentView = view; renderShell(displayName); });
   }
