@@ -17,15 +17,17 @@
     padding:11px 18px;
     border:none;
     border-radius:10px;
-    background:linear-gradient(135deg,var(--gold-light),var(--gold),var(--gold-dark));
-    color:#111;
+    background:linear-gradient(180deg,var(--gold-light),var(--gold),var(--gold-dark));
+    color:#000000;
     font-weight:700;
     cursor:pointer;
-    transition:all .18s ease;
-    box-shadow:0 3px 12px rgba(0,0,0,.35);
+    transition:all 0.3s ease;
+    box-shadow:0 4px 15px rgba(212,168,67,0.25), 0 0 30px rgba(212,168,67,0.1);
 }
 .btn-primary:hover{
-    transform:translateY(-2px);
+    background:linear-gradient(180deg,#FAD06D,#E0B84D,#C48430);
+    box-shadow:0 6px 25px rgba(212,168,67,0.35), 0 0 50px rgba(212,168,67,0.15);
+    transform:translateY(-1px);
     filter:brightness(1.06);
 }
 .btn-primary:active{
@@ -37,15 +39,17 @@
     justify-content:center;
     padding:11px 18px;
     border-radius:10px;
-    border:1px solid #3a3120;
-    background:#1a1a1a;
-    color:#ddd;
+    border:1px solid rgba(212,168,67,0.4);
+    background:transparent;
+    color:var(--gold);
     cursor:pointer;
-    transition:.18s;
+    transition:all 0.3s ease;
+    box-shadow:0 0 15px rgba(212,168,67,0.05);
 }
 .btn-ghost:hover{
-    background:#262626;
-    border-color:var(--gold);
+    background:rgba(212,168,67,0.1);
+    border-color:rgba(212,168,67,0.7);
+    box-shadow:0 0 25px rgba(212,168,67,0.15);
     color:#fff;
 }
 .modal-backdrop-custom{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:2000;
@@ -59,27 +63,6 @@
   color:#fff;padding:11px 14px;border-radius:9px;font-size:14px;font-family:inherit;box-sizing:border-box;}
 .modal-card textarea{min-height:70px;resize:vertical;}
 .modal-actions{display:flex;gap:10px;margin-top:20px;}
-.modal-actions .btn-primary{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:11px 18px;
-    border:none;
-    border-radius:10px;
-    background:linear-gradient(135deg,var(--gold-light),var(--gold),var(--gold-dark));
-    color:#111;
-    font-weight:700;
-    cursor:pointer;
-    transition:all .18s ease;
-    box-shadow:0 3px 12px rgba(0,0,0,.35);
-}
-.btn-primary:hover{
-    transform:translateY(-2px);
-    filter:brightness(1.06);
-}
-.btn-primary:active{
-    transform:translateY(0);
-}
 .modal-error{color:#ef5350;font-size:13px;text-align:center;margin-top:10px;min-height:16px;}
 .pf-photos-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
 .pf-photo-chip{position:relative;width:70px;height:70px;border-radius:10px;overflow:hidden;background:#161616;}
