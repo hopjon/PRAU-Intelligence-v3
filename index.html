@@ -29,11 +29,11 @@
 <body>
     <div id="app"></div>
     <div id="offlineBanner" style="display:none;position:fixed;top:0;left:0;right:0;text-align:center;font-size:12px;
-      letter-spacing:.5px;color:#0a0a0a;padding:8px 0;background:var(--gold);z-index:9999;pointer-events:none;">
+      letter-spacing:.5px;color:#0a0a0a;padding:calc(8px + env(safe-area-inset-top)) 0 8px;background:var(--gold);z-index:9999;pointer-events:none;">
       Offline — changes will sync when connection returns
     </div>
     <div id="appFooter" style="position:fixed;left:0;right:0;bottom:0;text-align:center;font-size:10px;
-      letter-spacing:1px;color:var(--gold);padding:8px 0;background:rgba(10,10,10,0.9);z-index:50;pointer-events:none;">
+      letter-spacing:1px;color:var(--gold);padding:8px 0 calc(8px + env(safe-area-inset-bottom));background:rgba(10,10,10,0.9);z-index:50;pointer-events:none;">
       PRAU Intelligence v<span id="appVersion"></span> · INTERNAL USE ONLY · © 2026 PRAU Intelligence
     </div>
 

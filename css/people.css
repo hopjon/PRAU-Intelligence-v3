@@ -246,7 +246,25 @@
   border:1px solid #3a3120;border-radius:9px;margin-top:4px;max-height:200px;overflow-y:auto;z-index:10;}
 .address-suggestion-row{padding:10px 14px;font-size:13px;cursor:pointer;border-bottom:1px solid #222;}
 .address-suggestion-row:last-child{border-bottom:none;}
-.address-suggestion-row:hover{background:#20242d;color:var(--gold);} 
+.address-suggestion-row:hover{background:#20242d;color:var(--gold);}
+
+/* ===========================
+   Mobile map/address-suggestions fixes (Stage 15B)
+   Placed after the conflicting unconditional rules above so they
+   actually win the cascade at max-width:768px.
+=========================== */
+@media(max-width:768px){
+  .map-container.overview{
+    height:160px;
+  }
+  .map-container.profile{
+    height:150px;
+  }
+  .address-suggestions-list{
+    position:static;
+    max-height:160px;
+  }
+}
 .stat-cards{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;padding:20px 0;margin-bottom:28px;}
 .stat-card{
   width:120px;
