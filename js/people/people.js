@@ -310,7 +310,7 @@ async function findDuplicateFace(descriptor, excludeId, peopleList){
 
 // ---------- add person (modal) ----------
 function openAddPersonModal(prefill, onCreated){
-  var pendingPhotos = [];
+  var pendingPhotos = (prefill && prefill.photos) ? prefill.photos.slice() : [];
 
   var backdrop = document.createElement("div");
   backdrop.className = "modal-backdrop-custom";
@@ -331,6 +331,8 @@ function openAddPersonModal(prefill, onCreated){
       '<label>Current Residence</label><input id="apResidence" placeholder="e.g. 12 Main Road, Khayelitsha">' +
       '<label>Previous Arrests</label>' +
       '<textarea id="apPreviousArrests" placeholder="e.g. Shoplifting, March 2024"></textarea>' +
+      '<label>Notes</label>' +
+      '<textarea id="apNotes" placeholder="Any other details worth recording">' + escapeHtml(prefill && prefill.notes ? prefill.notes : "") + '</textarea>' +
       '<label><i class="bi bi-geo-alt-fill"></i> Profiling Location</label>' +
       '<div style="display:flex;gap:8px;">' +
           '<input id="apProfilingLocation" style="flex:1;" placeholder="e.g. Corner of Main and Voortrekker">' +
@@ -360,6 +362,7 @@ function openAddPersonModal(prefill, onCreated){
       btn.onclick = function(){ pendingPhotos.splice(parseInt(btn.getAttribute("data-i"), 10), 1); renderApPhotos(); };
     });
   }
+  renderApPhotos();
 
   document.getElementById("apAddPhotoBtn").onclick = function(){
     document.getElementById("apPhotoFile").value = "";
@@ -431,6 +434,7 @@ function openAddPersonModal(prefill, onCreated){
       origin: document.getElementById("apOrigin").value.trim(),
       residence: document.getElementById("apResidence").value.trim(),
       previousArrests: previousArrests,
+      notes: document.getElementById("apNotes").value.trim(),
       profilingLocation: profilingLocation,
       deceased: false,
       encounters: [],
@@ -585,6 +589,7 @@ async function renderPersonProfile(id){
           field("Originally From", "pfOrigin", p.origin, editMode, null, "e.g. Gugulethu") +
           field("Current Residence", "pfResidence", p.residence, editMode, null, "e.g. 12 Main Road, Khayelitsha") +
           field("Previous Arrests", "pfPreviousArrests", p.previousArrests, editMode, "textarea", "e.g. Shoplifting, March 2024") +
+          field("Notes", "pfNotes", p.notes, editMode, "textarea", "Any other details worth recording") +
           field("📍 Profiling Location", "pfProfilingLocation", p.profilingLocation, editMode, null, "e.g. Corner of Main and Voortrekker") +
         '</div>' +
         (editMode ?
@@ -783,6 +788,7 @@ async function renderPersonProfile(id){
           origin: document.getElementById("pfOrigin").value.trim(),
           residence: document.getElementById("pfResidence").value.trim(),
           previousArrests: document.getElementById("pfPreviousArrests").value.trim(),
+          notes: document.getElementById("pfNotes").value.trim(),
           profilingLocation: document.getElementById("pfProfilingLocation").value.trim(),
           deceased: document.getElementById("pfDeceased").checked
         };

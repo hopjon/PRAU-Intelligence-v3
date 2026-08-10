@@ -55,6 +55,10 @@ function dataUrlToCanvas(dataUrl){
 function recordLabel(u){
   return u.label && u.label.trim() ? u.label.trim() : "Unlabeled";
 }
+function isPlaceholderLabel(s){
+  var norm = (s || "").trim().toLowerCase();
+  return !norm || norm === "unlabeled" || /^unknown( (male|female))?$/.test(norm);
+}
 
 // ---------- list ----------
 export async function renderUnidentifiedPeople(container, backToPeople){
@@ -233,9 +237,11 @@ async function renderUnidentifiedProfile(container, id, backToPeople){
           field("Notes", "ufNotes", u.notes, editMode, "textarea", "Any details worth recording") +
         '</div>' +
         '<div class="people-card-meta">Logged by ' + escapeHtml(u.loggedBy || "unknown") + '</div>' +
+        (u.promotedTo ? '<div class="people-card-meta">Promoted to <span class="linked-person-view" id="viewPromotedBtn" style="cursor:pointer;">Person profile</span></div>' : '') +
         (editMode ?
           '<div class="profile-actions">' +
             '<button class="btn-primary" id="saveProfileBtn">Save Changes</button>' +
+            (u.promotedTo ? '' : '<button class="btn-ghost" id="createProfileBtn">Create Profile</button>') +
             '<button class="btn-ghost" id="deleteUnidBtn" style="color:#ef5350;border-color:#ef5350;">Delete Record</button>' +
           '</div>' +
           '<div class="modal-error" id="profileError"></div>'
@@ -297,8 +303,57 @@ async function renderUnidentifiedProfile(container, id, backToPeople){
     renderPhotos();
   }
 
+  async function promoteToPerson(){
+    var errEl = document.getElementById("profileError");
+    var name = (u.label || "").trim();
+    if(isPlaceholderLabel(name)){
+      errEl.textContent = "Enter the person's real name in the Reference Label field before creating a profile.";
+      return;
+    }
+    if(!window.__openAddPersonModal){
+      errEl.textContent = "Person creation isn't available right now.";
+      return;
+    }
+
+    var normalizedName = name.toLowerCase().replace(/\s+/g, " ");
+    try{
+      var peopleSnap = await getDocs(collection(db, "people"));
+      var likelyMatch = false;
+      peopleSnap.forEach(function(d){
+        var data = d.data();
+        if(data.deleted) return;
+        var fn = ((data.name || "") + " " + (data.surname || "")).trim().toLowerCase().replace(/\s+/g, " ");
+        if(fn === normalizedName) likelyMatch = true;
+      });
+      if(likelyMatch && !confirm('A person named "' + name + '" already exists. Continue creating a new profile anyway?')) return;
+    }catch(e){ /* if the lookup itself fails, don't block promotion */ }
+
+    if(!confirm('Create a full Person profile for "' + name + '" and remove this unidentified record?')) return;
+
+    window.__openAddPersonModal({ name: name, notes: u.notes || "", photos: (u.photos || []).slice() }, async function(newPerson){
+      try{
+        await updateDoc(doc(db, "unidentifiedPeople", id), {
+          deleted: true,
+          deletedAt: new Date().toISOString(),
+          deletedBy: auth.currentUser ? auth.currentUser.email : "unknown",
+          promotedTo: newPerson.id
+        });
+        renderUnidentifiedPeople(container, backToPeople);
+      }catch(e){
+        alert('The profile for "' + name + '" was created, but this unidentified record could not be updated — you can find and remove it manually.');
+        renderUnidentifiedPeople(container, backToPeople);
+      }
+    });
+  }
+
   function wireUp(){
     document.getElementById("backToUnidList").onclick = function(){ renderUnidentifiedPeople(container, backToPeople); };
+
+    if(document.getElementById("viewPromotedBtn")){
+      document.getElementById("viewPromotedBtn").onclick = function(){
+        if(u.promotedTo && window.__openPersonProfile) window.__openPersonProfile(u.promotedTo);
+      };
+    }
 
     document.getElementById("toggleEditBtn").onclick = function(){
       editMode = !editMode;
@@ -328,6 +383,10 @@ async function renderUnidentifiedProfile(container, id, backToPeople){
           this.textContent = "Save Changes";
         }
       };
+
+      if(document.getElementById("createProfileBtn")){
+        document.getElementById("createProfileBtn").onclick = function(){ promoteToPerson(); };
+      }
 
       document.getElementById("deleteUnidBtn").onclick = async function(){
         if(!confirm('Delete "' + recordLabel(u) + '"? This can be undone by a database admin, but not from here.')) return;
