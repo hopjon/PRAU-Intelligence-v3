@@ -153,10 +153,13 @@
   align-items:center;
   gap:8px;
   width:auto;
+  box-shadow:0 0 15px rgba(212,168,67,0.1), 0 0 30px rgba(212,168,67,0.05);
+  transition:all 0.3s ease;
 }
 .logout-btn:hover{
   background:var(--gold);
   color:#1a1400;
+  box-shadow:0 0 25px rgba(212,168,67,0.2), 0 0 50px rgba(212,168,67,0.1);
 }
 .card-icon{
     font-size:2.2rem;

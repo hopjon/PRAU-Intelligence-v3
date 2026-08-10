@@ -84,40 +84,6 @@ button.btn-primary i {
   color: #000000 !important;
 }
 
-/* ========== LOGOUT BUTTON WITH GLOW ========== */
-.logout-btn,
-button.logout-btn,
-#logoutBtn,
-button#logoutBtn {
-  background: transparent !important;
-  color: var(--gold) !important;
-  border: 1px solid rgba(212, 168, 67, 0.4) !important;
-  border-radius: 10px !important;
-  padding: 10px 20px !important;
-  box-shadow: 0 0 15px rgba(212, 168, 67, 0.1), 0 0 30px rgba(212, 168, 67, 0.05) !important;
-  transition: all 0.3s ease !important;
-  font-weight: 600 !important;
-}
-
-.logout-btn:hover,
-button.logout-btn:hover,
-#logoutBtn:hover {
-  background: rgba(212, 168, 67, 0.1) !important;
-  border-color: rgba(212, 168, 67, 0.7) !important;
-  box-shadow: 0 0 25px rgba(212, 168, 67, 0.2), 0 0 50px rgba(212, 168, 67, 0.1) !important;
-  color: var(--gold-light) !important;
-}
-
-.logout-btn i,
-#logoutBtn i {
-  color: var(--gold) !important;
-}
-
-.logout-btn:hover i,
-#logoutBtn:hover i {
-  color: var(--gold-light) !important;
-}
-
 /* ========== GHOST BUTTONS ========== */
 .btn-ghost,
 button.btn-ghost {
