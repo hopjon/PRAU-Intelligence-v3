@@ -23,3 +23,18 @@ body{background:#0a0a0a;margin:0;font-family:Arial,Helvetica,sans-serif;}
 }
 .login-error{color:#ef5350;font-size:13px;text-align:center;min-height:16px;margin-top:10px;}
 .login-version{color:var(--gold-dark);font-size:12px;margin-top:24px;letter-spacing:1px;}
+
+@media(max-width:768px){
+  .login-field{border-color:transparent;outline:none;position:relative;padding-right:44px;}
+  .login-field input{outline:none;}
+  .login-field input{
+    border:1px solid transparent !important;
+    outline:none !important;
+  }
+  .login-field input:focus{
+    border-color:transparent !important;
+    outline:none !important;
+    box-shadow:none !important;
+  }
+  .login-field .login-eye{position:absolute;right:16px;top:50%;transform:translateY(-50%);margin:0;}
+}

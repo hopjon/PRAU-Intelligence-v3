@@ -19,3 +19,16 @@
   color:#888;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 .vf-import-label{display:block;text-align:center;padding:10px;border:1px solid #3a3120;border-radius:9px;
   color:var(--gold);font-size:13px;font-weight:700;cursor:pointer;margin-top:8px;}
+
+/* ===========================
+   Neutralize style.css's global !important gold input border/focus
+   for the vehicles search field (same pattern as the login fix).
+=========================== */
+.vehicles-search input{
+  border:none !important;
+}
+.vehicles-search input:focus{
+  border:none !important;
+  box-shadow:none !important;
+  outline:none !important;
+}

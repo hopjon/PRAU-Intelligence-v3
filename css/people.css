@@ -307,3 +307,36 @@
 .dash-row:hover{border-color:var(--gold);}
 .dash-row .dash-row-count{color:var(--gold);font-weight:700;flex-shrink:0;margin-left:12px;}
 .dash-row .dash-row-sub{color:#888;font-size:11px;}
+
+/* ===========================
+   Neutralize style.css's global !important gold input border/focus
+   for editable text fields (same pattern as the login fix).
+=========================== */
+.modal-card input,
+.modal-card textarea{
+  border-color:#3a3120 !important;
+}
+.modal-card input:focus,
+.modal-card textarea:focus{
+  border-color:#3a3120 !important;
+  box-shadow:none !important;
+  outline:none !important;
+}
+.profile-field input,
+.profile-field textarea{
+  border-color:#3a3120 !important;
+}
+.profile-field input:focus,
+.profile-field textarea:focus{
+  border-color:#3a3120 !important;
+  box-shadow:none !important;
+  outline:none !important;
+}
+.people-search input{
+  border:none !important;
+}
+.people-search input:focus{
+  border:none !important;
+  box-shadow:none !important;
+  outline:none !important;
+}
