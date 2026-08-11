@@ -22,25 +22,26 @@ service cloud.firestore {
     }
 
     match /sessions/{uid} {
-      allow read, write: if request.auth != null &&
-        request.auth.uid == uid;
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
     }
 
     match /teamMembers/{email} {
       allow read: if isApprovedUser();
+      allow write: if false;
     }
     match /encounters/{docId} {
-      allow read, write: if request.auth != null;
+      allow read, write: if isApprovedUser();
     }
     match /vehicleEncounters/{docId} {
-      allow read, write: if request.auth != null;
+      allow read, write: if isApprovedUser();
     }
     match /places/{docId} {
-      allow read, write: if request.auth != null;
+      allow read, write: if isApprovedUser();
     }
     match /unidentifiedPeople/{docId} {
-  allow read, write: if request.auth != null;
-}
+      allow read, write: if isApprovedUser();
+    }
 
   }
 
