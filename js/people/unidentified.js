@@ -2,7 +2,7 @@ import { db, auth } from "../firebase.js";
 import {
   collection, getDocs, addDoc, updateDoc, doc, getDoc
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { ensureModelsLoaded, computeDescriptor, photoUrl, photoDescriptor, matchThreshold, euclidean } from "../face.js";
+import { ensureModelsLoaded, computeDescriptorWhenReady, photoUrl, photoDescriptor, matchThreshold, euclidean } from "../face.js";
 
 ensureModelsLoaded();
 
@@ -165,18 +165,26 @@ function openAddUnidentifiedModal(container, backToPeople){
     if(!file) return;
     var dataUrl = await fileToCompressedDataUrl(file, 480);
     var canvas = await dataUrlToCanvas(dataUrl);
-    var descriptor = await computeDescriptor(canvas);
-    pendingPhotos.push({ dataUrl: dataUrl, descriptorV2: descriptor, takenBy: currentUserShortName(), addedAt: new Date().toISOString() });
+    var result = await computeDescriptorWhenReady(canvas);
+    if(!result.engineReady){
+      document.getElementById("auError").textContent = "Face-matching engine unavailable — this photo was saved without face data.";
+    }
+    pendingPhotos.push({ dataUrl: dataUrl, descriptorV2: result.descriptor, takenBy: currentUserShortName(), addedAt: new Date().toISOString() });
     renderAuPhotos();
   };
   document.getElementById("auImportFile").onchange = async function(){
     var files = Array.prototype.slice.call(this.files);
+    var engineWarned = false;
     for(var i = 0; i < files.length; i++){
       try{
         var dataUrl = await fileToCompressedDataUrl(files[i], 480);
         var canvas = await dataUrlToCanvas(dataUrl);
-        var descriptor = await computeDescriptor(canvas);
-        pendingPhotos.push({ dataUrl: dataUrl, descriptorV2: descriptor, takenBy: currentUserShortName(), addedAt: new Date().toISOString() });
+        var result = await computeDescriptorWhenReady(canvas);
+        if(!result.engineReady && !engineWarned){
+          document.getElementById("auError").textContent = "Face-matching engine unavailable — these photos were saved without face data.";
+          engineWarned = true;
+        }
+        pendingPhotos.push({ dataUrl: dataUrl, descriptorV2: result.descriptor, takenBy: currentUserShortName(), addedAt: new Date().toISOString() });
         renderAuPhotos();
       }catch(e){ console.error(e); }
     }
@@ -303,11 +311,15 @@ async function renderUnidentifiedProfile(container, id, backToPeople){
 
   async function addPhoto(dataUrl){
     var canvas = await dataUrlToCanvas(dataUrl);
-    var descriptor = await computeDescriptor(canvas);
-    var entry = { dataUrl: dataUrl, descriptorV2: descriptor, takenBy: currentUserShortName(), addedAt: new Date().toISOString() };
+    var result = await computeDescriptorWhenReady(canvas);
+    var entry = { dataUrl: dataUrl, descriptorV2: result.descriptor, takenBy: currentUserShortName(), addedAt: new Date().toISOString() };
     pendingPhotos.push(entry);
     await updateDoc(doc(db, "unidentifiedPeople", id), { photos: pendingPhotos });
     renderPhotos();
+    if(!result.engineReady){
+      var errEl = document.getElementById("profileError");
+      if(errEl) errEl.textContent = "Face-matching engine unavailable — this photo was saved without face data.";
+    }
   }
 
   async function findPossibleMatches(){

@@ -45,6 +45,17 @@ export async function computeDescriptor(canvasOrImg){
   }catch(e){ return null; }
 }
 
+// Waits for the face engine to finish loading before attempting descriptor extraction, so
+// captures taken before the models finish downloading don't silently end up with no face data.
+// Reports whether the engine was actually ready, so callers can tell "engine unavailable" apart
+// from "no face detected in this photo".
+export async function computeDescriptorWhenReady(canvasOrImg){
+  await ensureModelsLoaded();
+  if(!modelsReady) return { descriptor: null, engineReady: false };
+  var descriptor = await computeDescriptor(canvasOrImg);
+  return { descriptor: descriptor, engineReady: true };
+}
+
 export function euclidean(a, b){
   if(!a || !b || a.length !== b.length) return Infinity;
   var sum = 0;

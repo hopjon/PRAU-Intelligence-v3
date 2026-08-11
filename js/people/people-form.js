@@ -1,6 +1,6 @@
 import { db, auth } from "../firebase.js";
 import { collection, addDoc, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { ensureModelsLoaded, computeDescriptor, photoUrl } from "../face.js";
+import { ensureModelsLoaded, computeDescriptorWhenReady, photoUrl } from "../face.js";
 
 ensureModelsLoaded();
 
@@ -258,12 +258,14 @@ export function openPersonForm(existing, onSaved){
   // background face-analysis, runs after save so it never blocks the UI
   async function analyzePhotosInBackground(docId, photosSnapshot){
     var changed = false;
+    var engineFailed = false;
     for(var i = 0; i < photosSnapshot.length; i++){
       if(!photosSnapshot[i].descriptor){
         try{
           var canvas = await dataUrlToCanvas(photosSnapshot[i].dataUrl);
-          var descriptor = await computeDescriptor(canvas);
-          if(descriptor){ photosSnapshot[i].descriptor = descriptor; changed = true; }
+          var result = await computeDescriptorWhenReady(canvas);
+          if(!result.engineReady){ engineFailed = true; continue; }
+          if(result.descriptor){ photosSnapshot[i].descriptor = result.descriptor; changed = true; }
         }catch(e){ console.error("background face analysis failed", e); }
       }
     }
@@ -271,6 +273,7 @@ export function openPersonForm(existing, onSaved){
       try{ await updateDoc(doc(db, "suspects", docId), { photos: photosSnapshot }); }
       catch(e){ console.error("could not save background analysis", e); }
     }
+    if(engineFailed){ console.error("Face-matching engine unavailable — some photos were saved without face data."); }
   }
 
   document.getElementById("pfSave").onclick = async function(){
