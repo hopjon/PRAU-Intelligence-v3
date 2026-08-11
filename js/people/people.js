@@ -876,6 +876,9 @@ async function renderPersonProfile(id){
         try{ await deleteDoc(doc(db, "encounters", encId)); }catch(e){}
         await loadEncounters();
         document.getElementById("encounterList").innerHTML = renderEncounters();
+        var newEncounterBtn = document.getElementById("newEncounterBtn");
+        newEncounterBtn.disabled = encounters.length >= MAX_ENCOUNTERS;
+        newEncounterBtn.textContent = encounters.length >= MAX_ENCOUNTERS ? "Maximum of 6 encounters reached" : "+ New Encounter (" + encounters.length + "/" + MAX_ENCOUNTERS + ")";
         wireUp();
       };
     });
@@ -991,11 +994,15 @@ async function renderPersonProfile(id){
       this.disabled = true;
       this.textContent = "Saving…";
       try{
-        await addDoc(collection(db, "encounters"), newEnc);
-        await loadEncounters();
-        backdrop.remove();
+        var ref = await addDoc(collection(db, "encounters"), newEnc);
+        encounters.push(Object.assign({ id: ref.id }, newEnc));
+        encounters.sort(function(a, b){ return (a.date || "").localeCompare(b.date || ""); });
         document.getElementById("encounterList").innerHTML = renderEncounters();
+        var newEncounterBtn = document.getElementById("newEncounterBtn");
+        newEncounterBtn.disabled = encounters.length >= MAX_ENCOUNTERS;
+        newEncounterBtn.textContent = encounters.length >= MAX_ENCOUNTERS ? "Maximum of 6 encounters reached" : "+ New Encounter (" + encounters.length + "/" + MAX_ENCOUNTERS + ")";
         wireUp();
+        backdrop.remove();
       }catch(e){
         document.getElementById("encError").textContent = "Could not save — check your connection.";
         this.disabled = false;
@@ -1087,6 +1094,9 @@ async function renderPersonProfile(id){
         await loadEncounters();
         backdrop.remove();
         document.getElementById("encounterList").innerHTML = renderEncounters();
+        var newEncounterBtn = document.getElementById("newEncounterBtn");
+        newEncounterBtn.disabled = encounters.length >= MAX_ENCOUNTERS;
+        newEncounterBtn.textContent = encounters.length >= MAX_ENCOUNTERS ? "Maximum of 6 encounters reached" : "+ New Encounter (" + encounters.length + "/" + MAX_ENCOUNTERS + ")";
         wireUp();
       }catch(e){
         document.getElementById("encError").textContent = "Could not save — check your connection.";
