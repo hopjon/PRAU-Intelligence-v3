@@ -302,6 +302,7 @@ async function renderUnidentifiedProfile(container, id, backToPeople){
       Array.prototype.forEach.call(row.querySelectorAll(".pf-rm"), function(btn){
         btn.onclick = async function(){
           pendingPhotos.splice(parseInt(btn.getAttribute("data-i"), 10), 1);
+          u.photos = pendingPhotos;
           await updateDoc(doc(db, "unidentifiedPeople", id), { photos: pendingPhotos });
           renderPhotos();
         };
@@ -314,6 +315,7 @@ async function renderUnidentifiedProfile(container, id, backToPeople){
     var result = await computeDescriptorWhenReady(canvas);
     var entry = { dataUrl: dataUrl, descriptorV2: result.descriptor, takenBy: currentUserShortName(), addedAt: new Date().toISOString() };
     pendingPhotos.push(entry);
+    u.photos = pendingPhotos;
     await updateDoc(doc(db, "unidentifiedPeople", id), { photos: pendingPhotos });
     renderPhotos();
     if(!result.engineReady){
