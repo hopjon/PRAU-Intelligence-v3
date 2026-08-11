@@ -357,7 +357,7 @@ async function renderUnidentifiedProfile(container, id, backToPeople){
     });
 
     scored.sort(function(a, b){ return b.sim - a.sim; });
-    var top = scored.slice(0, 5);
+    var top = scored.filter(function(s){ return s.sim > 0; }).slice(0, 5);
 
     if(!top.length){
       resultsEl.innerHTML = '<div class="people-empty">No People records have matchable face data yet.</div>';
