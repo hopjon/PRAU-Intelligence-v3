@@ -17,13 +17,25 @@ export function ensureModelsLoaded(){
       const faceapi = await import("https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.15/dist/face-api.esm.js");
       window.faceapi = faceapi;
 
+      // Force WebGL and wait for it to be fully ready before touching any tensor ops,
+      // then verify it actually took hold (mobile GPUs can silently fail backend switches).
+      await faceapi.tf.setBackend("webgl");
+      await faceapi.tf.ready();
+      var activeBackend = faceapi.tf.getBackend();
+      if(activeBackend !== "webgl"){
+        await faceapi.tf.setBackend("webgl");
+        await faceapi.tf.ready();
+        activeBackend = faceapi.tf.getBackend();
+      }
+      console.log("face-api active TF backend:", activeBackend);
+
       // Load all required models: detection + landmarks + recognition descriptor
       await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL);
       await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
       await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
 
       modelsReady = true;
-      console.log("face-api models loaded successfully");
+      console.log("face-api models loaded successfully, backend:", activeBackend);
     }catch(e){ console.error("face engine failed to load", e); }
   })();
   return loadPromise;
