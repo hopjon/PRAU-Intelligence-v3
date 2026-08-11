@@ -2,7 +2,7 @@ import { db, auth } from "../firebase.js";
 import {
   collection, getDocs, addDoc, updateDoc, doc, getDoc
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { ensureModelsLoaded, computeDescriptor, photoUrl } from "../face.js";
+import { ensureModelsLoaded, computeDescriptor, photoUrl, photoDescriptor, matchThreshold, euclidean } from "../face.js";
 
 ensureModelsLoaded();
 
@@ -256,6 +256,13 @@ async function renderUnidentifiedProfile(container, id, backToPeople){
           '<input type="file" id="ufPhotoFile" accept="image/*" capture="environment" style="display:none;">' +
           '<input type="file" id="ufImportFile" accept="image/*" multiple style="display:none;">'
         : '') +
+
+        ((u.photos && u.photos.length) ?
+          '<hr>' +
+          '<h3>Possible Matches</h3>' +
+          '<button class="btn-ghost" id="findMatchesBtn" type="button"><i class="bi bi-person-bounding-box"></i> Find Possible Matches</button>' +
+          '<div id="matchResultsArea"></div>'
+        : '') +
       '</div>';
 
     wireUp();
@@ -301,6 +308,66 @@ async function renderUnidentifiedProfile(container, id, backToPeople){
     pendingPhotos.push(entry);
     await updateDoc(doc(db, "unidentifiedPeople", id), { photos: pendingPhotos });
     renderPhotos();
+  }
+
+  async function findPossibleMatches(){
+    var resultsEl = document.getElementById("matchResultsArea");
+    resultsEl.innerHTML = '<div class="people-empty">Analyzing…</div>';
+
+    var uDescriptors = (u.photos || []).map(photoDescriptor).filter(Boolean);
+    if(!uDescriptors.length){
+      resultsEl.innerHTML = '<div class="people-empty">This record\'s photo(s) have no matchable face data yet.</div>';
+      return;
+    }
+
+    var peopleSnap = await getDocs(collection(db, "people"));
+    var scored = [];
+    peopleSnap.forEach(function(d){
+      var data = d.data();
+      if(data.deleted) return;
+      var person = Object.assign({ id: d.id }, data);
+      var best = null;
+      (person.photos || []).forEach(function(ph){
+        var desc = photoDescriptor(ph);
+        if(!desc) return;
+        var threshold = matchThreshold(ph);
+        uDescriptors.forEach(function(uDesc){
+          var dist = euclidean(uDesc, desc);
+          var sim = 1 - dist / threshold; // normalized similarity, comparable across descriptor versions with differing thresholds
+          if(!best || sim > best.sim){
+            best = { dist: dist, threshold: threshold, sim: sim, photoUrl: photoUrl(ph) };
+          }
+        });
+      });
+      if(best) scored.push({ person: person, dist: best.dist, threshold: best.threshold, sim: best.sim, photoUrl: best.photoUrl });
+    });
+
+    scored.sort(function(a, b){ return b.sim - a.sim; });
+    var top = scored.slice(0, 5);
+
+    if(!top.length){
+      resultsEl.innerHTML = '<div class="people-empty">No People records have matchable face data yet.</div>';
+      return;
+    }
+
+    resultsEl.innerHTML = top.map(function(t, i){
+      var pct = Math.max(0, Math.round(t.sim * 100));
+      var label = t.dist < t.threshold ? "Likely match" : "Possible match";
+      var fullName = ((t.person.name || "") + " " + (t.person.surname || "")).trim() || "Unnamed Person";
+      return '<div class="people-row" data-mi="' + i + '">' +
+        '<img class="people-row-thumb" src="' + t.photoUrl + '">' +
+        '<div><div class="people-row-name">' + escapeHtml(fullName) + '</div>' +
+        '<div class="people-row-meta">' + label + ' · ' + pct + '% similarity</div></div>' +
+        '<button class="btn-ghost" data-open-i="' + i + '" type="button">Open Profile</button>' +
+      '</div>';
+    }).join("");
+
+    Array.prototype.forEach.call(resultsEl.querySelectorAll("[data-open-i]"), function(btn){
+      btn.onclick = function(){
+        var t = top[parseInt(btn.getAttribute("data-open-i"), 10)];
+        if(t && window.__openPersonProfile) window.__openPersonProfile(t.person.id);
+      };
+    });
   }
 
   async function promoteToPerson(){
@@ -353,6 +420,10 @@ async function renderUnidentifiedProfile(container, id, backToPeople){
       document.getElementById("viewPromotedBtn").onclick = function(){
         if(u.promotedTo && window.__openPersonProfile) window.__openPersonProfile(u.promotedTo);
       };
+    }
+
+    if(document.getElementById("findMatchesBtn")){
+      document.getElementById("findMatchesBtn").onclick = function(){ findPossibleMatches(); };
     }
 
     document.getElementById("toggleEditBtn").onclick = function(){
