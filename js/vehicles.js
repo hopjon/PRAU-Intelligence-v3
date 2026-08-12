@@ -3,6 +3,8 @@ import {
   collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc, query, where
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { markPending, clearPending, isPending } from "./pendingWrites.js";
+import { profilingLocationViewHTML, profilingLocationEditHTML, wireProfilingLocationView, wireProfilingLocationEditor, profilingLocationPatch } from "./profilingLocation.js";
+import { getDisplayName } from "./userDisplay.js";
 
 var MAX_ENCOUNTERS = 6;
 
@@ -242,6 +244,7 @@ function openAddVehicleModal(){
       '<label>Make and Model</label><input id="avMake" placeholder="e.g. VW Citi Golf">' +
       '<label>Year</label><input id="avYear" placeholder="e.g. 2015">' +
       '<label>Colour</label><input id="avColour" placeholder="e.g. White">' +
+      profilingLocationEditHTML("avPl", null) +
       '<div id="avLinkedWidget"></div>' +
       '<div class="modal-actions">' +
         '<button class="btn-ghost" id="avCancel">Cancel</button>' +
@@ -278,7 +281,7 @@ function openAddVehicleModal(){
     var file = this.files[0];
     if(!file) return;
     var dataUrl = await fileToCompressedDataUrl(file, 480);
-    pendingPhotos.push({ dataUrl: dataUrl, takenBy: currentUserShortName(), addedAt: new Date().toISOString() });
+    pendingPhotos.push({ dataUrl: dataUrl, takenBy: (auth.currentUser && auth.currentUser.email) || "", addedAt: new Date().toISOString() });
     renderAvPhotos();
   };
   document.getElementById("avImportFile").onchange = async function(){
@@ -286,11 +289,13 @@ function openAddVehicleModal(){
     for(var i = 0; i < files.length; i++){
       try{
         var dataUrl = await fileToCompressedDataUrl(files[i], 480);
-        pendingPhotos.push({ dataUrl: dataUrl, takenBy: currentUserShortName(), addedAt: new Date().toISOString() });
+        pendingPhotos.push({ dataUrl: dataUrl, takenBy: (auth.currentUser && auth.currentUser.email) || "", addedAt: new Date().toISOString() });
         renderAvPhotos();
       }catch(e){ console.error(e); }
     }
   };
+
+  var avPlEditor = wireProfilingLocationEditor("avPl", null);
 
   document.getElementById("avSave").onclick = async function(){
     var errEl = document.getElementById("avError");
@@ -315,7 +320,7 @@ function openAddVehicleModal(){
       return;
     }
 
-    var vehicle = {
+    var vehicle = Object.assign({
       registration: registration,
       make: make,
       model: model,
@@ -327,7 +332,7 @@ function openAddVehicleModal(){
       photos: pendingPhotos,
       addedAt: new Date().toISOString(),
       addedBy: auth.currentUser ? auth.currentUser.email : "unknown"
-    };
+    }, profilingLocationPatch(avPlEditor.getState()));
 
     this.textContent = "Saving…";
     markPending("vehicles");
@@ -360,6 +365,7 @@ async function renderVehicleProfile(id){
   var v = Object.assign({ id: id }, snap.data());
   var editMode = false;
   var pendingPhotos = v.photos ? v.photos.slice() : [];
+  var vfPlEditor = null;
   var encounters = [];
   var editLinkedPeople = (v.linkedPeople !== undefined) ? v.linkedPeople.slice() : (v.ownerId ? [{ id: v.ownerId, name: v.ownerName }] : []);
   var editUnprofiledPeople = (v.unprofiledPeople || []).slice();
@@ -431,12 +437,8 @@ async function renderVehicleProfile(id){
           field("Colour", "vfColour", v.colour, editMode, null, "e.g. White") +
           field("Distinct Markings", "vfMarkings", v.markings, editMode, "textarea", "e.g. Missing front headlight") +
         '</div>' +
-        '<label>Location spotted</label>' +
-        '<div style="display:flex;gap:8px;">' +
-          '<input id="vfLocationSpotted" style="flex:1;" value="' + escapeHtml(v.locationSpotted || "") + '"' + (editMode ? '' : ' readonly') + ' placeholder="Where this vehicle was seen">' +
-          (editMode ? '<button class="btn-ghost" id="vfLocationGpsBtn" type="button" style="flex-shrink:0;padding:11px 14px;">📍</button>' : '') +
-        '</div>' +
-        (editMode ? '<div class="modal-error" id="vfLocationGpsStatus" style="text-align:left;color:#888;"></div>' : '') +
+        (editMode ? profilingLocationEditHTML("vfPl", v) : profilingLocationViewHTML("vfPl", v)) +
+        '<div class="people-card-meta">Added by ' + escapeHtml(getDisplayName(v.addedBy)) + '</div>' +
         '<div id="linkedPeopleDisplay">' + linkedPeopleDisplayHtml() + '</div>' +
         '<div id="unprofiledPeopleDisplay" style="margin-top:14px;">' + unprofiledPeopleDisplayHtml() + '</div>' +
         (editMode ?
@@ -505,7 +507,7 @@ async function renderVehicleProfile(id){
       var takenBy = (typeof ph === "object" && ph.takenBy) ? ph.takenBy : "";
       html += '<div><div class="pf-photo-chip"><img class="vehicle-profile-photo" src="' + ph.dataUrl + '" style="cursor:pointer;" data-photo-i="' + i + '">' +
         (editMode ? '<button class="pf-rm" data-i="' + i + '" type="button">✕</button>' : '') +
-        '</div>' + (takenBy ? '<div class="pf-photo-caption">' + escapeHtml(takenBy) + '</div>' : '') + '</div>';
+        '</div>' + (takenBy ? '<div class="pf-photo-caption">' + escapeHtml(getDisplayName(takenBy)) + '</div>' : '') + '</div>';
     });
     row.innerHTML = html;
     if(editMode && addBtn){
@@ -521,7 +523,7 @@ async function renderVehicleProfile(id){
   }
 
   async function addPhoto(dataUrl){
-    var entry = { dataUrl: dataUrl, takenBy: currentUserShortName(), addedAt: new Date().toISOString() };
+    var entry = { dataUrl: dataUrl, takenBy: (auth.currentUser && auth.currentUser.email) || "", addedAt: new Date().toISOString() };
     pendingPhotos.push(entry);
     await updateDoc(doc(db, "vehicles", id), { photos: pendingPhotos });
     renderPhotos();
@@ -622,24 +624,17 @@ async function renderVehicleProfile(id){
     wireLinkedPersonViews();
 
     if(editMode){
+      vfPlEditor = wireProfilingLocationEditor("vfPl", v);
+    }else{
+      vfPlEditor = null;
+      wireProfilingLocationView("vfPl", v);
+    }
+
+    if(editMode){
       linkedPeopleWidget(document.getElementById("vfLinkedWidget"), editLinkedPeople, function(list){
         editLinkedPeople = list;
       });
       renderUnprofiledEditor();
-      if(document.getElementById("vfLocationGpsBtn")){
-        document.getElementById("vfLocationGpsBtn").onclick = function(){
-          var statusEl = document.getElementById("vfLocationGpsStatus");
-          var input = document.getElementById("vfLocationSpotted");
-          if(!navigator.geolocation){ statusEl.textContent = "Location isn't available — enter it manually."; return; }
-          statusEl.textContent = "Getting current location…";
-          navigator.geolocation.getCurrentPosition(function(pos){
-            input.value = "Lat " + pos.coords.latitude.toFixed(5) + ", Lon " + pos.coords.longitude.toFixed(5);
-            statusEl.textContent = "Location found.";
-          }, function(){
-            statusEl.textContent = "Could not determine location — enter it manually.";
-          }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
-        };
-      }
 
       document.getElementById("saveProfileBtn").onclick = async function(){
         var errEl = document.getElementById("profileError");
@@ -655,17 +650,16 @@ async function renderVehicleProfile(id){
           return;
         }
 
-        var updates = {
+        var updates = Object.assign({
           registration: registration,
           make: document.getElementById("vfMake").value.trim(),
           model: "",
           year: document.getElementById("vfYear").value.trim(),
           colour: document.getElementById("vfColour").value.trim(),
           markings: document.getElementById("vfMarkings").value.trim(),
-          locationSpotted: document.getElementById("vfLocationSpotted").value.trim(),
           linkedPeople: editLinkedPeople,
           unprofiledPeople: editUnprofiledPeople
-        };
+        }, profilingLocationPatch(vfPlEditor && vfPlEditor.getState()));
         try{
           await updateDoc(doc(db, "vehicles", id), updates);
           Object.assign(v, updates);

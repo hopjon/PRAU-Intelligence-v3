@@ -63,7 +63,7 @@ export function profilingLocationViewHTML(idPrefix, loc){
     '<h3><i class="bi bi-geo-alt-fill"></i> Profiling Location</h3>' +
     '<div class="map-container profile" id="' + idPrefix + 'ViewMap"></div>' +
     (lines.length ? '<div class="people-card-meta">' + lines.join("<br>") + '</div>' : '') +
-    '<div style="font-size:10px;color:#666;margin-top:4px;">Map data ' + OSM_ATTRIBUTION + '</div>'
+    '<div style="font-size:10px;color:var(--text-gray-dark);margin-top:4px;">Map data ' + OSM_ATTRIBUTION + '</div>'
   );
 }
 
@@ -99,7 +99,7 @@ export function profilingLocationEditHTML(idPrefix, loc){
       '<div class="profile-field"><label>Road</label><input type="text" id="' + idPrefix + 'Road" value="' + escapeHtml(loc && loc.profilingRoad || "") + '" readonly></div>' +
       '<div class="profile-field"><label>Suburb</label><input type="text" id="' + idPrefix + 'Suburb" value="' + escapeHtml(loc && loc.profilingSuburb || "") + '" readonly></div>' +
     '</div>' +
-    '<div style="font-size:10px;color:#666;margin:-6px 0 12px;">Map data ' + OSM_ATTRIBUTION + '</div>'
+    '<div style="font-size:10px;color:var(--text-gray-dark);margin:-6px 0 12px;">Map data ' + OSM_ATTRIBUTION + '</div>'
   );
 }
 

@@ -14,9 +14,6 @@ function escapeHtml(s){
     return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
   });
 }
-function currentUserShortName(){
-  return (auth.currentUser && auth.currentUser.email) ? auth.currentUser.email.split("@")[0] : "unknown";
-}
 function isDocTooLargeError(e){
   return e && e.code === "invalid-argument" && /longer than \d+ bytes/i.test(e.message || "");
 }
@@ -201,7 +198,7 @@ function openAddUnidentifiedModal(container, backToPeople){
       label: document.getElementById("auLabel").value.trim(),
       notes: document.getElementById("auNotes").value.trim(),
       photos: pendingPhotos,
-      loggedBy: currentUserShortName(),
+      loggedBy: (auth.currentUser && auth.currentUser.email) || "unknown",
       dateProfiled: new Date().toISOString().slice(0, 10),
       addedAt: new Date().toISOString(),
       deleted: false
@@ -250,7 +247,7 @@ async function renderUnidentifiedProfile(container, id, backToPeople){
           field("Date Profiled", "ufDateProfiled", u.dateProfiled || "Not recorded", false) +
         '</div>' +
         (editMode ? profilingLocationEditHTML("ufPl", u) : profilingLocationViewHTML("ufPl", u)) +
-        '<div class="people-card-meta">Logged by ' + escapeHtml(u.loggedBy || "unknown") + '</div>' +
+        '<div class="people-card-meta">Logged by ' + escapeHtml(getDisplayName(u.loggedBy)) + '</div>' +
         (u.promotedTo ? '<div class="people-card-meta">Promoted to <span class="linked-person-view" id="viewPromotedBtn" style="cursor:pointer;">Person profile</span></div>' : '') +
         (editMode ?
           '<div class="profile-actions">' +
@@ -417,7 +414,17 @@ async function renderUnidentifiedProfile(container, id, backToPeople){
 
     if(!confirm('Create a full Person profile for "' + name + '" and remove this unidentified record?')) return;
 
-    window.__openAddPersonModal({ name: name, notes: u.notes || "", photos: (u.photos || []).slice() }, async function(newPerson){
+    var promotionPrefill = { name: name, notes: u.notes || "", photos: (u.photos || []).slice() };
+    if(typeof u.profilingLatitude === "number" && typeof u.profilingLongitude === "number"){
+      promotionPrefill.profilingLatitude = u.profilingLatitude;
+      promotionPrefill.profilingLongitude = u.profilingLongitude;
+      promotionPrefill.profilingAddress = u.profilingAddress || "";
+      promotionPrefill.profilingRoad = u.profilingRoad || "";
+      promotionPrefill.profilingSuburb = u.profilingSuburb || "";
+    }
+    if(u.dateProfiled) promotionPrefill.dateProfiled = u.dateProfiled;
+
+    window.__openAddPersonModal(promotionPrefill, async function(newPerson){
       try{
         await updateDoc(doc(db, "unidentifiedPeople", id), {
           deleted: true,

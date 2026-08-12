@@ -14,8 +14,8 @@
 
   /* === TEXT COLORS === */
   --text:           #ffffff;   /* Main text (was var(--text)) */
-  --text-secondary: #888888;   /* Subtitles, meta (was var(--text-secondary)) */
-  --text-gray-dark: #666666;   /* Captions, placeholders */
+  --text-secondary: #9c9c9c;   /* Subtitles, meta (was var(--text-secondary)) */
+  --text-gray-dark: #8a8a8a;   /* Captions, placeholders */
   --text-gray-light:#aaaaaa;   /* Labels, hints */
   --text-black:     #000000;   /* Text on gold buttons */
   --text-red:       #ef5350;   /* Errors, warnings, deceased */

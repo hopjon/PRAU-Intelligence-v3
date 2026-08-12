@@ -23,9 +23,6 @@ function escapeHtml(s){
 function fullName(p){
   return ((p.name||"") + " " + (p.surname||"")).trim() || "Unnamed Person";
 }
-function currentUserShortName(){
-  return (auth.currentUser && auth.currentUser.email) ? auth.currentUser.email.split("@")[0] : "unknown";
-}
 function isDocTooLargeError(e){
   return e && e.code === "invalid-argument" && /longer than \d+ bytes/i.test(e.message || "");
 }
@@ -313,6 +310,15 @@ async function findDuplicateFace(descriptor, excludeId, peopleList){
 // ---------- add person (modal) ----------
 function openAddPersonModal(prefill, onCreated){
   var pendingPhotos = (prefill && prefill.photos) ? prefill.photos.slice() : [];
+  var prefillLoc = (prefill && typeof prefill.profilingLatitude === "number" && typeof prefill.profilingLongitude === "number")
+    ? {
+        profilingLatitude: prefill.profilingLatitude,
+        profilingLongitude: prefill.profilingLongitude,
+        profilingAddress: prefill.profilingAddress || "",
+        profilingRoad: prefill.profilingRoad || "",
+        profilingSuburb: prefill.profilingSuburb || ""
+      }
+    : null;
 
   var backdrop = document.createElement("div");
   backdrop.className = "modal-backdrop-custom";
@@ -334,7 +340,7 @@ function openAddPersonModal(prefill, onCreated){
       '<textarea id="apPreviousArrests" placeholder="e.g. Shoplifting, March 2024"></textarea>' +
       '<label>Notes</label>' +
       '<textarea id="apNotes" placeholder="Any other details worth recording">' + escapeHtml(prefill && prefill.notes ? prefill.notes : "") + '</textarea>' +
-      profilingLocationEditHTML("apPl", null) +
+      profilingLocationEditHTML("apPl", prefillLoc) +
       '<div class="modal-actions">' +
         '<button class="btn-ghost" id="apCancel">Cancel</button>' +
         '<button class="btn-primary" id="apSave">Save</button>' +
@@ -396,7 +402,7 @@ function openAddPersonModal(prefill, onCreated){
     }
   };
 
-  var apPlEditor = wireProfilingLocationEditor("apPl", null);
+  var apPlEditor = wireProfilingLocationEditor("apPl", prefillLoc);
 
   document.getElementById("apSave").onclick = async function(){
     var errEl = document.getElementById("apError");
@@ -432,7 +438,7 @@ function openAddPersonModal(prefill, onCreated){
       deceased: false,
       encounters: [],
       photos: pendingPhotos,
-      dateProfiled: new Date().toISOString().slice(0, 10),
+      dateProfiled: (prefill && prefill.dateProfiled) ? prefill.dateProfiled : new Date().toISOString().slice(0, 10),
       addedAt: new Date().toISOString(),
       addedBy: auth.currentUser ? auth.currentUser.email : "unknown"
     }, profilingLocationPatch(apPlEditor.getState()));
@@ -584,6 +590,7 @@ async function renderPersonProfile(id){
           field("Date Profiled", "pfDateProfiled", p.dateProfiled || "Not recorded", false) +
         '</div>' +
         (editMode ? profilingLocationEditHTML("pfPl", p) : profilingLocationViewHTML("pfPl", p)) +
+        '<div class="people-card-meta">Added by ' + escapeHtml(getDisplayName(p.addedBy)) + '</div>' +
         (editMode ?
           '<div class="deceased-checkbox-row">' +
             '<input type="checkbox" id="pfDeceased"' + (p.deceased ? ' checked' : '') + '>' +
@@ -655,7 +662,7 @@ async function renderPersonProfile(id){
           itemsPhotos.map(function(ph, pi){ return '<div class="pf-photo-chip"><img class="pf-photo-view enc-photo-view" data-enc-i="' + i + '" data-photo-i="' + pi + '" src="' + photoUrl(ph) + '" style="cursor:pointer;"></div>'; }).join("") +
         '</div>' : '') +
         (enc.notes ? '<div class="people-card-meta">' + escapeHtml(enc.notes) + '</div>' : '') +
-        (enc.loggedBy ? '<div class="people-card-meta" style="opacity:0.6;">Logged by ' + escapeHtml(enc.loggedBy) + '</div>' : '') +
+        (enc.loggedBy ? '<div class="people-card-meta" style="opacity:0.6;">Logged by ' + escapeHtml(getDisplayName(enc.loggedBy)) + '</div>' : '') +
       '</div>';
     }).join("");
   }
@@ -977,7 +984,7 @@ async function renderPersonProfile(id){
         itemsFound: document.getElementById("encItems").value.trim(),
         itemsPhotos: itemsPhotos,
         notes: document.getElementById("encNotes").value.trim(),
-        loggedBy: currentUserShortName(),
+        loggedBy: (auth.currentUser && auth.currentUser.email) || "unknown",
         createdAt: new Date().toISOString()
       };
       this.disabled = true;

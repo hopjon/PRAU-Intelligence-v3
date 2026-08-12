@@ -52,6 +52,11 @@ h3 [class*="bi-"] {
   color: var(--gold) !important;
 }
 
+/* Profile section headings (Photos, Profiling Location, Encounters, Possible Matches) */
+.modal-card h3 {
+  color: var(--text);
+}
+
 /* People header */
 .people-header h1,
 .people-header h1 i,
