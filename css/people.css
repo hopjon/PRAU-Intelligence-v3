@@ -179,13 +179,24 @@
 =========================== */
 @media(max-width:768px){
   .people-header{
-    flex-wrap:wrap;
+    width:100%;
+    flex-direction:column;
+    align-items:center;
     gap:10px;
   }
   .people-header h1{
-    min-width:0;
-    flex:1 1 auto;
+    width:100%;
+    max-width:100%;
     overflow-wrap:break-word;
+    text-align:center;
+  }
+  .people-header > div{
+    width:100%;
+    display:flex;
+    justify-content:center;
+  }
+  #unidentifiedPeopleBtn{
+    gap:10px !important;
   }
   .pf-photo-chip .pf-rm{
     width:32px;

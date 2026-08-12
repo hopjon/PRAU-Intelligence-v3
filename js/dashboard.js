@@ -34,7 +34,9 @@ function getMenu(){
 
 function getDateTime(){
   var now = new Date();
-  return now.toLocaleString("en-ZA", { weekday: "long", day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" });
+  var datePart = now.toLocaleString("en-ZA", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  var timePart = now.toLocaleString("en-ZA", { hour: "2-digit", minute: "2-digit" });
+  return datePart + ' <span class="date-time-at">at ' + timePart + '</span>';
 }
 
 function getGreeting(){

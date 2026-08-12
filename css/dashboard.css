@@ -257,4 +257,15 @@
         padding:14px;
         padding-bottom:calc(40px + env(safe-area-inset-bottom));
     }
+    .topbar{
+        display:grid;
+        grid-template-columns:1fr auto 1fr;
+        align-items:center;
+    }
+    .welcome-text{
+        text-align:center;
+    }
+    .date-time-at{
+        display:block;
+    }
 }
