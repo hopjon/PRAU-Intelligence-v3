@@ -6,6 +6,8 @@ import { ensureModelsLoaded, computeDescriptorWhenReady, euclidean, photoUrl } f
 import { reassignVehicleLinks } from "../vehicles.js";
 import { renderUnidentifiedPeople } from "./unidentified.js";
 import { markPending, clearPending, isPending } from "../pendingWrites.js";
+import { getDisplayName } from "../userDisplay.js";
+import { profilingLocationViewHTML, profilingLocationEditHTML, wireProfilingLocationView, wireProfilingLocationEditor, profilingLocationPatch } from "../profilingLocation.js";
 
 ensureModelsLoaded();
 
@@ -323,7 +325,6 @@ function openAddPersonModal(prefill, onCreated){
       '<input type="file" id="apPhotoFile" accept="image/*" capture="environment" style="display:none;">' +
       '<input type="file" id="apImportFile" accept="image/*" multiple style="display:none;">' +
       '<label>Name and Surname</label><input id="apName" placeholder="e.g. John Doe" value="' + escapeHtml(prefill && prefill.name ? prefill.name : "") + '">' +
-      '<label>Phone Number</label><input id="apPhone" placeholder="e.g. 082 123 4567" value="' + escapeHtml(prefill && prefill.phone ? prefill.phone : "") + '">' +
       '<label>ID Number</label><input id="apIdNumber" placeholder="e.g. 9001015800086">' +
       '<label>Date of Birth</label><input type="text" id="apDob" placeholder="DD/MM/YYYY">' +
       '<label>Known Alias</label><input id="apAliases" placeholder="e.g. Skhokho">' +
@@ -333,12 +334,7 @@ function openAddPersonModal(prefill, onCreated){
       '<textarea id="apPreviousArrests" placeholder="e.g. Shoplifting, March 2024"></textarea>' +
       '<label>Notes</label>' +
       '<textarea id="apNotes" placeholder="Any other details worth recording">' + escapeHtml(prefill && prefill.notes ? prefill.notes : "") + '</textarea>' +
-      '<label><i class="bi bi-geo-alt-fill"></i> Profiling Location</label>' +
-      '<div style="display:flex;gap:8px;">' +
-          '<input id="apProfilingLocation" style="flex:1;" placeholder="e.g. Corner of Main and Voortrekker">' +
-          '<button class="btn-ghost" id="apGpsBtn" type="button">📍</button>' +
-      '</div>' +
-      '<div class="modal-error" id="apGpsStatus" style="text-align:left;color:#888;"></div>' +
+      profilingLocationEditHTML("apPl", null) +
       '<div class="modal-actions">' +
         '<button class="btn-ghost" id="apCancel">Cancel</button>' +
         '<button class="btn-primary" id="apSave">Save</button>' +
@@ -378,7 +374,7 @@ function openAddPersonModal(prefill, onCreated){
       document.getElementById("apError").textContent = "Face-matching engine unavailable — this photo was saved without face data.";
     }
     // PATH B: Save new face-api descriptor to descriptorV2, keep old descriptor field empty
-    pendingPhotos.push({ dataUrl: dataUrl, descriptorV2: result.descriptor, takenBy: currentUserShortName(), addedAt: new Date().toISOString() });
+    pendingPhotos.push({ dataUrl: dataUrl, descriptorV2: result.descriptor, takenBy: (auth.currentUser && auth.currentUser.email) || "", addedAt: new Date().toISOString() });
     renderApPhotos();
   };
   document.getElementById("apImportFile").onchange = async function(){
@@ -394,21 +390,13 @@ function openAddPersonModal(prefill, onCreated){
           engineWarned = true;
         }
         // PATH B: Save new face-api descriptor to descriptorV2
-        pendingPhotos.push({ dataUrl: dataUrl, descriptorV2: result.descriptor, takenBy: currentUserShortName(), addedAt: new Date().toISOString() });
+        pendingPhotos.push({ dataUrl: dataUrl, descriptorV2: result.descriptor, takenBy: (auth.currentUser && auth.currentUser.email) || "", addedAt: new Date().toISOString() });
         renderApPhotos();
       }catch(e){ console.error(e); }
     }
   };
 
-  document.getElementById("apGpsBtn").onclick = function(){
-    var status = document.getElementById("apGpsStatus");
-    getBestLocation(status, function(pos){
-      var lat = pos.coords.latitude.toFixed(6);
-      var lng = pos.coords.longitude.toFixed(6);
-      document.getElementById("apProfilingLocation").value = lat + ", " + lng;
-      status.textContent = "Location captured (accuracy ±" + Math.round(pos.coords.accuracy) + "m).";
-    });
-  };
+  var apPlEditor = wireProfilingLocationEditor("apPl", null);
 
   document.getElementById("apSave").onclick = async function(){
     var errEl = document.getElementById("apError");
@@ -416,7 +404,6 @@ function openAddPersonModal(prefill, onCreated){
     var surname = "";
     var idNumber = document.getElementById("apIdNumber").value.trim();
     var previousArrests = document.getElementById("apPreviousArrests").value.trim();
-    var profilingLocation = document.getElementById("apProfilingLocation").value.trim();
     if(!name){ errEl.textContent = "Full name is required."; return; }
 
     if(isPending("people") && !confirm("A previous Add may still be syncing from before a reload. Add another anyway?")) return;
@@ -432,10 +419,9 @@ function openAddPersonModal(prefill, onCreated){
       return;
     }
 
-    var person = {
+    var person = Object.assign({
       name: name,
       surname: surname,
-      phone: document.getElementById("apPhone").value.trim(),
       idNumber: idNumber,
       dob: document.getElementById("apDob").value,
       aliases: document.getElementById("apAliases").value.trim(),
@@ -443,25 +429,22 @@ function openAddPersonModal(prefill, onCreated){
       residence: document.getElementById("apResidence").value.trim(),
       previousArrests: previousArrests,
       notes: document.getElementById("apNotes").value.trim(),
-      profilingLocation: profilingLocation,
       deceased: false,
       encounters: [],
       photos: pendingPhotos,
+      dateProfiled: new Date().toISOString().slice(0, 10),
       addedAt: new Date().toISOString(),
       addedBy: auth.currentUser ? auth.currentUser.email : "unknown"
-    };
+    }, profilingLocationPatch(apPlEditor.getState()));
 
     this.textContent = "Saving…";
     markPending("people");
     try{
-      var ref = await addDoc(collection(db, "people"), Object.assign({}, person, {
-        previousArrests: previousArrests,
-        profilingLocation: profilingLocation
-      }));
+      var ref = await addDoc(collection(db, "people"), person);
       clearPending("people");
       backdrop.remove();
       if(onCreated){
-        onCreated({ id: ref.id, name: fullName(person), phone: person.phone });
+        onCreated({ id: ref.id, name: fullName(person) });
       }else{
         renderPersonProfile(ref.id);
       }
@@ -555,6 +538,7 @@ async function renderPersonProfile(id){
   var p = Object.assign({ id: id }, snap.data());
   var editMode = false;
   var pendingPhotos = p.photos ? p.photos.slice() : [];
+  var pfPlEditor = null;
   var encounters = [];
   var allPeopleCache = null;
   async function getAllPeopleCached(){
@@ -590,7 +574,6 @@ async function renderPersonProfile(id){
           '<div class="profile-field" style="grid-column:1 / -1;">' +
             '<label>Name and Surname</label><input type="text" id="pfName" value="' + escapeHtml(fullName(p)) + '"' + (editMode ? '' : ' readonly') + ' placeholder="e.g. John Doe">' +
           '</div>' +
-          field("Phone Number", "pfPhone", p.phone, editMode, null, "e.g. 082 123 4567") +
           field("ID Number", "pfIdNumber", p.idNumber, editMode, null, "e.g. 9001015800086") +
           field("Date of Birth", "pfDob", p.dob, editMode, "text", "DD/MM/YYYY") +
           field("Known Alias", "pfAliases", p.aliases, editMode, null, "e.g. Skhokho") +
@@ -598,8 +581,9 @@ async function renderPersonProfile(id){
           field("Current Residence", "pfResidence", p.residence, editMode, null, "e.g. 12 Main Road, Khayelitsha") +
           field("Previous Arrests", "pfPreviousArrests", p.previousArrests, editMode, "textarea", "e.g. Shoplifting, March 2024") +
           field("Notes", "pfNotes", p.notes, editMode, "textarea", "Any other details worth recording") +
-          field("📍 Profiling Location", "pfProfilingLocation", p.profilingLocation, editMode, null, "e.g. Corner of Main and Voortrekker") +
+          field("Date Profiled", "pfDateProfiled", p.dateProfiled || "Not recorded", false) +
         '</div>' +
+        (editMode ? profilingLocationEditHTML("pfPl", p) : profilingLocationViewHTML("pfPl", p)) +
         (editMode ?
           '<div class="deceased-checkbox-row">' +
             '<input type="checkbox" id="pfDeceased"' + (p.deceased ? ' checked' : '') + '>' +
@@ -687,7 +671,7 @@ async function renderPersonProfile(id){
             '<img class="pf-photo-view" data-photo-i="' + i + '" src="' + photoUrl(ph) + '">' +
         (editMode ? '<button class="pf-rm" data-i="' + i + '" type="button">✕</button>' : '') +
         '</div>' +
-        (takenBy ? '<div class="pf-photo-caption">' + escapeHtml(takenBy) + '</div>' : '') +
+        (takenBy ? '<div class="pf-photo-caption">' + escapeHtml(getDisplayName(takenBy)) + '</div>' : '') +
         '</div>';
     });
 
@@ -714,7 +698,7 @@ async function renderPersonProfile(id){
 
   async function addPhoto(dataUrl){
     // PATH B: Save new face-api descriptor to descriptorV2, leave old descriptor empty
-    var entry = { dataUrl: dataUrl, descriptorV2: null, takenBy: currentUserShortName(), addedAt: new Date().toISOString() };
+    var entry = { dataUrl: dataUrl, descriptorV2: null, takenBy: (auth.currentUser && auth.currentUser.email) || "", addedAt: new Date().toISOString() };
     pendingPhotos.push(entry);
     await updateDoc(doc(db, "people", id), { photos: pendingPhotos });
     renderPhotos();
@@ -777,6 +761,13 @@ async function renderPersonProfile(id){
     };
 
     if(editMode){
+      pfPlEditor = wireProfilingLocationEditor("pfPl", p);
+    }else{
+      pfPlEditor = null;
+      wireProfilingLocationView("pfPl", p);
+    }
+
+    if(editMode){
       document.getElementById("saveProfileBtn").onclick = async function(){
         var errEl = document.getElementById("profileError");
         var name = document.getElementById("pfName").value.trim();
@@ -793,18 +784,16 @@ async function renderPersonProfile(id){
           return;
         }
 
-        var updates = {
+        var updates = Object.assign({
           name: name, surname: "", idNumber: idNumber,
-          phone: document.getElementById("pfPhone").value.trim(),
           dob: document.getElementById("pfDob").value,
           aliases: document.getElementById("pfAliases").value.trim(),
           origin: document.getElementById("pfOrigin").value.trim(),
           residence: document.getElementById("pfResidence").value.trim(),
           previousArrests: document.getElementById("pfPreviousArrests").value.trim(),
           notes: document.getElementById("pfNotes").value.trim(),
-          profilingLocation: document.getElementById("pfProfilingLocation").value.trim(),
           deceased: document.getElementById("pfDeceased").checked
-        };
+        }, profilingLocationPatch(pfPlEditor && pfPlEditor.getState()));
         try{
           await updateDoc(doc(db, "people", id), updates);
           Object.assign(p, updates);

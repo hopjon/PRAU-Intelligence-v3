@@ -3,6 +3,8 @@ import {
   collection, getDocs, addDoc, updateDoc, doc, getDoc
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { ensureModelsLoaded, computeDescriptorWhenReady, photoUrl, photoDescriptor, matchThreshold, euclidean } from "../face.js";
+import { getDisplayName } from "../userDisplay.js";
+import { profilingLocationViewHTML, profilingLocationEditHTML, wireProfilingLocationView, wireProfilingLocationEditor, profilingLocationPatch } from "../profilingLocation.js";
 
 ensureModelsLoaded();
 
@@ -130,8 +132,8 @@ function openAddUnidentifiedModal(container, backToPeople){
       '<input type="file" id="auPhotoFile" accept="image/*" capture="environment" style="display:none;">' +
       '<input type="file" id="auImportFile" accept="image/*" multiple style="display:none;">' +
       '<label>Reference Label (optional)</label><input id="auLabel" placeholder="e.g. Unknown Person 001">' +
-      '<label>Location (optional)</label><input id="auLocation" placeholder="e.g. Corner of Main and Voortrekker">' +
       '<label>Notes</label><textarea id="auNotes" placeholder="Any details worth recording"></textarea>' +
+      profilingLocationEditHTML("auPl", null) +
       '<div class="modal-actions">' +
         '<button class="btn-ghost" id="auCancel">Cancel</button>' +
         '<button class="btn-primary" id="auSave">Save</button>' +
@@ -169,7 +171,7 @@ function openAddUnidentifiedModal(container, backToPeople){
     if(!result.engineReady){
       document.getElementById("auError").textContent = "Face-matching engine unavailable — this photo was saved without face data.";
     }
-    pendingPhotos.push({ dataUrl: dataUrl, descriptorV2: result.descriptor, takenBy: currentUserShortName(), addedAt: new Date().toISOString() });
+    pendingPhotos.push({ dataUrl: dataUrl, descriptorV2: result.descriptor, takenBy: (auth.currentUser && auth.currentUser.email) || "", addedAt: new Date().toISOString() });
     renderAuPhotos();
   };
   document.getElementById("auImportFile").onchange = async function(){
@@ -184,24 +186,26 @@ function openAddUnidentifiedModal(container, backToPeople){
           document.getElementById("auError").textContent = "Face-matching engine unavailable — these photos were saved without face data.";
           engineWarned = true;
         }
-        pendingPhotos.push({ dataUrl: dataUrl, descriptorV2: result.descriptor, takenBy: currentUserShortName(), addedAt: new Date().toISOString() });
+        pendingPhotos.push({ dataUrl: dataUrl, descriptorV2: result.descriptor, takenBy: (auth.currentUser && auth.currentUser.email) || "", addedAt: new Date().toISOString() });
         renderAuPhotos();
       }catch(e){ console.error(e); }
     }
   };
 
+  var auPlEditor = wireProfilingLocationEditor("auPl", null);
+
   document.getElementById("auSave").onclick = async function(){
     var errEl = document.getElementById("auError");
 
-    var record = {
+    var record = Object.assign({
       label: document.getElementById("auLabel").value.trim(),
-      location: document.getElementById("auLocation").value.trim(),
       notes: document.getElementById("auNotes").value.trim(),
       photos: pendingPhotos,
       loggedBy: currentUserShortName(),
+      dateProfiled: new Date().toISOString().slice(0, 10),
       addedAt: new Date().toISOString(),
       deleted: false
-    };
+    }, profilingLocationPatch(auPlEditor.getState()));
 
     this.disabled = true;
     this.textContent = "Saving…";
@@ -230,6 +234,7 @@ async function renderUnidentifiedProfile(container, id, backToPeople){
   var u = Object.assign({ id: id }, snap.data());
   var editMode = false;
   var pendingPhotos = u.photos ? u.photos.slice() : [];
+  var ufPlEditor = null;
 
   function render(){
     container.innerHTML =
@@ -241,9 +246,10 @@ async function renderUnidentifiedProfile(container, id, backToPeople){
       '<div class="modal-card profile-view">' +
         '<div class="profile-field-group">' +
           field("Reference Label", "ufLabel", u.label, editMode, null, "e.g. Unknown Person 001") +
-          field("Location", "ufLocation", u.location, editMode, null, "e.g. Corner of Main and Voortrekker") +
           field("Notes", "ufNotes", u.notes, editMode, "textarea", "Any details worth recording") +
+          field("Date Profiled", "ufDateProfiled", u.dateProfiled || "Not recorded", false) +
         '</div>' +
+        (editMode ? profilingLocationEditHTML("ufPl", u) : profilingLocationViewHTML("ufPl", u)) +
         '<div class="people-card-meta">Logged by ' + escapeHtml(u.loggedBy || "unknown") + '</div>' +
         (u.promotedTo ? '<div class="people-card-meta">Promoted to <span class="linked-person-view" id="viewPromotedBtn" style="cursor:pointer;">Person profile</span></div>' : '') +
         (editMode ?
@@ -294,7 +300,7 @@ async function renderUnidentifiedProfile(container, id, backToPeople){
       var takenBy = (typeof ph === "object" && ph.takenBy) ? ph.takenBy : "";
       html += '<div><div class="pf-photo-chip"><img src="' + photoUrl(ph) + '">' +
         (editMode ? '<button class="pf-rm" data-i="' + i + '" type="button">✕</button>' : '') +
-        '</div>' + (takenBy ? '<div class="pf-photo-caption">' + escapeHtml(takenBy) + '</div>' : '') + '</div>';
+        '</div>' + (takenBy ? '<div class="pf-photo-caption">' + escapeHtml(getDisplayName(takenBy)) + '</div>' : '') + '</div>';
     });
     row.innerHTML = html;
     if(editMode && addBtn){
@@ -313,7 +319,7 @@ async function renderUnidentifiedProfile(container, id, backToPeople){
   async function addPhoto(dataUrl){
     var canvas = await dataUrlToCanvas(dataUrl);
     var result = await computeDescriptorWhenReady(canvas);
-    var entry = { dataUrl: dataUrl, descriptorV2: result.descriptor, takenBy: currentUserShortName(), addedAt: new Date().toISOString() };
+    var entry = { dataUrl: dataUrl, descriptorV2: result.descriptor, takenBy: (auth.currentUser && auth.currentUser.email) || "", addedAt: new Date().toISOString() };
     pendingPhotos.push(entry);
     u.photos = pendingPhotos;
     await updateDoc(doc(db, "unidentifiedPeople", id), { photos: pendingPhotos });
@@ -446,13 +452,19 @@ async function renderUnidentifiedProfile(container, id, backToPeople){
     };
 
     if(editMode){
+      ufPlEditor = wireProfilingLocationEditor("ufPl", u);
+    }else{
+      ufPlEditor = null;
+      wireProfilingLocationView("ufPl", u);
+    }
+
+    if(editMode){
       document.getElementById("saveProfileBtn").onclick = async function(){
         var errEl = document.getElementById("profileError");
-        var updates = {
+        var updates = Object.assign({
           label: document.getElementById("ufLabel").value.trim(),
-          location: document.getElementById("ufLocation").value.trim(),
           notes: document.getElementById("ufNotes").value.trim()
-        };
+        }, profilingLocationPatch(ufPlEditor && ufPlEditor.getState()));
         this.disabled = true;
         this.textContent = "Saving…";
         try{
