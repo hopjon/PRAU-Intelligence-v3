@@ -29,10 +29,55 @@ function hasCoords(loc){
   return !!loc && typeof loc.profilingLatitude === "number" && typeof loc.profilingLongitude === "number";
 }
 
+// Restricts address search to South Africa via Nominatim's own country
+// filter (not client-side post-filtering). To add more countries later,
+// extend this comma-separated list — no other code needs to change.
+var SEARCH_COUNTRY_CODES = "za";
+
+function extractLeadingHouseNumber(q){
+  var m = String(q || "").trim().match(/^(\d+[a-zA-Z]?)\b/);
+  return m ? m[1].toLowerCase() : null;
+}
+
+// Reorders (never filters) results so an entry whose house number, road,
+// and/or suburb actually match the typed query is preferred over whatever
+// Nominatim ranked first.
+function rankAddressResults(q, results){
+  var houseNumber = extractLeadingHouseNumber(q);
+  var qLower = String(q || "").toLowerCase();
+  return results
+    .map(function(r, i){
+      var addr = r.address || {};
+      var score = 0;
+      if(houseNumber && addr.house_number && String(addr.house_number).toLowerCase() === houseNumber) score += 3;
+      var road = (addr.road || "").toLowerCase();
+      if(road && qLower.indexOf(road) !== -1) score += 2;
+      var locality = (addr.suburb || addr.neighbourhood || addr.village || addr.town || "").toLowerCase();
+      if(locality && qLower.indexOf(locality) !== -1) score += 1;
+      return { r: r, score: score, i: i };
+    })
+    .sort(function(a, b){ return (b.score - a.score) || (a.i - b.i); })
+    .map(function(x){ return x.r; });
+}
+
 async function nominatimSearch(q){
-  var url = "https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=5&q=" + encodeURIComponent(q);
+  var params = "format=json&addressdetails=1&limit=5" +
+    (SEARCH_COUNTRY_CODES ? "&countrycodes=" + SEARCH_COUNTRY_CODES : "");
+  // Structured params (street/city) query Nominatim's address-point index
+  // directly, instead of its free-text tokenizer — which is what was
+  // silently dropping house numbers from "23 X Street, Suburb" queries.
+  var commaIdx = String(q).indexOf(",");
+  if(commaIdx !== -1){
+    var street = q.slice(0, commaIdx).trim();
+    var rest = q.slice(commaIdx + 1).trim();
+    params += "&street=" + encodeURIComponent(street) + (rest ? "&city=" + encodeURIComponent(rest) : "");
+  }else{
+    params += "&q=" + encodeURIComponent(q);
+  }
+  var url = "https://nominatim.openstreetmap.org/search?" + params;
   var res = await fetch(url, { headers: { "Accept": "application/json" } });
-  return res.json();
+  var results = await res.json();
+  return rankAddressResults(q, results || []);
 }
 
 async function nominatimReverse(lat, lng){
@@ -89,6 +134,7 @@ export function profilingLocationEditHTML(idPrefix, loc){
       '<button type="button" class="btn-ghost" id="' + idPrefix + 'SearchBtn" style="flex-shrink:0;">Search</button>' +
     '</div>' +
     '<div class="address-suggestions-list" id="' + idPrefix + 'Results" style="position:static;max-height:160px;overflow-y:auto;"></div>' +
+    '<div style="font-size:12px;color:var(--text-gray-dark);margin:4px 0 8px;">Can\'t find the exact address? Search for the street/suburb, then drag the pin to the exact location.</div>' +
     '<div class="map-container profile" id="' + idPrefix + 'Map"></div>' +
     '<button type="button" class="btn-ghost" id="' + idPrefix + 'GpsBtn" style="width:100%;margin-bottom:8px;">📍 Use My Location</button>' +
     '<div class="modal-error" id="' + idPrefix + 'Status" style="text-align:left;color:#888;"></div>' +
