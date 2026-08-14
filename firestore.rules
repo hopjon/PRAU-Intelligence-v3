@@ -9,16 +9,199 @@ service cloud.firestore {
         exists(/databases/$(database)/documents/teamMembers/$(request.auth.token.email));
     }
 
+    // ---------- generic field helpers ----------
+    // "Optional" checks only validate the field's type/size when it is present —
+    // they never require it, so legacy documents missing a field stay valid.
+    function optStr(data, key, maxLen) {
+      return !(key in data) || (data[key] is string && data[key].size() <= maxLen);
+    }
+    function optBool(data, key) {
+      return !(key in data) || data[key] is bool;
+    }
+    function optNum(data, key) {
+      return !(key in data) || data[key] is number;
+    }
+    function optList(data, key, maxSize) {
+      return !(key in data) || (data[key] is list && data[key].size() <= maxSize);
+    }
+    // Immutable-once-set: if the document did NOT already have this field, the
+    // write may set it for the first time (covers one-time fields like
+    // unidentifiedPeople.promotedTo). If it already had a value, the new
+    // document must keep that exact value.
+    function unchanged(key) {
+      return !(key in resource.data) ||
+        (key in request.resource.data && request.resource.data[key] == resource.data[key]);
+    }
+
+    // Shared "Profiling Location" field group (People/Vehicles/Unidentified People).
+    // Only type-checks whichever of the 5 fields is present — never requires them,
+    // since most records never set a location at all.
+    function profilingLocationValid(data) {
+      return optNum(data, 'profilingLatitude') &&
+        optNum(data, 'profilingLongitude') &&
+        optStr(data, 'profilingAddress', 300) &&
+        optStr(data, 'profilingRoad', 200) &&
+        optStr(data, 'profilingSuburb', 200);
+    }
+
+    // tags: array of strings. Per-element type checking isn't supported by
+    // Firestore rules for arbitrary-length lists, so this validates the array
+    // itself (type + a generous size cap) but not each individual tag string.
+    function tagsValid(data) {
+      return optList(data, 'tags', 100);
+    }
+
+    // ---------- people ----------
+    function peopleCreateValid() {
+      let data = request.resource.data;
+      return data.name is string && data.name.size() > 0 && data.name.size() <= 200 &&
+        optStr(data, 'surname', 200) && optStr(data, 'idNumber', 50) && optStr(data, 'dob', 50) &&
+        optStr(data, 'aliases', 200) && optStr(data, 'origin', 200) && optStr(data, 'residence', 300) &&
+        optStr(data, 'previousArrests', 3000) && optStr(data, 'notes', 3000) &&
+        optBool(data, 'deceased') && optList(data, 'photos', 200) && optList(data, 'encounters', 500) &&
+        optStr(data, 'addedBy', 200) && optStr(data, 'addedAt', 40) && optStr(data, 'dateProfiled', 30) &&
+        profilingLocationValid(data) && tagsValid(data);
+    }
+    function peopleUpdateValid() {
+      let data = request.resource.data;
+      return optStr(data, 'name', 200) && optStr(data, 'surname', 200) && optStr(data, 'idNumber', 50) &&
+        optStr(data, 'dob', 50) && optStr(data, 'aliases', 200) && optStr(data, 'origin', 200) &&
+        optStr(data, 'residence', 300) && optStr(data, 'previousArrests', 3000) && optStr(data, 'notes', 3000) &&
+        optBool(data, 'deceased') && optList(data, 'photos', 200) && optList(data, 'encounters', 500) &&
+        optBool(data, 'deleted') && optStr(data, 'deletedBy', 200) && optStr(data, 'deletedAt', 40) &&
+        profilingLocationValid(data) && tagsValid(data) &&
+        unchanged('addedBy') && unchanged('addedAt') && unchanged('dateProfiled');
+    }
+
     match /people/{docId} {
-      allow read, write: if isApprovedUser();
+      allow read, delete: if isApprovedUser();
+      allow create: if isApprovedUser() && peopleCreateValid();
+      allow update: if isApprovedUser() && peopleUpdateValid();
+    }
+
+    // ---------- vehicles ----------
+    // Legacy documents may carry ownerId/ownerName instead of linkedPeople —
+    // intentionally not validated/blocked here so those records stay editable.
+    function vehiclesCreateValid() {
+      let data = request.resource.data;
+      return ((('registration' in data) && data.registration is string && data.registration.size() > 0) ||
+              (('make' in data) && data.make is string && data.make.size() > 0)) &&
+        optStr(data, 'registration', 50) && optStr(data, 'make', 200) && optStr(data, 'model', 200) &&
+        optStr(data, 'year', 20) && optStr(data, 'colour', 50) && optStr(data, 'markings', 1000) &&
+        optBool(data, 'deceased') && optList(data, 'linkedPeople', 100) && optList(data, 'unprofiledPeople', 100) &&
+        optList(data, 'photos', 200) && optStr(data, 'addedBy', 200) && optStr(data, 'addedAt', 40) &&
+        profilingLocationValid(data) && tagsValid(data);
+    }
+    function vehiclesUpdateValid() {
+      let data = request.resource.data;
+      return optStr(data, 'registration', 50) && optStr(data, 'make', 200) && optStr(data, 'model', 200) &&
+        optStr(data, 'year', 20) && optStr(data, 'colour', 50) && optStr(data, 'markings', 1000) &&
+        optBool(data, 'deceased') && optList(data, 'linkedPeople', 100) && optList(data, 'unprofiledPeople', 100) &&
+        optList(data, 'photos', 200) && optBool(data, 'deleted') && optStr(data, 'deletedBy', 200) &&
+        optStr(data, 'deletedAt', 40) && profilingLocationValid(data) && tagsValid(data) &&
+        unchanged('addedBy') && unchanged('addedAt');
     }
 
     match /vehicles/{docId} {
-      allow read, write: if isApprovedUser();
+      allow read, delete: if isApprovedUser();
+      allow create: if isApprovedUser() && vehiclesCreateValid();
+      allow update: if isApprovedUser() && vehiclesUpdateValid();
     }
 
-    match /suspects/{docId} {
-      allow read, write: if isApprovedUser();
+    // ---------- unidentifiedPeople ----------
+    function unidentifiedCreateValid() {
+      let data = request.resource.data;
+      return optStr(data, 'label', 200) && optStr(data, 'notes', 3000) && optList(data, 'photos', 200) &&
+        optStr(data, 'loggedBy', 200) && optStr(data, 'addedAt', 40) && optStr(data, 'dateProfiled', 30) &&
+        optBool(data, 'deleted') && profilingLocationValid(data) && tagsValid(data);
+    }
+    function unidentifiedUpdateValid() {
+      let data = request.resource.data;
+      return optStr(data, 'label', 200) && optStr(data, 'notes', 3000) && optList(data, 'photos', 200) &&
+        optBool(data, 'deleted') && optStr(data, 'deletedBy', 200) && optStr(data, 'deletedAt', 40) &&
+        optStr(data, 'promotedTo', 200) && profilingLocationValid(data) && tagsValid(data) &&
+        unchanged('loggedBy') && unchanged('addedAt') && unchanged('promotedTo');
+    }
+
+    match /unidentifiedPeople/{docId} {
+      allow read, delete: if isApprovedUser();
+      allow create: if isApprovedUser() && unidentifiedCreateValid();
+      allow update: if isApprovedUser() && unidentifiedUpdateValid();
+    }
+
+    // ---------- places ----------
+    function placesCoordsValid(data) {
+      return !('coords' in data) || data.coords == null ||
+        (data.coords is map && data.coords.lat is number && data.coords.lng is number);
+    }
+    function placesCreateValid() {
+      let data = request.resource.data;
+      return data.name is string && data.name.size() > 0 && data.name.size() <= 200 &&
+        optStr(data, 'type', 100) && optStr(data, 'address', 300) && optStr(data, 'notes', 3000) &&
+        optList(data, 'photos', 200) && optStr(data, 'addedBy', 200) && optStr(data, 'addedAt', 40) &&
+        placesCoordsValid(data);
+    }
+    function placesUpdateValid() {
+      let data = request.resource.data;
+      return optStr(data, 'name', 200) && optStr(data, 'type', 100) && optStr(data, 'address', 300) &&
+        optStr(data, 'notes', 3000) && optList(data, 'photos', 200) && optBool(data, 'deleted') &&
+        optStr(data, 'deletedBy', 200) && optStr(data, 'deletedAt', 40) && placesCoordsValid(data) &&
+        unchanged('addedBy') && unchanged('addedAt');
+    }
+
+    match /places/{docId} {
+      allow read, delete: if isApprovedUser();
+      allow create: if isApprovedUser() && placesCreateValid();
+      allow update: if isApprovedUser() && placesUpdateValid();
+    }
+
+    // ---------- encounters (People) ----------
+    // personId is intentionally NOT immutable — the People merge-duplicate
+    // feature legitimately reassigns encounters.personId to the surviving
+    // record (people.js), so locking it would break that existing flow.
+    function encounterCoordsValid(data) {
+      return !('coords' in data) || data.coords == null ||
+        (data.coords is list && data.coords.size() == 2);
+    }
+    function encountersCreateValid() {
+      let data = request.resource.data;
+      return data.personId is string && data.personId.size() > 0 &&
+        optStr(data, 'date', 30) && optStr(data, 'location', 300) && optStr(data, 'itemsFound', 2000) &&
+        optStr(data, 'notes', 3000) && optList(data, 'itemsPhotos', 100) &&
+        data.loggedBy is string && data.createdAt is string && encounterCoordsValid(data);
+    }
+    function encountersUpdateValid() {
+      let data = request.resource.data;
+      return optStr(data, 'personId', 200) && optStr(data, 'date', 30) && optStr(data, 'location', 300) &&
+        optStr(data, 'itemsFound', 2000) && optStr(data, 'notes', 3000) && optList(data, 'itemsPhotos', 100) &&
+        encounterCoordsValid(data) && unchanged('loggedBy') && unchanged('createdAt');
+    }
+
+    match /encounters/{docId} {
+      allow read, delete: if isApprovedUser();
+      allow create: if isApprovedUser() && encountersCreateValid();
+      allow update: if isApprovedUser() && encountersUpdateValid();
+    }
+
+    // ---------- vehicleEncounters ----------
+    function vehicleEncountersCreateValid() {
+      let data = request.resource.data;
+      return data.vehicleId is string && data.vehicleId.size() > 0 &&
+        optStr(data, 'date', 30) && optStr(data, 'location', 300) && optStr(data, 'itemsFound', 2000) &&
+        optStr(data, 'notes', 3000) && optList(data, 'itemsPhotos', 100) &&
+        data.loggedBy is string && data.createdAt is string && encounterCoordsValid(data);
+    }
+    function vehicleEncountersUpdateValid() {
+      let data = request.resource.data;
+      return optStr(data, 'vehicleId', 200) && optStr(data, 'date', 30) && optStr(data, 'location', 300) &&
+        optStr(data, 'itemsFound', 2000) && optStr(data, 'notes', 3000) && optList(data, 'itemsPhotos', 100) &&
+        encounterCoordsValid(data) && unchanged('loggedBy') && unchanged('createdAt');
+    }
+
+    match /vehicleEncounters/{docId} {
+      allow read, delete: if isApprovedUser();
+      allow create: if isApprovedUser() && vehicleEncountersCreateValid();
+      allow update: if isApprovedUser() && vehicleEncountersUpdateValid();
     }
 
     match /sessions/{uid} {
@@ -30,16 +213,11 @@ service cloud.firestore {
       allow read: if isApprovedUser();
       allow write: if false;
     }
-    match /encounters/{docId} {
-      allow read, write: if isApprovedUser();
-    }
-    match /vehicleEncounters/{docId} {
-      allow read, write: if isApprovedUser();
-    }
-    match /places/{docId} {
-      allow read, write: if isApprovedUser();
-    }
-    match /unidentifiedPeople/{docId} {
+
+    // Legacy/dead-code path (js/people/people-form.js is not imported by the
+    // live app) — left as the original permissive rule since no live code
+    // exercises it and its exact field shape is unverified.
+    match /suspects/{docId} {
       allow read, write: if isApprovedUser();
     }
 
