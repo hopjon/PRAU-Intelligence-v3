@@ -4,6 +4,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { markPending, clearPending, isPending } from "./pendingWrites.js";
 import { profilingLocationViewHTML, profilingLocationEditHTML, wireProfilingLocationView, wireProfilingLocationEditor, profilingLocationPatch } from "./profilingLocation.js";
+import { VEHICLE_TAG_GROUPS, tagsViewHTML, tagsEditHTML, wireTagsEditor, tagsPatch } from "./tags.js";
 import { getDisplayName } from "./userDisplay.js";
 
 var MAX_ENCOUNTERS = 6;
@@ -245,6 +246,7 @@ function openAddVehicleModal(){
       '<label>Year</label><input id="avYear" placeholder="e.g. 2015">' +
       '<label>Colour</label><input id="avColour" placeholder="e.g. White">' +
       profilingLocationEditHTML("avPl", null) +
+      tagsEditHTML("avTags", [], VEHICLE_TAG_GROUPS) +
       '<div id="avLinkedWidget"></div>' +
       '<div class="modal-actions">' +
         '<button class="btn-ghost" id="avCancel">Cancel</button>' +
@@ -296,6 +298,7 @@ function openAddVehicleModal(){
   };
 
   var avPlEditor = wireProfilingLocationEditor("avPl", null);
+  var avTagsEditor = wireTagsEditor("avTags", [], VEHICLE_TAG_GROUPS);
 
   document.getElementById("avSave").onclick = async function(){
     var errEl = document.getElementById("avError");
@@ -332,7 +335,7 @@ function openAddVehicleModal(){
       photos: pendingPhotos,
       addedAt: new Date().toISOString(),
       addedBy: auth.currentUser ? auth.currentUser.email : "unknown"
-    }, profilingLocationPatch(avPlEditor.getState()));
+    }, profilingLocationPatch(avPlEditor.getState()), tagsPatch(avTagsEditor.getState()));
 
     this.textContent = "Saving…";
     markPending("vehicles");
@@ -366,6 +369,7 @@ async function renderVehicleProfile(id){
   var editMode = false;
   var pendingPhotos = v.photos ? v.photos.slice() : [];
   var vfPlEditor = null;
+  var vfTagsEditor = null;
   var encounters = [];
   var editLinkedPeople = (v.linkedPeople !== undefined) ? v.linkedPeople.slice() : (v.ownerId ? [{ id: v.ownerId, name: v.ownerName }] : []);
   var editUnprofiledPeople = (v.unprofiledPeople || []).slice();
@@ -438,6 +442,7 @@ async function renderVehicleProfile(id){
           field("Distinct Markings", "vfMarkings", v.markings, editMode, "textarea", "e.g. Missing front headlight") +
         '</div>' +
         (editMode ? profilingLocationEditHTML("vfPl", v) : profilingLocationViewHTML("vfPl", v)) +
+        (editMode ? tagsEditHTML("vfTags", v.tags || [], VEHICLE_TAG_GROUPS) : tagsViewHTML("vfTags", v.tags || [], VEHICLE_TAG_GROUPS)) +
         '<div class="people-card-meta">Added by ' + escapeHtml(getDisplayName(v.addedBy)) + '</div>' +
         '<div id="linkedPeopleDisplay">' + linkedPeopleDisplayHtml() + '</div>' +
         '<div id="unprofiledPeopleDisplay" style="margin-top:14px;">' + unprofiledPeopleDisplayHtml() + '</div>' +
@@ -625,8 +630,10 @@ async function renderVehicleProfile(id){
 
     if(editMode){
       vfPlEditor = wireProfilingLocationEditor("vfPl", v);
+      vfTagsEditor = wireTagsEditor("vfTags", v.tags || [], VEHICLE_TAG_GROUPS);
     }else{
       vfPlEditor = null;
+      vfTagsEditor = null;
       wireProfilingLocationView("vfPl", v);
     }
 
@@ -659,7 +666,7 @@ async function renderVehicleProfile(id){
           markings: document.getElementById("vfMarkings").value.trim(),
           linkedPeople: editLinkedPeople,
           unprofiledPeople: editUnprofiledPeople
-        }, profilingLocationPatch(vfPlEditor && vfPlEditor.getState()));
+        }, profilingLocationPatch(vfPlEditor && vfPlEditor.getState()), tagsPatch(vfTagsEditor && vfTagsEditor.getState()));
         try{
           await updateDoc(doc(db, "vehicles", id), updates);
           Object.assign(v, updates);

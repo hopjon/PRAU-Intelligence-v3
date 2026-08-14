@@ -5,6 +5,7 @@ import {
 import { ensureModelsLoaded, computeDescriptorWhenReady, photoUrl, photoDescriptor, matchThreshold, euclidean } from "../face.js";
 import { getDisplayName } from "../userDisplay.js";
 import { profilingLocationViewHTML, profilingLocationEditHTML, wireProfilingLocationView, wireProfilingLocationEditor, profilingLocationPatch } from "../profilingLocation.js";
+import { PEOPLE_TAG_GROUPS, tagsViewHTML, tagsEditHTML, wireTagsEditor, tagsPatch } from "../tags.js";
 
 ensureModelsLoaded();
 
@@ -131,6 +132,7 @@ function openAddUnidentifiedModal(container, backToPeople){
       '<label>Reference Label (optional)</label><input id="auLabel" placeholder="e.g. Unknown Person 001">' +
       '<label>Notes</label><textarea id="auNotes" placeholder="Any details worth recording"></textarea>' +
       profilingLocationEditHTML("auPl", null) +
+      tagsEditHTML("auTags", [], PEOPLE_TAG_GROUPS) +
       '<div class="modal-actions">' +
         '<button class="btn-ghost" id="auCancel">Cancel</button>' +
         '<button class="btn-primary" id="auSave">Save</button>' +
@@ -190,6 +192,7 @@ function openAddUnidentifiedModal(container, backToPeople){
   };
 
   var auPlEditor = wireProfilingLocationEditor("auPl", null);
+  var auTagsEditor = wireTagsEditor("auTags", [], PEOPLE_TAG_GROUPS);
 
   document.getElementById("auSave").onclick = async function(){
     var errEl = document.getElementById("auError");
@@ -202,7 +205,7 @@ function openAddUnidentifiedModal(container, backToPeople){
       dateProfiled: new Date().toISOString().slice(0, 10),
       addedAt: new Date().toISOString(),
       deleted: false
-    }, profilingLocationPatch(auPlEditor.getState()));
+    }, profilingLocationPatch(auPlEditor.getState()), tagsPatch(auTagsEditor.getState()));
 
     this.disabled = true;
     this.textContent = "Saving…";
@@ -232,6 +235,7 @@ async function renderUnidentifiedProfile(container, id, backToPeople){
   var editMode = false;
   var pendingPhotos = u.photos ? u.photos.slice() : [];
   var ufPlEditor = null;
+  var ufTagsEditor = null;
 
   function render(){
     container.innerHTML =
@@ -247,6 +251,7 @@ async function renderUnidentifiedProfile(container, id, backToPeople){
           field("Date Profiled", "ufDateProfiled", u.dateProfiled || "Not recorded", false) +
         '</div>' +
         (editMode ? profilingLocationEditHTML("ufPl", u) : profilingLocationViewHTML("ufPl", u)) +
+        (editMode ? tagsEditHTML("ufTags", u.tags || [], PEOPLE_TAG_GROUPS) : tagsViewHTML("ufTags", u.tags || [], PEOPLE_TAG_GROUPS)) +
         '<div class="people-card-meta">Logged by ' + escapeHtml(getDisplayName(u.loggedBy)) + '</div>' +
         (u.promotedTo ? '<div class="people-card-meta">Promoted to <span class="linked-person-view" id="viewPromotedBtn" style="cursor:pointer;">Person profile</span></div>' : '') +
         (editMode ?
@@ -423,6 +428,7 @@ async function renderUnidentifiedProfile(container, id, backToPeople){
       promotionPrefill.profilingSuburb = u.profilingSuburb || "";
     }
     if(u.dateProfiled) promotionPrefill.dateProfiled = u.dateProfiled;
+    if(u.tags && u.tags.length) promotionPrefill.tags = u.tags.slice();
 
     window.__openAddPersonModal(promotionPrefill, async function(newPerson){
       try{
@@ -460,8 +466,10 @@ async function renderUnidentifiedProfile(container, id, backToPeople){
 
     if(editMode){
       ufPlEditor = wireProfilingLocationEditor("ufPl", u);
+      ufTagsEditor = wireTagsEditor("ufTags", u.tags || [], PEOPLE_TAG_GROUPS);
     }else{
       ufPlEditor = null;
+      ufTagsEditor = null;
       wireProfilingLocationView("ufPl", u);
     }
 
@@ -471,7 +479,7 @@ async function renderUnidentifiedProfile(container, id, backToPeople){
         var updates = Object.assign({
           label: document.getElementById("ufLabel").value.trim(),
           notes: document.getElementById("ufNotes").value.trim()
-        }, profilingLocationPatch(ufPlEditor && ufPlEditor.getState()));
+        }, profilingLocationPatch(ufPlEditor && ufPlEditor.getState()), tagsPatch(ufTagsEditor && ufTagsEditor.getState()));
         this.disabled = true;
         this.textContent = "Saving…";
         try{

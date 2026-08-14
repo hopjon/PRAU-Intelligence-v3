@@ -252,6 +252,32 @@
 .leaflet-popup-content-wrapper{background:#161616;color:#fff;border:1px solid #3a3120;}
 .leaflet-popup-tip{background:#161616;}
 .leaflet-popup-content a{color:var(--gold);} 
+.tags-selected{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px;}
+.tag-pill{display:inline-flex;align-items:center;gap:6px;border-radius:14px;padding:4px 10px;
+  font-size:12px;font-weight:600;border:1px solid transparent;white-space:nowrap;}
+.tag-pill-remove{background:transparent;border:none;color:inherit;opacity:0.7;font-size:11px;
+  cursor:pointer;padding:0;line-height:1;}
+.tag-pill-remove:hover{opacity:1;}
+.tag-pill-red{background:var(--tag-red-bg);color:var(--tag-red-text);border-color:var(--tag-red-border);}
+.tag-pill-orange{background:var(--tag-orange-bg);color:var(--tag-orange-text);border-color:var(--tag-orange-border);}
+.tag-pill-purple{background:var(--tag-purple-bg);color:var(--tag-purple-text);border-color:var(--tag-purple-border);}
+.tag-pill-blue{background:var(--tag-blue-bg);color:var(--tag-blue-text);border-color:var(--tag-blue-border);}
+.tag-pill-magenta{background:var(--tag-magenta-bg);color:var(--tag-magenta-text);border-color:var(--tag-magenta-border);}
+.tag-pill-teal{background:var(--tag-teal-bg);color:var(--tag-teal-text);border-color:var(--tag-teal-border);}
+.tag-pill-grey{background:var(--tag-grey-bg);color:var(--tag-grey-text);border-color:var(--tag-grey-border);}
+.tags-picker-wrap{position:relative;margin-bottom:14px;}
+.tags-picker-list{position:absolute;left:0;right:0;top:100%;background:#161616;
+  border:1px solid #2b3038;border-radius:10px;margin-top:4px;max-height:220px;overflow-y:auto;z-index:20;}
+.tags-picker-group{padding:8px 12px 4px;font-size:11px;font-weight:700;text-transform:uppercase;
+  color:var(--text-gray-dark);letter-spacing:0.04em;}
+.tags-picker-row{padding:6px 12px;cursor:pointer;}
+.tags-picker-row:hover{background:#20242d;}
+.tags-picker-empty{padding:12px;font-size:13px;color:var(--text-gray-dark);}
+.tags-custom-form{background:#161616;border:1px solid #2b3038;border-radius:10px;
+  margin-top:8px;padding:10px;}
+.tags-custom-form input{margin-bottom:8px;}
+.tags-custom-actions{display:flex;gap:8px;justify-content:flex-end;}
+.tags-custom-error{color:var(--text-red);font-size:12px;margin-top:6px;}
 .address-suggestions{position:relative;}
 .address-suggestions-list{position:absolute;left:0;right:0;top:100%;background:#161616;
   border:1px solid #3a3120;border-radius:9px;margin-top:4px;max-height:200px;overflow-y:auto;z-index:10;}

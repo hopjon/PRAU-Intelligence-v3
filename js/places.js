@@ -50,7 +50,7 @@ function fileToCompressedDataUrl(file, maxDim){
 var addressSearchTimer = null;
 async function searchAddresses(q){
   if(!q || q.trim().length < 3) return [];
-  var url = "https://nominatim.openstreetmap.org/search?format=json&q=" + encodeURIComponent(q) + "&limit=5&addressdetails=1";
+  var url = "https://nominatim.openstreetmap.org/search?format=json&q=" + encodeURIComponent(q) + "&limit=5&addressdetails=1&countrycodes=za";
   try{
     var res = await fetch(url, { headers: { "Accept": "application/json" } });
     var data = await res.json();

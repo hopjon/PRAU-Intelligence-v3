@@ -38,4 +38,15 @@
   /* === LAYOUT === */
   --radius:         12px;
   --transition:     all 0.3s ease;
+
+  /* === TAG CATEGORY COLOURS ===
+     Dark-toned backgrounds with light, readable text — kept in the same
+     muted register as the rest of the PRAU dark/gold theme. */
+  --tag-red-bg:      #3a1a1a; --tag-red-text:     #ff8a80; --tag-red-border:     #6b2b2b;
+  --tag-orange-bg:   #3a2712; --tag-orange-text:  #ffb066; --tag-orange-border:  #6b4a20;
+  --tag-purple-bg:   #2a1a3a; --tag-purple-text:  #c79bff; --tag-purple-border:  #4a2f6b;
+  --tag-blue-bg:     #14283a; --tag-blue-text:    #7ec4ff; --tag-blue-border:    #244a6b;
+  --tag-magenta-bg:  #3a1430; --tag-magenta-text: #ff8fd6; --tag-magenta-border: #6b2258;
+  --tag-teal-bg:     #0f3330; --tag-teal-text:    #6fe0d0; --tag-teal-border:    #1f5c55;
+  --tag-grey-bg:     #232323; --tag-grey-text:    #cfcfcf; --tag-grey-border:    #3d3d3d;
 }

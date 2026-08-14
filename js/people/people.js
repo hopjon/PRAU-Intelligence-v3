@@ -8,6 +8,7 @@ import { renderUnidentifiedPeople } from "./unidentified.js";
 import { markPending, clearPending, isPending } from "../pendingWrites.js";
 import { getDisplayName } from "../userDisplay.js";
 import { profilingLocationViewHTML, profilingLocationEditHTML, wireProfilingLocationView, wireProfilingLocationEditor, profilingLocationPatch } from "../profilingLocation.js";
+import { PEOPLE_TAG_GROUPS, tagsViewHTML, tagsEditHTML, wireTagsEditor, tagsPatch } from "../tags.js";
 
 ensureModelsLoaded();
 
@@ -341,6 +342,7 @@ function openAddPersonModal(prefill, onCreated){
       '<label>Notes</label>' +
       '<textarea id="apNotes" placeholder="Any other details worth recording">' + escapeHtml(prefill && prefill.notes ? prefill.notes : "") + '</textarea>' +
       profilingLocationEditHTML("apPl", prefillLoc) +
+      tagsEditHTML("apTags", (prefill && prefill.tags) || [], PEOPLE_TAG_GROUPS) +
       '<div class="modal-actions">' +
         '<button class="btn-ghost" id="apCancel">Cancel</button>' +
         '<button class="btn-primary" id="apSave">Save</button>' +
@@ -403,6 +405,7 @@ function openAddPersonModal(prefill, onCreated){
   };
 
   var apPlEditor = wireProfilingLocationEditor("apPl", prefillLoc);
+  var apTagsEditor = wireTagsEditor("apTags", (prefill && prefill.tags) || [], PEOPLE_TAG_GROUPS);
 
   document.getElementById("apSave").onclick = async function(){
     var errEl = document.getElementById("apError");
@@ -441,7 +444,7 @@ function openAddPersonModal(prefill, onCreated){
       dateProfiled: (prefill && prefill.dateProfiled) ? prefill.dateProfiled : new Date().toISOString().slice(0, 10),
       addedAt: new Date().toISOString(),
       addedBy: auth.currentUser ? auth.currentUser.email : "unknown"
-    }, profilingLocationPatch(apPlEditor.getState()));
+    }, profilingLocationPatch(apPlEditor.getState()), tagsPatch(apTagsEditor.getState()));
 
     this.textContent = "Saving…";
     markPending("people");
@@ -545,6 +548,7 @@ async function renderPersonProfile(id){
   var editMode = false;
   var pendingPhotos = p.photos ? p.photos.slice() : [];
   var pfPlEditor = null;
+  var pfTagsEditor = null;
   var encounters = [];
   var allPeopleCache = null;
   async function getAllPeopleCached(){
@@ -590,6 +594,7 @@ async function renderPersonProfile(id){
           field("Date Profiled", "pfDateProfiled", p.dateProfiled || "Not recorded", false) +
         '</div>' +
         (editMode ? profilingLocationEditHTML("pfPl", p) : profilingLocationViewHTML("pfPl", p)) +
+        (editMode ? tagsEditHTML("pfTags", p.tags || [], PEOPLE_TAG_GROUPS) : tagsViewHTML("pfTags", p.tags || [], PEOPLE_TAG_GROUPS)) +
         '<div class="people-card-meta">Added by ' + escapeHtml(getDisplayName(p.addedBy)) + '</div>' +
         (editMode ?
           '<div class="deceased-checkbox-row">' +
@@ -769,8 +774,10 @@ async function renderPersonProfile(id){
 
     if(editMode){
       pfPlEditor = wireProfilingLocationEditor("pfPl", p);
+      pfTagsEditor = wireTagsEditor("pfTags", p.tags || [], PEOPLE_TAG_GROUPS);
     }else{
       pfPlEditor = null;
+      pfTagsEditor = null;
       wireProfilingLocationView("pfPl", p);
     }
 
@@ -800,7 +807,7 @@ async function renderPersonProfile(id){
           previousArrests: document.getElementById("pfPreviousArrests").value.trim(),
           notes: document.getElementById("pfNotes").value.trim(),
           deceased: document.getElementById("pfDeceased").checked
-        }, profilingLocationPatch(pfPlEditor && pfPlEditor.getState()));
+        }, profilingLocationPatch(pfPlEditor && pfPlEditor.getState()), tagsPatch(pfTagsEditor && pfTagsEditor.getState()));
         try{
           await updateDoc(doc(db, "people", id), updates);
           Object.assign(p, updates);
