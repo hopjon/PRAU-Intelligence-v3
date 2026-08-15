@@ -110,10 +110,13 @@ nav button i,
 
 .menu-item.active,
 nav .menu-item.active,
-.sidebar .menu-item.active,
+.sidebar .menu-item.active {
+  background: rgba(212, 168, 67, 0.12) !important;
+  color: var(--gold) !important;
+}
+
 .menu-item.active i,
 .menu-item.active .bi {
-  background: rgba(212, 168, 67, 0.12) !important;
   color: var(--gold) !important;
 }
 
