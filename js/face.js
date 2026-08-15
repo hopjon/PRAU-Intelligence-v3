@@ -3,6 +3,8 @@
 // All functions, icons, and UI structure preserved from original.
 // PATH B: Stores new face-api descriptors in descriptorV2 field — old Human.js descriptors in "descriptor" stay untouched.
 
+import { backToDashboardHTML, wireBackToDashboard } from "./backButton.js";
+
 var modelsReady = false;
 var loadPromise = null;
 
@@ -134,7 +136,7 @@ function fileToCanvas(file, maxDim){
 
 export function renderFaceSearch(container){
   container.innerHTML =
-    '<div class="people-header"><h1>Face Search</h1></div>' +
+    '<div class="people-header">' + backToDashboardHTML() + '<h1>Face Search</h1></div>' +
     '<div class="modal-error" id="faceStatus" style="text-align:left;color:#888;margin-bottom:16px;">Loading matching engine...</div>' +
     '<div style="display:flex;gap:10px;">' +
       '<button id="faceTakeBtn" class="btn-primary" style="flex:1;justify-content:center;"><i class="bi bi-camera"></i> Take photo</button>' +
@@ -144,6 +146,7 @@ export function renderFaceSearch(container){
     '<input type="file" id="faceGalleryFile" accept="image/*" style="display:none;">' +
     '<div id="faceResults" style="margin-top:20px;"></div>';
 
+  wireBackToDashboard();
   var statusEl = document.getElementById("faceStatus");
 
   ensureModelsLoaded().then(function(){

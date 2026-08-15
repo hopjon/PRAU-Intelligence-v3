@@ -3,6 +3,7 @@ import {
   collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { markPending, clearPending, isPending } from "./pendingWrites.js";
+import { backToDashboardHTML, wireBackToDashboard } from "./backButton.js";
 var goldPinIcon = L.divIcon({
   className: "gold-pin-icon",
   html: '<svg width="30" height="42" viewBox="0 0 30 42" xmlns="http://www.w3.org/2000/svg">' +
@@ -122,6 +123,7 @@ export async function renderPlaces(){
   var content = document.getElementById("contentArea");
   content.innerHTML =
     '<div class="people-header">' +
+      backToDashboardHTML() +
       '<h1><i class="bi bi-geo-alt-fill"></i> Places</h1>' +
       '<button class="btn-primary" id="addPlaceBtn"><i class="bi bi-plus-circle-fill"></i> Add</button>' +
     '</div>' +
@@ -129,6 +131,7 @@ export async function renderPlaces(){
     '<div class="people-search"><i class="bi bi-search"></i><input type="text" id="placesSearchInput" placeholder="Search places…"></div>' +
     '<div id="placesListArea">Loading…</div>';
 
+  wireBackToDashboard();
   document.getElementById("addPlaceBtn").onclick = function(){ openAddPlaceModal(); };
 
   var snapshot = await getDocs(collection(db, "places"));

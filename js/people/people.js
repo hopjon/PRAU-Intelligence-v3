@@ -9,6 +9,7 @@ import { markPending, clearPending, isPending } from "../pendingWrites.js";
 import { getDisplayName } from "../userDisplay.js";
 import { profilingLocationViewHTML, profilingLocationEditHTML, wireProfilingLocationView, wireProfilingLocationEditor, profilingLocationPatch } from "../profilingLocation.js";
 import { PEOPLE_TAG_GROUPS, tagsViewHTML, tagsEditHTML, wireTagsEditor, tagsPatch } from "../tags.js";
+import { backToDashboardHTML, wireBackToDashboard } from "../backButton.js";
 
 ensureModelsLoaded();
 
@@ -202,6 +203,7 @@ export async function showPeople(){
   var content = document.getElementById("contentArea");
   content.innerHTML =
     '<div class="people-header">' +
+      backToDashboardHTML() +
       '<h1><i class="bi bi-person-fill"></i> People Database</h1>' +
       '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
         '<button class="btn-ghost" id="unidentifiedPeopleBtn"><i class="bi bi-question-circle-fill"></i> Unidentified People</button>' +
@@ -211,6 +213,7 @@ export async function showPeople(){
     '<div class="people-search" style="max-width:400px;margin:0 auto 16px;"><i class="bi bi-search"></i><input type="text" id="peopleSearchInput" placeholder="Search people…" style="width:100%;"></div>' +
     '<div id="peopleListArea">Loading…</div>';
 
+  wireBackToDashboard();
   document.getElementById("addPersonBtn").onclick = function(){ openAddPersonModal(); };
   document.getElementById("unidentifiedPeopleBtn").onclick = function(){
     renderUnidentifiedPeople(content, function(){ showPeople(); });

@@ -1,5 +1,6 @@
 import { db } from "./firebase.js";
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { backToDashboardHTML, wireBackToDashboard } from "./backButton.js";
 
 function escapeHtml(s){
   return (s||"").replace(/[&<>"']/g, function(c){
@@ -180,11 +181,12 @@ function renderResults(resultsEl, results){
 
 export function renderGlobalSearch(container){
   container.innerHTML =
-    '<div class="people-header"><h1><i class="bi bi-search"></i> Global Search</h1></div>' +
+    '<div class="people-header">' + backToDashboardHTML() + '<h1><i class="bi bi-search"></i> Global Search</h1></div>' +
     '<div class="people-search" style="max-width:500px;margin:0 auto 16px;"><i class="bi bi-search"></i>' +
       '<input type="text" id="globalSearchInput" placeholder="Search people, vehicles, places, encounters…" style="width:100%;"></div>' +
     '<div id="globalSearchResults"></div>';
 
+  wireBackToDashboard();
   var input = document.getElementById("globalSearchInput");
   var resultsEl = document.getElementById("globalSearchResults");
   resultsEl.innerHTML = '<div class="people-empty">Loading…</div>';

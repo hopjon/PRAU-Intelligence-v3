@@ -6,6 +6,7 @@ import { markPending, clearPending, isPending } from "./pendingWrites.js";
 import { profilingLocationViewHTML, profilingLocationEditHTML, wireProfilingLocationView, wireProfilingLocationEditor, profilingLocationPatch } from "./profilingLocation.js";
 import { VEHICLE_TAG_GROUPS, tagsViewHTML, tagsEditHTML, wireTagsEditor, tagsPatch } from "./tags.js";
 import { getDisplayName } from "./userDisplay.js";
+import { backToDashboardHTML, wireBackToDashboard } from "./backButton.js";
 
 var MAX_ENCOUNTERS = 6;
 
@@ -51,12 +52,14 @@ export async function renderVehicles(){
   var content = document.getElementById("contentArea");
   content.innerHTML =
     '<div class="people-header">' +
+      backToDashboardHTML() +
       '<h1><i class="bi bi-car-front-fill"></i> Vehicle Database</h1>' +
       '<button class="btn-primary" id="addVehicleBtn"><i class="bi bi-plus-circle-fill"></i> Add</button>' +
     '</div>' +
     '<div class="people-search" style="max-width:400px;margin:0 auto 16px;"><i class="bi bi-search"></i><input type="text" id="vehiclesSearchInput" placeholder="Search make, model, registration, VIN…" style="width:100%;"></div>' +
     '<div id="vehiclesListArea">Loading…</div>';
 
+  wireBackToDashboard();
   document.getElementById("addVehicleBtn").onclick = function(){ openAddVehicleModal(); };
 
   var snapshot = await getDocs(collection(db, "vehicles"));

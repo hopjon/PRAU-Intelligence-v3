@@ -72,6 +72,7 @@ function renderShell(displayName){
   document.getElementById("sidebarToggle").onclick = function(){ sidebarEl.classList.toggle("open"); };
   document.getElementById("sidebarBackdrop").onclick = function(){ sidebarEl.classList.remove("open"); };
   document.getElementById("navDashboard").onclick = function(){ currentView = "dashboard"; renderShell(displayName); };
+  window.__goToDashboard = function(){ document.getElementById("navDashboard").click(); };
   document.getElementById("navPeople").onclick = function(){ currentView = "people"; renderShell(displayName); };
   document.getElementById("navVehicles").onclick = function(){ currentView = "vehicles"; renderShell(displayName); };
   document.getElementById("navFace").onclick = function(){ currentView = "face"; renderShell(displayName); };

@@ -6,6 +6,7 @@ import { ensureModelsLoaded, computeDescriptorWhenReady, photoUrl, photoDescript
 import { getDisplayName } from "../userDisplay.js";
 import { profilingLocationViewHTML, profilingLocationEditHTML, wireProfilingLocationView, wireProfilingLocationEditor, profilingLocationPatch } from "../profilingLocation.js";
 import { PEOPLE_TAG_GROUPS, tagsViewHTML, tagsEditHTML, wireTagsEditor, tagsPatch } from "../tags.js";
+import { backToDashboardHTML, wireBackToDashboard } from "../backButton.js";
 
 ensureModelsLoaded();
 
@@ -64,6 +65,7 @@ function isPlaceholderLabel(s){
 export async function renderUnidentifiedPeople(container, backToPeople){
   container.innerHTML =
     '<div class="people-header">' +
+      backToDashboardHTML() +
       '<button class="btn-ghost" id="backToPeopleFromUnid">← Back</button>' +
       '<h1><i class="bi bi-question-circle-fill"></i> Unidentified People</h1>' +
       '<button class="btn-primary" id="addUnidBtn"><i class="bi bi-plus-circle-fill"></i> Add</button>' +
@@ -71,6 +73,7 @@ export async function renderUnidentifiedPeople(container, backToPeople){
     '<div class="people-search" style="max-width:400px;margin:0 auto 16px;"><i class="bi bi-search"></i><input type="text" id="unidSearchInput" placeholder="Search label or notes…" style="width:100%;"></div>' +
     '<div id="unidListArea">Loading…</div>';
 
+  wireBackToDashboard();
   document.getElementById("backToPeopleFromUnid").onclick = function(){ backToPeople(); };
   document.getElementById("addUnidBtn").onclick = function(){ openAddUnidentifiedModal(container, backToPeople); };
 
