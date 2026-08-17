@@ -490,7 +490,7 @@ async function renderVehicleProfile(id){
     if(!encounters.length) return '<div class="people-empty">No encounters recorded yet.</div>';
     return encounters.map(function(enc, i){
       var itemsPhotos = enc.itemsPhotos || [];
-      return '<div class="pf-encounter">' +
+      return '<div class="pf-encounter" data-i="' + i + '" style="cursor:pointer;">' +
         '<div class="pf-encounter-head"><span>Encounter ' + (i + 1) + ' — ' + escapeHtml(enc.date || "") + '</span>' +
         '<div style="display:flex;gap:8px;">' +
           '<button class="pf-encounter-edit" data-i="' + i + '" type="button">✏ Edit</button>' +
@@ -767,6 +767,67 @@ async function renderVehicleProfile(id){
         if(window.__openImageViewer) window.__openImageViewer(srcs, idx);
       };
     });
+
+    Array.prototype.forEach.call(document.querySelectorAll(".pf-encounter"), function(row){
+      row.onclick = function(e){
+        if(e.target.closest(".pf-encounter-edit, .pf-encounter-remove, .vehicle-enc-photo")) return;
+        var i = parseInt(row.getAttribute("data-i"), 10);
+        openEncounterDetailsModal(encounters[i]);
+      };
+    });
+  }
+
+  function openEncounterDetailsModal(enc){
+    var itemsPhotos = enc.itemsPhotos || [];
+    var backdrop = document.createElement("div");
+    backdrop.className = "modal-backdrop-custom";
+    backdrop.innerHTML =
+      '<div class="modal-card">' +
+        '<h2>Encounter Details</h2>' +
+        '<label>Date</label><div class="people-card-meta">' + escapeHtml(enc.date || "Not recorded") + '</div>' +
+        '<label>Location</label><div class="people-card-meta">' + escapeHtml(enc.location || "Not recorded") + '</div>' +
+        (enc.coords ? '<label>Coordinates</label><div class="people-card-meta">Lat ' + enc.coords[0] + ', Lon ' + enc.coords[1] + '</div>' : '') +
+        '<label>Items Found</label><div class="people-card-meta">' + escapeHtml(enc.itemsFound || "None recorded") + '</div>' +
+        '<label>Notes</label><div class="people-card-meta">' + escapeHtml(enc.notes || "None recorded") + '</div>' +
+        (itemsPhotos.length ?
+          '<label>Photos</label><div class="pf-photos-row" id="edPhotosRow">' +
+            itemsPhotos.map(function(ph, pi){ return '<div class="pf-photo-chip"><img class="vehicle-enc-photo" data-photo-i="' + pi + '" src="' + ph + '" style="cursor:pointer;"></div>'; }).join("") +
+          '</div>'
+        : '') +
+        '<label>Logged By</label><div class="people-card-meta">' + escapeHtml(enc.loggedBy || "Unknown") + '</div>' +
+        '<div class="modal-actions">' +
+          '<button class="btn-ghost" id="edCloseBtn">Close</button>' +
+          '<button class="btn-ghost" id="edEditBtn">Edit</button>' +
+          '<button class="btn-ghost" id="edDeleteBtn" style="color:#ef5350;border-color:#ef5350;">Delete</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(backdrop);
+    backdrop.onclick = function(e){ if(e.target === backdrop) backdrop.remove(); };
+    document.getElementById("edCloseBtn").onclick = function(){ backdrop.remove(); };
+
+    Array.prototype.forEach.call(backdrop.querySelectorAll(".vehicle-enc-photo"), function(img){
+      img.onclick = function(){
+        var srcs = itemsPhotos.map(function(ph){ return ph; });
+        if(window.__openImageViewer) window.__openImageViewer(srcs, parseInt(img.getAttribute("data-photo-i"), 10));
+      };
+    });
+
+    document.getElementById("edEditBtn").onclick = function(){
+      backdrop.remove();
+      openEditEncounterModal(enc, function(){
+        var updated = encounters.filter(function(e){ return e.id === enc.id; })[0];
+        if(updated) openEncounterDetailsModal(updated);
+      });
+    };
+
+    document.getElementById("edDeleteBtn").onclick = async function(){
+      if(!confirm("Remove this encounter?")) return;
+      try{ await deleteDoc(doc(db, "vehicleEncounters", enc.id)); }catch(e){}
+      await loadEncounters();
+      document.getElementById("encounterList").innerHTML = renderEncounters();
+      wireUp();
+      backdrop.remove();
+    };
   }
 
   function encounterFormHtml(existing){
@@ -868,7 +929,7 @@ async function renderVehicleProfile(id){
     };
   }
 
-  function openEditEncounterModal(existing){
+  function openEditEncounterModal(existing, onSaved){
     var itemsPhotos = existing.itemsPhotos ? existing.itemsPhotos.slice() : [];
     var encCoords = existing.coords || null;
     var backdrop = document.createElement("div");
@@ -899,6 +960,7 @@ async function renderVehicleProfile(id){
         backdrop.remove();
         document.getElementById("encounterList").innerHTML = renderEncounters();
         wireUp();
+        if(onSaved) onSaved();
       }catch(e){
         document.getElementById("encError").textContent = "Could not save — check your connection.";
         this.disabled = false;

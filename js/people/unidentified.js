@@ -379,15 +379,16 @@ async function renderUnidentifiedProfile(container, id, backToPeople){
     Array.prototype.forEach.call(backdrop.querySelectorAll(".pf-photo-view"), function(img){
       img.onclick = function(){
         var srcs = itemsPhotos.map(function(ph){ return photoUrl(ph); });
-        var photoIndex = parseInt(img.getAttribute("data-photo-i"), 10);
-        backdrop.remove(); // the image viewer's z-index sits below .modal-backdrop-custom; close first so it's visible
-        if(window.__openImageViewer) window.__openImageViewer(srcs, photoIndex);
+        if(window.__openImageViewer) window.__openImageViewer(srcs, parseInt(img.getAttribute("data-photo-i"), 10));
       };
     });
 
     document.getElementById("edEditBtn").onclick = function(){
       backdrop.remove();
-      openEditEncounterModal(enc);
+      openEditEncounterModal(enc, function(){
+        var updated = encounters.filter(function(e){ return e.id === enc.id; })[0];
+        if(updated) openEncounterDetailsModal(updated);
+      });
     };
 
     document.getElementById("edDeleteBtn").onclick = async function(){
@@ -493,7 +494,7 @@ async function renderUnidentifiedProfile(container, id, backToPeople){
     };
   }
 
-  function openEditEncounterModal(existing){
+  function openEditEncounterModal(existing, onSaved){
     var itemsPhotos = existing.itemsPhotos ? existing.itemsPhotos.slice() : [];
     var encCoords = existing.coords || null;
 
@@ -576,6 +577,7 @@ async function renderUnidentifiedProfile(container, id, backToPeople){
         await loadEncounters();
         backdrop.remove();
         refreshEncounterList();
+        if(onSaved) onSaved();
       }catch(e){
         document.getElementById("encError").textContent = "Could not save — check your connection.";
         this.disabled = false;

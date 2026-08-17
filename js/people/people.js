@@ -958,15 +958,16 @@ async function renderPersonProfile(id){
     Array.prototype.forEach.call(backdrop.querySelectorAll(".pf-photo-view"), function(img){
       img.onclick = function(){
         var srcs = itemsPhotos.map(function(ph){ return photoUrl(ph); });
-        var photoIndex = parseInt(img.getAttribute("data-photo-i"), 10);
-        backdrop.remove(); // the image viewer's z-index sits below .modal-backdrop-custom; close first so it's visible
-        openImageViewer(srcs, photoIndex);
+        openImageViewer(srcs, parseInt(img.getAttribute("data-photo-i"), 10));
       };
     });
 
     document.getElementById("edEditBtn").onclick = function(){
       backdrop.remove();
-      openEditEncounterModal(enc);
+      openEditEncounterModal(enc, function(){
+        var updated = encounters.filter(function(e){ return e.id === enc.id; })[0];
+        if(updated) openEncounterDetailsModal(updated);
+      });
     };
 
     document.getElementById("edDeleteBtn").onclick = async function(){
@@ -1080,7 +1081,7 @@ async function renderPersonProfile(id){
     };
   }
 
-  function openEditEncounterModal(existing){
+  function openEditEncounterModal(existing, onSaved){
     var itemsPhotos = existing.itemsPhotos ? existing.itemsPhotos.slice() : [];
     var encCoords = existing.coords || null;
 
@@ -1167,6 +1168,7 @@ async function renderPersonProfile(id){
         newEncounterBtn.disabled = encounters.length >= MAX_ENCOUNTERS;
         newEncounterBtn.textContent = encounters.length >= MAX_ENCOUNTERS ? "Maximum of 6 encounters reached" : "+ New Encounter (" + encounters.length + "/" + MAX_ENCOUNTERS + ")";
         wireUp();
+        if(onSaved) onSaved();
       }catch(e){
         document.getElementById("encError").textContent = "Could not save — check your connection.";
         this.disabled = false;
