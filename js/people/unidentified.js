@@ -286,7 +286,7 @@ async function renderUnidentifiedProfile(container, id, backToPeople){
     if(!encounters.length) return '<div class="people-empty">No encounters recorded yet.</div>';
     return encounters.map(function(enc, i){
       var itemsPhotos = enc.itemsPhotos || [];
-      return '<div class="pf-encounter">' +
+      return '<div class="pf-encounter" data-i="' + i + '" style="cursor:pointer;">' +
         '<div class="pf-encounter-head"><span>Encounter ' + (i + 1) + ' — ' + escapeHtml(enc.date || "") + '</span>' +
         '<div style="display:flex;gap:8px;">' +
           '<button class="pf-encounter-edit" data-i="' + i + '" type="button">✏ Edit</button>' +
@@ -337,6 +337,65 @@ async function renderUnidentifiedProfile(container, id, backToPeople){
     document.getElementById("newEncounterBtn").onclick = function(){
       if(encounters.length >= MAX_ENCOUNTERS) return;
       openNewEncounterModal();
+    };
+
+    Array.prototype.forEach.call(document.querySelectorAll(".pf-encounter"), function(row){
+      row.onclick = function(e){
+        if(e.target.closest(".pf-encounter-edit, .pf-encounter-remove, .pf-photo-view")) return;
+        var i = parseInt(row.getAttribute("data-i"), 10);
+        openEncounterDetailsModal(encounters[i]);
+      };
+    });
+  }
+
+  function openEncounterDetailsModal(enc){
+    var itemsPhotos = enc.itemsPhotos || [];
+    var backdrop = document.createElement("div");
+    backdrop.className = "modal-backdrop-custom";
+    backdrop.innerHTML =
+      '<div class="modal-card">' +
+        '<h2>Encounter Details</h2>' +
+        '<label>Date</label><div class="people-card-meta">' + escapeHtml(enc.date || "Not recorded") + '</div>' +
+        '<label>Location</label><div class="people-card-meta">' + escapeHtml(enc.location || "Not recorded") + '</div>' +
+        (enc.coords ? '<label>Coordinates</label><div class="people-card-meta">Lat ' + enc.coords[0] + ', Lon ' + enc.coords[1] + '</div>' : '') +
+        '<label>Items Found</label><div class="people-card-meta">' + escapeHtml(enc.itemsFound || "None recorded") + '</div>' +
+        '<label>Notes</label><div class="people-card-meta">' + escapeHtml(enc.notes || "None recorded") + '</div>' +
+        (itemsPhotos.length ?
+          '<label>Photos</label><div class="pf-photos-row" id="edPhotosRow">' +
+            itemsPhotos.map(function(ph, pi){ return '<div class="pf-photo-chip"><img class="pf-photo-view" data-photo-i="' + pi + '" src="' + photoUrl(ph) + '" style="cursor:pointer;"></div>'; }).join("") +
+          '</div>'
+        : '') +
+        '<label>Logged By</label><div class="people-card-meta">' + escapeHtml(getDisplayName(enc.loggedBy)) + '</div>' +
+        '<div class="modal-actions">' +
+          '<button class="btn-ghost" id="edCloseBtn">Close</button>' +
+          '<button class="btn-ghost" id="edEditBtn">Edit</button>' +
+          '<button class="btn-ghost" id="edDeleteBtn" style="color:#ef5350;border-color:#ef5350;">Delete</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(backdrop);
+    backdrop.onclick = function(e){ if(e.target === backdrop) backdrop.remove(); };
+    document.getElementById("edCloseBtn").onclick = function(){ backdrop.remove(); };
+
+    Array.prototype.forEach.call(backdrop.querySelectorAll(".pf-photo-view"), function(img){
+      img.onclick = function(){
+        var srcs = itemsPhotos.map(function(ph){ return photoUrl(ph); });
+        var photoIndex = parseInt(img.getAttribute("data-photo-i"), 10);
+        backdrop.remove(); // the image viewer's z-index sits below .modal-backdrop-custom; close first so it's visible
+        if(window.__openImageViewer) window.__openImageViewer(srcs, photoIndex);
+      };
+    });
+
+    document.getElementById("edEditBtn").onclick = function(){
+      backdrop.remove();
+      openEditEncounterModal(enc);
+    };
+
+    document.getElementById("edDeleteBtn").onclick = async function(){
+      if(!confirm("Remove this encounter?")) return;
+      try{ await deleteDoc(doc(db, "encounters", enc.id)); }catch(e){}
+      await loadEncounters();
+      refreshEncounterList();
+      backdrop.remove();
     };
   }
 
