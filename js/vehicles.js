@@ -502,7 +502,7 @@ async function renderVehicleProfile(id){
           itemsPhotos.map(function(ph, pi){ return '<div class="pf-photo-chip"><img class="vehicle-enc-photo" src="' + ph + '" style="cursor:pointer;" data-enc-i="' + i + '" data-photo-i="' + pi + '"></div>'; }).join("") +
         '</div>' : '') +
         (enc.notes ? '<div class="people-card-meta">' + escapeHtml(enc.notes) + '</div>' : '') +
-        (enc.loggedBy ? '<div class="people-card-meta" style="opacity:0.6;">Logged by ' + escapeHtml(enc.loggedBy) + '</div>' : '') +
+        (enc.loggedBy ? '<div class="people-card-meta" style="opacity:0.6;">Logged by ' + escapeHtml(getDisplayName(enc.loggedBy)) + '</div>' : '') +
       '</div>';
     }).join("");
   }
@@ -794,7 +794,7 @@ async function renderVehicleProfile(id){
             itemsPhotos.map(function(ph, pi){ return '<div class="pf-photo-chip"><img class="vehicle-enc-photo" data-photo-i="' + pi + '" src="' + ph + '" style="cursor:pointer;"></div>'; }).join("") +
           '</div>'
         : '') +
-        '<label>Logged By</label><div class="people-card-meta">' + escapeHtml(enc.loggedBy || "Unknown") + '</div>' +
+        '<label>Logged By</label><div class="people-card-meta">' + escapeHtml(enc.loggedBy ? getDisplayName(enc.loggedBy) : "Unknown") + '</div>' +
         '<div class="modal-actions">' +
           '<button class="btn-ghost" id="edCloseBtn">Close</button>' +
           '<button class="btn-ghost" id="edEditBtn">Edit</button>' +

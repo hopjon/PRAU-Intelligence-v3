@@ -4,7 +4,8 @@
 var EMAIL_DISPLAY_NAMES = {
   "hopjon01@yahoo.com": "Jono",
   "snakeman07@protonmail.com": "Justin",
-  "raven@prau.co.za": "Raven"
+  "raven@prau.co.za": "Raven",
+  "test@prau.local": "Jono"
 };
 
 // Legacy records (pre-dating full-email attribution) stored just the email's
