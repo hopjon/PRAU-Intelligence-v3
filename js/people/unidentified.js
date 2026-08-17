@@ -1,6 +1,6 @@
 import { db, auth } from "../firebase.js";
 import {
-  collection, getDocs, addDoc, updateDoc, doc, getDoc
+  collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc, query, where
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { ensureModelsLoaded, computeDescriptorWhenReady, photoUrl, photoDescriptor, matchThreshold, euclidean } from "../face.js";
 import { getDisplayName } from "../userDisplay.js";
@@ -9,6 +9,8 @@ import { PEOPLE_TAG_GROUPS, tagsViewHTML, tagsEditHTML, wireTagsEditor, tagsPatc
 import { backToDashboardHTML, wireBackToDashboard } from "../backButton.js";
 
 ensureModelsLoaded();
+
+var MAX_ENCOUNTERS = 6;
 
 // ---------- helpers ----------
 function escapeHtml(s){
@@ -59,6 +61,37 @@ function recordLabel(u){
 function isPlaceholderLabel(s){
   var norm = (s || "").trim().toLowerCase();
   return !norm || norm === "unlabeled" || /^unknown( (male|female))?$/.test(norm);
+}
+function getBestLocation(statusEl, onResult, timeoutMs){
+  timeoutMs = timeoutMs || 8000;
+  if(!navigator.geolocation){
+    statusEl.textContent = "Location isn't available on this device.";
+    return;
+  }
+  var best = null;
+  var watchId = null;
+  var finished = false;
+
+  function finish(){
+    if(finished) return;
+    finished = true;
+    if(watchId !== null) navigator.geolocation.clearWatch(watchId);
+    if(best){ onResult(best); }
+    else{ statusEl.textContent = "Couldn't get a location fix — enter it manually."; }
+  }
+
+  statusEl.textContent = "Getting current location…";
+  watchId = navigator.geolocation.watchPosition(function(pos){
+    if(!best || pos.coords.accuracy < best.coords.accuracy){
+      best = pos;
+      statusEl.textContent = "Refining location… (±" + Math.round(pos.coords.accuracy) + "m so far)";
+    }
+    if(pos.coords.accuracy <= 15){ finish(); }
+  }, function(){
+    if(!best) statusEl.textContent = "Couldn't get location — enter it manually.";
+  }, { enableHighAccuracy: true, maximumAge: 0, timeout: timeoutMs });
+
+  setTimeout(finish, timeoutMs);
 }
 
 // ---------- list ----------
@@ -239,6 +272,258 @@ async function renderUnidentifiedProfile(container, id, backToPeople){
   var pendingPhotos = u.photos ? u.photos.slice() : [];
   var ufPlEditor = null;
   var ufTagsEditor = null;
+  var encounters = [];
+
+  async function loadEncounters(){
+    var q = query(collection(db, "encounters"), where("personId", "==", id));
+    var snap2 = await getDocs(q);
+    encounters = [];
+    snap2.forEach(function(d){ encounters.push(Object.assign({ id: d.id }, d.data())); });
+    encounters.sort(function(a, b){ return (a.date || "").localeCompare(b.date || ""); });
+  }
+
+  function renderEncounters(){
+    if(!encounters.length) return '<div class="people-empty">No encounters recorded yet.</div>';
+    return encounters.map(function(enc, i){
+      var itemsPhotos = enc.itemsPhotos || [];
+      return '<div class="pf-encounter">' +
+        '<div class="pf-encounter-head"><span>Encounter ' + (i + 1) + ' — ' + escapeHtml(enc.date || "") + '</span>' +
+        '<div style="display:flex;gap:8px;">' +
+          '<button class="pf-encounter-edit" data-i="' + i + '" type="button">✏ Edit</button>' +
+          '<button class="pf-encounter-remove" data-id="' + enc.id + '" type="button">Remove</button></div>' +
+        '</div>' +
+        (enc.location ? '<div class="people-card-meta">📍 ' + escapeHtml(enc.location) + '</div>' : '') +
+        (enc.itemsFound ? '<div class="people-card-meta">Items found: ' + escapeHtml(enc.itemsFound) + '</div>' : '') +
+        (itemsPhotos.length ? '<div class="pf-photos-row" style="margin-top:8px;">' +
+          itemsPhotos.map(function(ph, pi){ return '<div class="pf-photo-chip"><img class="pf-photo-view enc-photo-view" data-enc-i="' + i + '" data-photo-i="' + pi + '" src="' + photoUrl(ph) + '" style="cursor:pointer;"></div>'; }).join("") +
+        '</div>' : '') +
+        (enc.notes ? '<div class="people-card-meta">' + escapeHtml(enc.notes) + '</div>' : '') +
+        (enc.loggedBy ? '<div class="people-card-meta" style="opacity:0.6;">Logged by ' + escapeHtml(getDisplayName(enc.loggedBy)) + '</div>' : '') +
+      '</div>';
+    }).join("");
+  }
+
+  function refreshEncounterList(){
+    document.getElementById("encounterList").innerHTML = renderEncounters();
+    var newEncounterBtn = document.getElementById("newEncounterBtn");
+    newEncounterBtn.disabled = encounters.length >= MAX_ENCOUNTERS;
+    newEncounterBtn.textContent = encounters.length >= MAX_ENCOUNTERS ? "Maximum of 6 encounters reached" : "+ New Encounter (" + encounters.length + "/" + MAX_ENCOUNTERS + ")";
+    wireEncounters();
+  }
+
+  function wireEncounters(){
+    Array.prototype.forEach.call(document.querySelectorAll(".pf-encounter-remove"), function(btn){
+      btn.onclick = async function(){
+        var encId = btn.getAttribute("data-id");
+        if(!confirm("Remove this encounter?")) return;
+        try{ await deleteDoc(doc(db, "encounters", encId)); }catch(e){}
+        await loadEncounters();
+        refreshEncounterList();
+      };
+    });
+    Array.prototype.forEach.call(document.querySelectorAll(".pf-encounter-edit"), function(btn){
+      btn.onclick = function(){
+        var i = parseInt(btn.getAttribute("data-i"), 10);
+        openEditEncounterModal(encounters[i]);
+      };
+    });
+    Array.prototype.forEach.call(document.querySelectorAll("#encounterList .pf-photo-view"), function(img){
+      img.onclick = function(){
+        var enc = encounters[parseInt(img.getAttribute("data-enc-i"), 10)];
+        var srcs = (enc.itemsPhotos || []).map(function(ph){ return photoUrl(ph); });
+        if(window.__openImageViewer) window.__openImageViewer(srcs, parseInt(img.getAttribute("data-photo-i"), 10));
+      };
+    });
+    document.getElementById("newEncounterBtn").onclick = function(){
+      if(encounters.length >= MAX_ENCOUNTERS) return;
+      openNewEncounterModal();
+    };
+  }
+
+  function openNewEncounterModal(){
+    var itemsPhotos = [];
+    var backdrop = document.createElement("div");
+    backdrop.className = "modal-backdrop-custom";
+    backdrop.innerHTML =
+      '<div class="modal-card">' +
+        '<h2>New Encounter</h2>' +
+        '<label>Date</label><input type="date" id="encDate" value="' + new Date().toISOString().slice(0,10) + '">' +
+        '<label>Location profiled</label>' +
+        '<div style="display:flex;gap:8px;">' +
+          '<input id="encLocation" style="flex:1;" placeholder="Where this took place">' +
+          '<button class="btn-ghost" id="encGpsBtn" type="button" style="flex-shrink:0;padding:11px 14px;">📍</button>' +
+        '</div>' +
+        '<div class="modal-error" id="encGpsStatus" style="text-align:left;color:#888;"></div>' +
+        '<label>Items found</label><textarea id="encItems"></textarea>' +
+        '<label>Photos of items found</label>' +
+        '<div class="pf-photos-row" id="encItemsPhotosRow"><button class="pf-add-photo" id="encAddItemsPhotoBtn" type="button">＋</button></div>' +
+        '<input type="file" id="encItemsPhotoFile" accept="image/*" capture="environment" style="display:none;">' +
+        '<label>Notes</label><textarea id="encNotes"></textarea>' +
+        '<div class="modal-actions">' +
+          '<button class="btn-ghost" id="encCancel">Cancel</button>' +
+          '<button class="btn-primary" id="encSave">Save Encounter</button>' +
+        '</div>' +
+        '<div class="modal-error" id="encError"></div>' +
+      '</div>';
+    document.body.appendChild(backdrop);
+    backdrop.onclick = function(e){ if(e.target === backdrop) backdrop.remove(); };
+    document.getElementById("encCancel").onclick = function(){ backdrop.remove(); };
+
+    function renderItemsPhotos(){
+      var row = document.getElementById("encItemsPhotosRow");
+      var addBtn = document.getElementById("encAddItemsPhotoBtn");
+      var html = "";
+      itemsPhotos.forEach(function(ph, i){
+        html += '<div class="pf-photo-chip"><img src="' + ph + '"><button class="pf-rm" data-i="' + i + '" type="button">✕</button></div>';
+      });
+      row.innerHTML = html;
+      row.appendChild(addBtn);
+      Array.prototype.forEach.call(row.querySelectorAll(".pf-rm"), function(btn){
+        btn.onclick = function(){ itemsPhotos.splice(parseInt(btn.getAttribute("data-i"), 10), 1); renderItemsPhotos(); };
+      });
+    }
+    document.getElementById("encAddItemsPhotoBtn").onclick = function(){
+      document.getElementById("encItemsPhotoFile").value = "";
+      document.getElementById("encItemsPhotoFile").click();
+    };
+    document.getElementById("encItemsPhotoFile").onchange = async function(){
+      var file = this.files[0];
+      if(!file) return;
+      var dataUrl = await fileToCompressedDataUrl(file, 480);
+      itemsPhotos.push(dataUrl);
+      renderItemsPhotos();
+    };
+
+    var encCoords = null;
+    document.getElementById("encGpsBtn").onclick = function(){
+      var statusEl = document.getElementById("encGpsStatus");
+      var input = document.getElementById("encLocation");
+      getBestLocation(statusEl, function(pos){
+        encCoords = [pos.coords.latitude, pos.coords.longitude];
+        input.value = "Lat " + pos.coords.latitude.toFixed(5) + ", Lon " + pos.coords.longitude.toFixed(5);
+        statusEl.textContent = "Location captured (accuracy ±" + Math.round(pos.coords.accuracy) + "m).";
+      });
+    };
+    document.getElementById("encGpsBtn").click();
+
+    document.getElementById("encSave").onclick = async function(){
+      var newEnc = {
+        personId: id,
+        date: document.getElementById("encDate").value,
+        location: document.getElementById("encLocation").value.trim(),
+        coords: encCoords,
+        itemsFound: document.getElementById("encItems").value.trim(),
+        itemsPhotos: itemsPhotos,
+        notes: document.getElementById("encNotes").value.trim(),
+        loggedBy: (auth.currentUser && auth.currentUser.email) || "unknown",
+        createdAt: new Date().toISOString()
+      };
+      this.disabled = true;
+      this.textContent = "Saving…";
+      try{
+        var ref = await addDoc(collection(db, "encounters"), newEnc);
+        encounters.push(Object.assign({ id: ref.id }, newEnc));
+        encounters.sort(function(a, b){ return (a.date || "").localeCompare(b.date || ""); });
+        refreshEncounterList();
+        backdrop.remove();
+      }catch(e){
+        document.getElementById("encError").textContent = "Could not save — check your connection.";
+        this.disabled = false;
+        this.textContent = "Save Encounter";
+      }
+    };
+  }
+
+  function openEditEncounterModal(existing){
+    var itemsPhotos = existing.itemsPhotos ? existing.itemsPhotos.slice() : [];
+    var encCoords = existing.coords || null;
+
+    var backdrop = document.createElement("div");
+    backdrop.className = "modal-backdrop-custom";
+    backdrop.innerHTML =
+      '<div class="modal-card">' +
+        '<h2>Edit Encounter</h2>' +
+        '<label>Date</label><input type="date" id="encDate" value="' + escapeHtml(existing.date || "") + '">' +
+        '<label>Location profiled</label>' +
+        '<div style="display:flex;gap:8px;">' +
+          '<input id="encLocation" style="flex:1;" value="' + escapeHtml(existing.location || "") + '" placeholder="Where this took place">' +
+          '<button class="btn-ghost" id="encGpsBtn" type="button" style="flex-shrink:0;padding:11px 14px;">📍</button>' +
+        '</div>' +
+        '<div class="modal-error" id="encGpsStatus" style="text-align:left;color:#888;"></div>' +
+        '<label>Items found</label><textarea id="encItems">' + escapeHtml(existing.itemsFound || "") + '</textarea>' +
+        '<label>Photos of items found</label>' +
+        '<div class="pf-photos-row" id="encItemsPhotosRow"><button class="pf-add-photo" id="encAddItemsPhotoBtn" type="button">＋</button></div>' +
+        '<input type="file" id="encItemsPhotoFile" accept="image/*" capture="environment" style="display:none;">' +
+        '<label>Notes</label><textarea id="encNotes">' + escapeHtml(existing.notes || "") + '</textarea>' +
+        '<div class="modal-actions">' +
+          '<button class="btn-ghost" id="encCancel">Cancel</button>' +
+          '<button class="btn-primary" id="encSave">Save Changes</button>' +
+        '</div>' +
+        '<div class="modal-error" id="encError"></div>' +
+      '</div>';
+    document.body.appendChild(backdrop);
+    backdrop.onclick = function(e){ if(e.target === backdrop) backdrop.remove(); };
+    document.getElementById("encCancel").onclick = function(){ backdrop.remove(); };
+
+    function renderItemsPhotos(){
+      var row = document.getElementById("encItemsPhotosRow");
+      var addBtn = document.getElementById("encAddItemsPhotoBtn");
+      var html = "";
+      itemsPhotos.forEach(function(ph, i){
+        html += '<div class="pf-photo-chip"><img src="' + ph + '"><button class="pf-rm" data-i="' + i + '" type="button">✕</button></div>';
+      });
+      row.innerHTML = html;
+      row.appendChild(addBtn);
+      Array.prototype.forEach.call(row.querySelectorAll(".pf-rm"), function(btn){
+        btn.onclick = function(){ itemsPhotos.splice(parseInt(btn.getAttribute("data-i"), 10), 1); renderItemsPhotos(); };
+      });
+    }
+    renderItemsPhotos();
+    document.getElementById("encAddItemsPhotoBtn").onclick = function(){
+      document.getElementById("encItemsPhotoFile").value = "";
+      document.getElementById("encItemsPhotoFile").click();
+    };
+    document.getElementById("encItemsPhotoFile").onchange = async function(){
+      var file = this.files[0];
+      if(!file) return;
+      var dataUrl = await fileToCompressedDataUrl(file, 480);
+      itemsPhotos.push(dataUrl);
+      renderItemsPhotos();
+    };
+
+    document.getElementById("encGpsBtn").onclick = function(){
+      var statusEl = document.getElementById("encGpsStatus");
+      var input = document.getElementById("encLocation");
+      getBestLocation(statusEl, function(pos){
+        encCoords = [pos.coords.latitude, pos.coords.longitude];
+        input.value = "Lat " + pos.coords.latitude.toFixed(5) + ", Lon " + pos.coords.longitude.toFixed(5);
+        statusEl.textContent = "Location captured (accuracy ±" + Math.round(pos.coords.accuracy) + "m).";
+      });
+    };
+
+    document.getElementById("encSave").onclick = async function(){
+      var updates = {
+        date: document.getElementById("encDate").value,
+        location: document.getElementById("encLocation").value.trim(),
+        coords: encCoords,
+        itemsFound: document.getElementById("encItems").value.trim(),
+        itemsPhotos: itemsPhotos,
+        notes: document.getElementById("encNotes").value.trim()
+      };
+      this.disabled = true;
+      this.textContent = "Saving…";
+      try{
+        await updateDoc(doc(db, "encounters", existing.id), updates);
+        await loadEncounters();
+        backdrop.remove();
+        refreshEncounterList();
+      }catch(e){
+        document.getElementById("encError").textContent = "Could not save — check your connection.";
+        this.disabled = false;
+        this.textContent = "Save Changes";
+      }
+    };
+  }
 
   function render(){
     container.innerHTML =
@@ -275,6 +560,13 @@ async function renderUnidentifiedProfile(container, id, backToPeople){
           '<input type="file" id="ufPhotoFile" accept="image/*" capture="environment" style="display:none;">' +
           '<input type="file" id="ufImportFile" accept="image/*" multiple style="display:none;">'
         : '') +
+
+        '<hr>' +
+        '<h3>Encounters</h3>' +
+        '<div id="encounterList">' + renderEncounters() + '</div>' +
+        '<button class="pf-add-encounter" id="newEncounterBtn" type="button"' + (encounters.length >= MAX_ENCOUNTERS ? ' disabled' : '') + '>' +
+          (encounters.length >= MAX_ENCOUNTERS ? "Maximum of 6 encounters reached" : "+ New Encounter (" + encounters.length + "/" + MAX_ENCOUNTERS + ")") +
+        '</button>' +
 
         ((u.photos && u.photos.length) ?
           '<hr>' +
@@ -518,6 +810,8 @@ async function renderUnidentifiedProfile(container, id, backToPeople){
       };
     }
 
+    wireEncounters();
+
     renderPhotos();
     if(editMode){
       document.getElementById("ufAddPhotoBtn").onclick = function(){
@@ -542,5 +836,6 @@ async function renderUnidentifiedProfile(container, id, backToPeople){
     }
   }
 
+  await loadEncounters();
   render();
 }
