@@ -38,11 +38,18 @@ function openForcedLogoutModal(){
       '</div>' +
     '</div>';
   document.body.appendChild(el);
+  el.style.zIndex = "2200"; // above every other app overlay (.modal-backdrop-custom: 2000, #imageViewer: 2100)
   el.addEventListener("hidden.bs.modal", function(){ el.remove(); });
   new bootstrap.Modal(el).show();
+  var bsBackdrop = document.body.querySelector(".modal-backdrop:last-of-type");
+  if(bsBackdrop) bsBackdrop.style.zIndex = "2199";
 }
 
 function renderLogin(){
+  Array.prototype.forEach.call(document.querySelectorAll(".modal-backdrop-custom"), function(el){ el.remove(); });
+  var imageViewerEl = document.getElementById("imageViewer");
+  if(imageViewerEl) imageViewerEl.style.display = "none";
+
   appEl.innerHTML = `
     <div class="login-screen">
       <div class="login-card">
