@@ -3,6 +3,7 @@ import { showDashboard } from "./dashboard.js";
 import { registerRoute } from "./layout/router.js";
 import { showPeople } from "./people/people.js";
 import { APP_VERSION } from "./version.js";
+import "./versionCheck.js";
 
 const appEl = document.getElementById("app");
 
