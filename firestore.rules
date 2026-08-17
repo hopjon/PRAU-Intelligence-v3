@@ -204,9 +204,18 @@ service cloud.firestore {
       allow update: if isApprovedUser() && vehicleEncountersUpdateValid();
     }
 
+    // Single-session enforcement: a device may only write its OWN session
+    // doc (never another user's), and only a minimal, typed token payload.
+    function sessionValid() {
+      let data = request.resource.data;
+      return data.sessionToken is string && data.sessionToken.size() > 0 && data.sessionToken.size() <= 100 &&
+        optStr(data, 'loggedInAt', 40);
+    }
+
     match /sessions/{uid} {
       allow read: if request.auth != null && request.auth.uid == uid;
-      allow write: if false;
+      allow create, update: if request.auth != null && request.auth.uid == uid && sessionValid();
+      allow delete: if false;
     }
 
     match /teamMembers/{email} {

@@ -17,6 +17,31 @@ updateOfflineBanner();
 window.addEventListener("offline", updateOfflineBanner);
 window.addEventListener("online", updateOfflineBanner);
 
+var pendingForcedLogoutModal = false;
+
+function openForcedLogoutModal(){
+  var el = document.createElement("div");
+  el.className = "modal fade";
+  el.tabIndex = -1;
+  el.innerHTML =
+    '<div class="modal-dialog modal-dialog-centered">' +
+      '<div class="modal-content" style="background:#0f0f0f;color:var(--text);border:1px solid var(--gold);">' +
+        '<div class="modal-header" style="border-bottom:1px solid var(--border);">' +
+          '<h5 class="modal-title" style="color:var(--gold);">Signed out</h5>' +
+        '</div>' +
+        '<div class="modal-body">' +
+          '<p style="color:var(--text);margin:0;">Your account was logged in on another device. You have been signed out of this device.</p>' +
+        '</div>' +
+        '<div class="modal-footer" style="border-top:1px solid var(--border);">' +
+          '<button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(el);
+  el.addEventListener("hidden.bs.modal", function(){ el.remove(); });
+  new bootstrap.Modal(el).show();
+}
+
 function renderLogin(){
   appEl.innerHTML = `
     <div class="login-screen">
@@ -38,6 +63,11 @@ function renderLogin(){
       <div class="login-version">v${APP_VERSION}</div>
     </div>
   `;
+
+  if(pendingForcedLogoutModal){
+    pendingForcedLogoutModal = false;
+    openForcedLogoutModal();
+  }
 
   document.getElementById("togglePassword").onclick = function(){
     var pw = document.getElementById("loginPassword");
@@ -65,5 +95,9 @@ function renderLogin(){
 
 
 
-watchAuth(showDashboard, renderLogin);
+watchAuth(function(user){
+  showDashboard(user);
+}, renderLogin, function(){
+  pendingForcedLogoutModal = true;
+});
 registerRoute("people", showPeople);
