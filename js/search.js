@@ -17,6 +17,7 @@ function vehicleTitle(v){
 // Module-level cache: fetched once per app session on first Search open, reused after that.
 var cache = null;
 var loadPromise = null;
+var DATA_LOAD_TIMEOUT_MS = 15000;
 
 function loadSearchData(){
   if(cache) return Promise.resolve(cache);
@@ -189,16 +190,42 @@ export function renderGlobalSearch(container){
   wireBackToDashboard();
   var input = document.getElementById("globalSearchInput");
   var resultsEl = document.getElementById("globalSearchResults");
-  resultsEl.innerHTML = '<div class="people-empty">Loading…</div>';
-
-  cache = null;
-  loadPromise = null;
 
   var loadedData = null;
-  loadSearchData().then(function(data){
-    loadedData = data;
-    resultsEl.innerHTML = '<div class="people-empty">Type to search across People, Vehicles, Places and Encounters.</div>';
-  });
+  function showLoadError(){
+    resultsEl.innerHTML =
+      '<div class="people-empty">Couldn\'t load search data.</div>' +
+      '<div style="text-align:center;margin-top:12px;">' +
+        '<button class="btn-primary" id="searchRetryBtn" style="display:inline-flex;">Retry</button>' +
+      '</div>';
+    document.getElementById("searchRetryBtn").onclick = attemptLoad;
+  }
+  function attemptLoad(){
+    cache = null;
+    loadPromise = null;
+    resultsEl.innerHTML = '<div class="people-empty">Loading…</div>';
+    var settled = false;
+    var timeoutId = setTimeout(function(){
+      if(settled) return;
+      settled = true;
+      console.error("Search data load timed out");
+      showLoadError();
+    }, DATA_LOAD_TIMEOUT_MS);
+    loadSearchData().then(function(data){
+      clearTimeout(timeoutId);
+      if(settled) return;
+      settled = true;
+      loadedData = data;
+      resultsEl.innerHTML = '<div class="people-empty">Type to search across People, Vehicles, Places and Encounters.</div>';
+    }).catch(function(e){
+      clearTimeout(timeoutId);
+      if(settled) return;
+      settled = true;
+      console.error("Search data load failed:", e);
+      showLoadError();
+    });
+  }
+  attemptLoad();
 
   var debounceTimer = null;
   input.oninput = function(){

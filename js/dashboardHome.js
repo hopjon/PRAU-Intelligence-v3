@@ -24,8 +24,27 @@ function timeAgo(iso){
   return days + "d ago";
 }
 
+var DATA_LOAD_TIMEOUT_MS = 15000;
+
 export async function renderDashboardHome(container, navigateTo){
   container.innerHTML = '<div class="people-empty">Loading dashboard…</div>';
+
+  function showLoadError(){
+    container.innerHTML =
+      '<div class="people-empty">Couldn\'t load dashboard data.</div>' +
+      '<div style="text-align:center;margin-top:12px;">' +
+        '<button class="btn-primary" id="dashRetryBtn" style="display:inline-flex;">Retry</button>' +
+      '</div>';
+    document.getElementById("dashRetryBtn").onclick = function(){ renderDashboardHome(container, navigateTo); };
+  }
+
+  var settled = false;
+  var timeoutId = setTimeout(function(){
+    if(settled) return;
+    settled = true;
+    console.error("Dashboard data load timed out");
+    showLoadError();
+  }, DATA_LOAD_TIMEOUT_MS);
 
   var peopleSnap, vehiclesSnap, placesSnap, unidentifiedSnap, encSnap, vEncSnap;
   try{
@@ -36,15 +55,17 @@ export async function renderDashboardHome(container, navigateTo){
     encSnap = await getDocs(collection(db, "encounters"));
     vEncSnap = await getDocs(collection(db, "vehicleEncounters"));
   }catch(e){
+    clearTimeout(timeoutId);
+    if(settled) return;
+    settled = true;
     console.error("Dashboard data load failed:", e);
-    container.innerHTML =
-      '<div class="people-empty">Couldn\'t load dashboard data.</div>' +
-      '<div style="text-align:center;margin-top:12px;">' +
-        '<button class="btn-primary" id="dashRetryBtn" style="display:inline-flex;">Retry</button>' +
-      '</div>';
-    document.getElementById("dashRetryBtn").onclick = function(){ renderDashboardHome(container, navigateTo); };
+    showLoadError();
     return;
   }
+
+  clearTimeout(timeoutId);
+  if(settled) return; // timeout already showed the error state — don't overwrite it with a late success render
+  settled = true;
 
   var people = [], peopleMap = {};
   peopleSnap.forEach(function(d){
