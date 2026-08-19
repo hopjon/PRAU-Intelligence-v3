@@ -27,12 +27,24 @@ function timeAgo(iso){
 export async function renderDashboardHome(container, navigateTo){
   container.innerHTML = '<div class="people-empty">Loading dashboard…</div>';
 
-  var peopleSnap = await getDocs(collection(db, "people"));
-  var vehiclesSnap = await getDocs(collection(db, "vehicles"));
-  var placesSnap = await getDocs(collection(db, "places"));
-  var unidentifiedSnap = await getDocs(collection(db, "unidentifiedPeople"));
-  var encSnap = await getDocs(collection(db, "encounters"));
-  var vEncSnap = await getDocs(collection(db, "vehicleEncounters"));
+  var peopleSnap, vehiclesSnap, placesSnap, unidentifiedSnap, encSnap, vEncSnap;
+  try{
+    peopleSnap = await getDocs(collection(db, "people"));
+    vehiclesSnap = await getDocs(collection(db, "vehicles"));
+    placesSnap = await getDocs(collection(db, "places"));
+    unidentifiedSnap = await getDocs(collection(db, "unidentifiedPeople"));
+    encSnap = await getDocs(collection(db, "encounters"));
+    vEncSnap = await getDocs(collection(db, "vehicleEncounters"));
+  }catch(e){
+    console.error("Dashboard data load failed:", e);
+    container.innerHTML =
+      '<div class="people-empty">Couldn\'t load dashboard data.</div>' +
+      '<div style="text-align:center;margin-top:12px;">' +
+        '<button class="btn-primary" id="dashRetryBtn" style="display:inline-flex;">Retry</button>' +
+      '</div>';
+    document.getElementById("dashRetryBtn").onclick = function(){ renderDashboardHome(container, navigateTo); };
+    return;
+  }
 
   var people = [], peopleMap = {};
   peopleSnap.forEach(function(d){
