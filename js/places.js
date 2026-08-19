@@ -1,6 +1,6 @@
 import { db, auth } from "./firebase.js";
 import {
-  collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc
+  collection, getDocs, addDoc, setDoc, updateDoc, deleteDoc, doc, getDoc
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { markPending, clearPending, isPending, showSyncToast, writeLocalFirst } from "./pendingWrites.js";
 import { backToDashboardHTML, wireBackToDashboard } from "./backButton.js";
@@ -315,10 +315,14 @@ function openAddPlaceModal(){
 
     this.textContent = "Saving…";
     markPending("places");
+    var ref = doc(collection(db, "places"));
     try{
-      var ref = await addDoc(collection(db, "places"), place);
+      var writeResult = await writeLocalFirst(setDoc(ref, place));
       clearPending("places");
       backdrop.remove();
+      if(writeResult.queued){
+        showSyncToast("Saved locally — it will sync when you're back online.");
+      }
       renderPlaceProfile(ref.id);
     }catch(e){
       clearPending("places");

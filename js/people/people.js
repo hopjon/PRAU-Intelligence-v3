@@ -1,6 +1,6 @@
 import { db, auth } from "../firebase.js";
 import {
-  collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc, getDocFromCache, query, where
+  collection, getDocs, addDoc, setDoc, updateDoc, deleteDoc, doc, getDoc, getDocFromCache, query, where
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { ensureModelsLoaded, computeDescriptorWhenReady, euclidean, photoUrl } from "../face.js";
 import { reassignVehicleLinks } from "../vehicles.js";
@@ -538,10 +538,14 @@ function openAddPersonModal(prefill, onCreated){
 
     this.textContent = "Saving…";
     markPending("people");
+    var ref = doc(collection(db, "people"));
     try{
-      var ref = await addDoc(collection(db, "people"), person);
+      var writeResult = await writeLocalFirst(setDoc(ref, person));
       clearPending("people");
       backdrop.remove();
+      if(writeResult.queued){
+        showSyncToast("Saved locally — it will sync when you're back online.");
+      }
       if(onCreated){
         onCreated({ id: ref.id, name: fullName(person) });
       }else{

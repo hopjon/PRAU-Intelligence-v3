@@ -1,6 +1,6 @@
 import { db, auth } from "./firebase.js";
 import {
-  collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc, query, where
+  collection, getDocs, addDoc, setDoc, updateDoc, deleteDoc, doc, getDoc, query, where
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { markPending, clearPending, isPending, showSyncToast, writeLocalFirst } from "./pendingWrites.js";
 import { profilingLocationViewHTML, profilingLocationEditHTML, wireProfilingLocationView, wireProfilingLocationEditor, profilingLocationPatch } from "./profilingLocation.js";
@@ -342,10 +342,14 @@ function openAddVehicleModal(){
 
     this.textContent = "Saving…";
     markPending("vehicles");
+    var ref = doc(collection(db, "vehicles"));
     try{
-      var ref = await addDoc(collection(db, "vehicles"), vehicle);
+      var writeResult = await writeLocalFirst(setDoc(ref, vehicle));
       clearPending("vehicles");
       backdrop.remove();
+      if(writeResult.queued){
+        showSyncToast("Saved locally — it will sync when you're back online.");
+      }
       renderVehicleProfile(ref.id);
     }catch(e){
       clearPending("vehicles");
