@@ -14,17 +14,30 @@ body{background:#0a0a0a;margin:0;font-family:Arial,Helvetica,sans-serif;}
 .login-field input{
   border:1px solid transparent !important;
   outline:none !important;
+  background:transparent !important;
+  -webkit-appearance:none;
+  appearance:none;
 }
 .login-field input:focus{
   border-color:transparent !important;
   outline:none !important;
   box-shadow:none !important;
 }
+.login-field input:-webkit-autofill,
+.login-field input:-webkit-autofill:hover,
+.login-field input:-webkit-autofill:focus{
+  -webkit-text-fill-color:#fff;
+  -webkit-box-shadow:0 0 0 1000px transparent inset;
+  box-shadow:0 0 0 1000px transparent inset;
+  transition:background-color 9999s ease-in-out 0s;
+  caret-color:#fff;
+}
 .login-eye{cursor:pointer;color:var(--gold);}
 .login-btn{width:100%;padding:14px;border:none;border-radius:10px;
   background:linear-gradient(180deg,var(--gold-hover),var(--gold),var(--gold-hover));color:#000000;font-weight:800;
   font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
-  box-shadow:0 4px 20px rgba(212,168,67,0.3), 0 0 40px rgba(212,168,67,0.15);}
+  box-shadow:0 4px 20px rgba(212,168,67,0.3), 0 0 40px rgba(212,168,67,0.15);
+  -webkit-appearance:none;appearance:none;}
 .login-btn i{color:#000000;font-size:18px;}
 .login-btn:hover{
   background:linear-gradient(180deg,var(--gold-hover),var(--gold-hover),var(--gold));

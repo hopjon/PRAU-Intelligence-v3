@@ -4,6 +4,8 @@
    ============================================================ */
 
 :root {
+  color-scheme: dark;
+
   /* === GOLD PALETTE === */
   --gold:           #A27732;   /* Main gold */
   --gold-light:     #C48D3C;   /* Lighter gold */
