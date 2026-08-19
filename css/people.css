@@ -1,3 +1,4 @@
+#imageViewerImg{width:98vw;height:94vh;object-fit:contain;}
 .people-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
 .people-header h1{margin:0;color:#fff;font-size:22px;}
 .people-header h1 i,
@@ -181,6 +182,11 @@
    Mobile touch-target fixes (Stage 15A)
 =========================== */
 @media(max-width:768px){
+  #imageViewerImg{
+    width:98vw;
+    height:92vh;
+    object-fit:contain;
+  }
   .people-header{
     width:100%;
     flex-direction:column;

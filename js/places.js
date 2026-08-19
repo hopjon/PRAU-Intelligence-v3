@@ -2,7 +2,7 @@ import { db, auth } from "./firebase.js";
 import {
   collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { markPending, clearPending, isPending } from "./pendingWrites.js";
+import { markPending, clearPending, isPending, showSyncToast, writeLocalFirst } from "./pendingWrites.js";
 import { backToDashboardHTML, wireBackToDashboard } from "./backButton.js";
 var goldPinIcon = L.divIcon({
   className: "gold-pin-icon",
@@ -442,9 +442,23 @@ async function renderPlaceProfile(id){
   }
 
   async function addPhoto(dataUrl){
-    pendingPhotos.push({ dataUrl: dataUrl, takenBy: currentUserShortName(), addedAt: new Date().toISOString() });
-    await updateDoc(doc(db, "places", id), { photos: pendingPhotos });
+    var entry = { dataUrl: dataUrl, takenBy: currentUserShortName(), addedAt: new Date().toISOString() };
+    pendingPhotos.push(entry);
+    var writeResult;
+    try{
+      writeResult = await writeLocalFirst(updateDoc(doc(db, "places", id), { photos: pendingPhotos }));
+    }catch(e){
+      pendingPhotos.pop();
+      var errEl = document.getElementById("profileError");
+      if(errEl) errEl.textContent = isDocTooLargeError(e)
+        ? "This photo is too large to save. Remove a photo and try again."
+        : "Could not save photo — check your connection.";
+      return;
+    }
     renderPhotos();
+    if(writeResult.queued){
+      showSyncToast("Photo added — it will sync when you're back online.");
+    }
   }
 
   function wireUp(){
@@ -490,10 +504,13 @@ async function renderPlaceProfile(id){
           coords: coords
         };
         try{
-          await updateDoc(doc(db, "places", id), updates);
+          var writeResult = await writeLocalFirst(updateDoc(doc(db, "places", id), updates));
           Object.assign(p, updates);
           editMode = false;
           render();
+          if(writeResult.queued){
+            showSyncToast("Changes saved locally — they will sync when you're back online.");
+          }
         }catch(e){
           errEl.textContent = isDocTooLargeError(e)
             ? "This record's photos are too large to save. Remove a photo and try again."

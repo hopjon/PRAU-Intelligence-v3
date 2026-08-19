@@ -1,11 +1,11 @@
 import { db, auth } from "../firebase.js";
 import {
-  collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc, query, where
+  collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc, getDocFromCache, query, where
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { ensureModelsLoaded, computeDescriptorWhenReady, euclidean, photoUrl } from "../face.js";
 import { reassignVehicleLinks } from "../vehicles.js";
 import { renderUnidentifiedPeople } from "./unidentified.js";
-import { markPending, clearPending, isPending } from "../pendingWrites.js";
+import { markPending, clearPending, isPending, showSyncToast, writeLocalFirst } from "../pendingWrites.js";
 import { getDisplayName } from "../userDisplay.js";
 import { profilingLocationViewHTML, profilingLocationEditHTML, wireProfilingLocationView, wireProfilingLocationEditor, profilingLocationPatch } from "../profilingLocation.js";
 import { PEOPLE_TAG_GROUPS, tagsViewHTML, tagsEditHTML, wireTagsEditor, tagsPatch } from "../tags.js";
@@ -28,7 +28,7 @@ function fullName(p){
 function isDocTooLargeError(e){
   return e && e.code === "invalid-argument" && /longer than \d+ bytes/i.test(e.message || "");
 }
-function fileToCompressedDataUrl(file, maxDim){
+function fileToCompressedDataUrl(file, maxDim, quality){
   return new Promise(function(resolve, reject){
     var img = new Image();
     var reader = new FileReader();
@@ -40,7 +40,7 @@ function fileToCompressedDataUrl(file, maxDim){
         var canvas = document.createElement("canvas");
         canvas.width = cw; canvas.height = ch;
         canvas.getContext("2d").drawImage(img, 0, 0, cw, ch);
-        resolve(canvas.toDataURL("image/jpeg", 0.7));
+        resolve(canvas.toDataURL("image/jpeg", quality || 0.7));
       };
       img.onerror = reject;
       img.src = e.target.result;
@@ -48,6 +48,24 @@ function fileToCompressedDataUrl(file, maxDim){
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });
+}
+
+// Connection-mode detection, used by the cache-first profile photo loading
+// below. Capture/compression is NOT connection-dependent — every photo is
+// always compressed the same way (see fileToCompressedDataUrl call sites,
+// all fixed at maxDim 480, default quality) regardless of connection type,
+// so the database always receives the same standard quality photo. This
+// function only informs READ/DISPLAY decisions.
+function detectConnectionMode(){
+  if(!navigator.onLine) return "OFFLINE-UNKNOWN";
+  var c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  if(!c) return "HIGH"; // Network Information API unavailable — default to normal behaviour
+  var isCellular = (typeof c.type === "string" && c.type === "cellular") ||
+    (typeof c.effectiveType === "string" && /^(slow-2g|2g|3g)$/.test(c.effectiveType));
+  // NOTE: effectiveType is a throughput/RTT estimate, not a reliable proxy for
+  // "on a cellular radio" — a slow/throttled Wi-Fi connection can also report
+  // 2g/3g here. This is a known limitation of the Network Information API.
+  return isCellular ? "CELLULAR" : "HIGH";
 }
 var viewerImages = [];
 var viewerIndex = 0;
@@ -228,6 +246,34 @@ export async function showPeople(){
 
   document.getElementById("peopleSearchInput").oninput = function(){ renderList(this.value); };
 
+  // TEMP POC — mobile-data thumbnail test only. Not persisted, not saved, no
+  // schema change. Detects a likely-cellular connection and, only for the
+  // People list thumbnails, swaps the existing full 480px photo for a
+  // smaller client-side-regenerated copy of that same data. Safe no-op if
+  // navigator.connection isn't available.
+  function isLikelyCellular(){
+    var c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    if(!c) return false;
+    if(typeof c.type === "string") return c.type === "cellular";
+    if(typeof c.effectiveType === "string") return /^(slow-2g|2g|3g)$/.test(c.effectiveType);
+    return false;
+  }
+  function shrinkDataUrlPoc(dataUrl, maxDim, quality){
+    return new Promise(function(resolve){
+      var img = new Image();
+      img.onload = function(){
+        var scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+        var cw = Math.round(img.width * scale), ch = Math.round(img.height * scale);
+        var canvas = document.createElement("canvas");
+        canvas.width = cw; canvas.height = ch;
+        canvas.getContext("2d").drawImage(img, 0, 0, cw, ch);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+      img.onerror = function(){ resolve(dataUrl); };
+      img.src = dataUrl;
+    });
+  }
+
   function renderList(q){
     q = (q || "").trim().toLowerCase();
     var filtered = !q ? people : people.filter(function(p){
@@ -259,15 +305,48 @@ export async function showPeople(){
         renderPersonProfile(id);
       };
     });
+
+    // TEMP POC — see isLikelyCellular()/shrinkDataUrlPoc() above.
+    if(isLikelyCellular()){
+      Array.prototype.forEach.call(listArea.querySelectorAll(".people-card-thumb"), function(imgEl){
+        var full = imgEl.getAttribute("src");
+        shrinkDataUrlPoc(full, 110, 0.55).then(function(small){ imgEl.src = small; });
+      });
+    }
   }
 
   renderList("");
 }
 
+// Bounds any single Firestore getDocs()/getDoc() call so it can never wait
+// indefinitely offline — same 15s pattern used by dashboardHome.js/search.js.
+var FIRESTORE_READ_TIMEOUT_MS = 15000;
+function withReadTimeout(promise){
+  return new Promise(function(resolve, reject){
+    var settled = false;
+    var timeoutId = setTimeout(function(){
+      if(settled) return;
+      settled = true;
+      reject(new Error("Firestore read timed out"));
+    }, FIRESTORE_READ_TIMEOUT_MS);
+    promise.then(function(v){
+      clearTimeout(timeoutId);
+      if(settled) return;
+      settled = true;
+      resolve(v);
+    }, function(e){
+      clearTimeout(timeoutId);
+      if(settled) return;
+      settled = true;
+      reject(e);
+    });
+  });
+}
+
 // ---------- duplicate ID check ----------
 async function findDuplicateByIdNumber(idNumber, excludeId){
   if(!idNumber) return null;
-  var snapshot = await getDocs(collection(db, "people"));
+  var snapshot = await withReadTimeout(getDocs(collection(db, "people")));
   var match = null;
   snapshot.forEach(function(d){
     if(d.id === excludeId) return;
@@ -423,7 +502,15 @@ function openAddPersonModal(prefill, onCreated){
     this.disabled = true;
     this.textContent = "Checking…";
 
-    var dup = await findDuplicateByIdNumber(idNumber, null);
+    var dup;
+    try{
+      dup = await findDuplicateByIdNumber(idNumber, null);
+    }catch(e){
+      errEl.textContent = "Could not check for duplicates — check your connection.";
+      this.disabled = false;
+      this.textContent = "Save";
+      return;
+    }
     if(dup){
       errEl.innerHTML = 'A person with this ID Number already exists: <strong>' + escapeHtml(fullName(dup)) + '</strong>. Open their profile instead to add a new encounter.';
       this.disabled = false;
@@ -536,13 +623,40 @@ async function openMergeModal(currentPerson, currentId, onMerged){
 }
 
 // ---------- full profile page ----------
-async function renderPersonProfile(id){
+async function renderPersonProfile(id, forceServerLoad){
   var content = document.getElementById("contentArea");
   content.innerHTML = '<div class="people-empty">Loading…</div>';
 
   console.log("Loading person:", id);
 
-  var snap = await getDoc(doc(db, "people", id));
+  // Cache-first photo/profile read. The full person document (including
+  // photos[]) is one Firestore doc, so "is the photo cached" and "is the
+  // document cached" are the same question here. This does not change what's
+  // written/stored — only which read path is taken.
+  var personRef = doc(db, "people", id);
+  var snap;
+  if(forceServerLoad){
+    snap = await getDoc(personRef); // explicit user tap — always allow the real read
+  }else{
+    try{
+      snap = await getDocFromCache(personRef);
+      console.log("[ProfileCache] served from local cache — no network request made");
+    }catch(cacheMiss){
+      var mode = detectConnectionMode();
+      if(mode === "CELLULAR" || mode === "OFFLINE-UNKNOWN"){
+        console.log("[ProfileCache] not cached, mode=" + mode + " — deferring, showing placeholder");
+        content.innerHTML =
+          '<div class="people-empty">Image not loaded — tap to load.</div>' +
+          '<div style="text-align:center;margin-top:12px;">' +
+            '<button class="btn-primary" id="loadPersonPhotoBtn" style="display:inline-flex;">Load</button>' +
+          '</div>';
+        document.getElementById("loadPersonPhotoBtn").onclick = function(){ renderPersonProfile(id, true); };
+        return;
+      }
+      console.log("[ProfileCache] not cached, mode=" + mode + " — fetching from server");
+      snap = await getDoc(personRef);
+    }
+  }
 
   console.log("Document exists:", snap.exists());
   if(!snap.exists()){ content.innerHTML = '<div class="people-empty">Record not found.</div>'; return; }
@@ -556,7 +670,7 @@ async function renderPersonProfile(id){
   var allPeopleCache = null;
   async function getAllPeopleCached(){
     if(!allPeopleCache){
-      var snap0 = await getDocs(collection(db, "people"));
+      var snap0 = await withReadTimeout(getDocs(collection(db, "people")));
       allPeopleCache = [];
       snap0.forEach(function(d){
         var data = d.data();
@@ -715,8 +829,20 @@ async function renderPersonProfile(id){
     // PATH B: Save new face-api descriptor to descriptorV2, leave old descriptor empty
     var entry = { dataUrl: dataUrl, descriptorV2: null, takenBy: (auth.currentUser && auth.currentUser.email) || "", addedAt: new Date().toISOString() };
     pendingPhotos.push(entry);
-    await updateDoc(doc(db, "people", id), { photos: pendingPhotos });
+    var writeResult;
+    try{
+      writeResult = await writeLocalFirst(updateDoc(doc(db, "people", id), { photos: pendingPhotos }));
+    }catch(e){
+      pendingPhotos.pop();
+      document.getElementById("faceWarningArea").innerHTML = '<div class="modal-error">' +
+        (isDocTooLargeError(e) ? "This photo is too large to save. Remove a photo and try again." : "Could not save photo — check your connection.") +
+        '</div>';
+      return;
+    }
     renderPhotos();
+    if(writeResult.queued){
+      showSyncToast("Photo added — it will sync when you're back online.");
+    }
 
     try{
       var canvas = await dataUrlToCanvas(dataUrl);
@@ -793,7 +919,15 @@ async function renderPersonProfile(id){
 
         this.disabled = true;
         this.textContent = "Checking…";
-        var dup = await findDuplicateByIdNumber(idNumber, id);
+        var dup;
+        try{
+          dup = await findDuplicateByIdNumber(idNumber, id);
+        }catch(e){
+          errEl.textContent = "Could not check for duplicates — check your connection.";
+          this.disabled = false;
+          this.textContent = "Save Changes";
+          return;
+        }
         if(dup){
           errEl.innerHTML = 'Another person already has this ID Number: <strong>' + escapeHtml(fullName(dup)) + '</strong>.';
           this.disabled = false;
@@ -812,10 +946,13 @@ async function renderPersonProfile(id){
           deceased: document.getElementById("pfDeceased").checked
         }, profilingLocationPatch(pfPlEditor && pfPlEditor.getState()), tagsPatch(pfTagsEditor && pfTagsEditor.getState()));
         try{
-          await updateDoc(doc(db, "people", id), updates);
+          var writeResult = await writeLocalFirst(updateDoc(doc(db, "people", id), updates));
           Object.assign(p, updates);
           editMode = false;
           render();
+          if(writeResult.queued){
+            showSyncToast("Changes saved locally — they will sync when you're back online.");
+          }
         }catch(e){
           errEl.textContent = isDocTooLargeError(e)
             ? "This record's photos are too large to save. Remove a photo and try again."

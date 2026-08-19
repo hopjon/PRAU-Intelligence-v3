@@ -2,7 +2,7 @@ import { db, auth } from "./firebase.js";
 import {
   collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc, query, where
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { markPending, clearPending, isPending } from "./pendingWrites.js";
+import { markPending, clearPending, isPending, showSyncToast, writeLocalFirst } from "./pendingWrites.js";
 import { profilingLocationViewHTML, profilingLocationEditHTML, wireProfilingLocationView, wireProfilingLocationEditor, profilingLocationPatch } from "./profilingLocation.js";
 import { VEHICLE_TAG_GROUPS, tagsViewHTML, tagsEditHTML, wireTagsEditor, tagsPatch } from "./tags.js";
 import { getDisplayName } from "./userDisplay.js";
@@ -533,8 +533,21 @@ async function renderVehicleProfile(id){
   async function addPhoto(dataUrl){
     var entry = { dataUrl: dataUrl, takenBy: (auth.currentUser && auth.currentUser.email) || "", addedAt: new Date().toISOString() };
     pendingPhotos.push(entry);
-    await updateDoc(doc(db, "vehicles", id), { photos: pendingPhotos });
+    var writeResult;
+    try{
+      writeResult = await writeLocalFirst(updateDoc(doc(db, "vehicles", id), { photos: pendingPhotos }));
+    }catch(e){
+      pendingPhotos.pop();
+      var errEl = document.getElementById("profileError");
+      if(errEl) errEl.textContent = isDocTooLargeError(e)
+        ? "This photo is too large to save. Remove a photo and try again."
+        : "Could not save photo — check your connection.";
+      return;
+    }
     renderPhotos();
+    if(writeResult.queued){
+      showSyncToast("Photo added — it will sync when you're back online.");
+    }
   }
 
   function renderUnprofiledEditor(){
@@ -671,10 +684,13 @@ async function renderVehicleProfile(id){
           unprofiledPeople: editUnprofiledPeople
         }, profilingLocationPatch(vfPlEditor && vfPlEditor.getState()), tagsPatch(vfTagsEditor && vfTagsEditor.getState()));
         try{
-          await updateDoc(doc(db, "vehicles", id), updates);
+          var writeResult = await writeLocalFirst(updateDoc(doc(db, "vehicles", id), updates));
           Object.assign(v, updates);
           editMode = false;
           render();
+          if(writeResult.queued){
+            showSyncToast("Changes saved locally — they will sync when you're back online.");
+          }
         }catch(e){
           errEl.textContent = isDocTooLargeError(e)
             ? "This record's photos are too large to save. Remove a photo and try again."
